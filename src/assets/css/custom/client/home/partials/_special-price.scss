@@ -1,0 +1,30 @@
+// Special price section template
+
+#special-price {
+  .title {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+
+    #filters {
+      position: absolute;
+      text-align: end;
+      top: 1%;
+      right: 0;
+    }
+    h4 {
+      padding-bottom: 0.6rem;
+    }
+  }
+  .grid {
+    width: 90%;
+    height: auto;
+    margin: 0 auto;
+    position: relative;
+  }
+  .grid .grid-item {
+    margin-right: 0.6rem;
+    margin-left: 0.6rem;
+    margin-top: 1rem;
+  }
+}

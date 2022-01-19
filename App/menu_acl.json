@@ -1,0 +1,15 @@
+{
+  "Accueil": "home",
+  "A-propos": "home/aboutUs",
+  "Prestations": "home/prestations",
+  "Réalisations": "home/realisations",
+  "Recrutement": "home/recrutement",
+  "Blog": "news/index",
+  "Contact": "home/contacts",
+  "log_reg_menu": {
+    "Mon compte": "account/account",
+    "Espace admin": "admin",
+    "separator": "",
+    "Logout": "logout"
+  }
+}

@@ -1,0 +1,74 @@
+@use "corecss/variables" as *
+@use "corecss/mixins" as *
+@use "corecss/globals" 
+@use "corecss/search_box"
+#header 
+  top: 0
+  left: 0
+  font-family: $font-convergence
+  .strip
+    @media only screen and (max-width: 800px)
+      justify-content: center!important
+      p
+        display: none
+    .left-side
+      +dflex()
+      +search-bar(1.75rem,$blue-standard,.9rem)
+  .navbar 
+    font-size: 1rem
+    background: $white-green
+    box-shadow: 0 5px 10px rgba(0,0,0,.1)
+    .navbar-brand
+      font-size: 2rem
+    .navbar-toggler,&:focus
+      border: none
+      outline: none
+      box-shadow: none
+      .bar
+        i
+          font-size: 1.5rem
+          padding: 7px
+          cursor: pointer
+          font-weight: 500
+          transition: .3s ease
+          color: $dark-color
+          &:hover, i.active
+            color: $white-smoke
+  @media only screen and (max-width: 991px)
+    > nav > div > button
+      &:hover,&:focus
+        background: $orange-in
+      &:hover i,&:focus i
+        color: $white-smoke
+    #main-menu
+      .navbar-nav
+        .nav-item
+          .nav-link
+            padding: 0 20px
+            color: $dark-color
+            transition: 0.3s ease
+            &:hover,.nav-link.active
+              color: $color-second
+      @media only screen and (max-width: 991px)
+        > ul
+          margin: 1rem
+          justify-content: flex-end
+          align-items: flex-end
+          text-align: right
+          > li:nth-child(n) > a
+            padding: 10px 0!important
+  #shopping-cart
+    .shopping-cart-icon
+      &::before
+        font-family: "Font Awesome 6 free"
+        font-weight: 900
+        content: "\f07a"
+        color: whitesmoke
+
+        
+	
+              
+    
+      
+  
+

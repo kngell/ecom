@@ -1,0 +1,11 @@
+/node_modules
+/vendor
+.babelrc
+.htacess
+.npmrc
+.browerslistrc
+.php-cs-fixer.php
+/temp
+/public
+/session_dir
+

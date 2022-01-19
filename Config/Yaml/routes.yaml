@@ -1,0 +1,6 @@
+"":
+  controller: home
+  method: index
+login:
+  controller: security
+  method: login

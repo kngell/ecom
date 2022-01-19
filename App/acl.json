@@ -1,0 +1,71 @@
+{
+  "Guest": {
+    "denied": {
+      "AdminController": ["*"]
+    },
+    "HomeController": ["*"],
+    "ErrorsController": ["*"],
+    "ClothingController": ["*"],
+    "AdminController": ["login"],
+    "AuthController": ["*"],
+    "NewsController": ["index", "show", "categorie", "unsuscribe"],
+    "RestrictedController": ["*"],
+    "VisitorsController": ["*"],
+    "CommentsController": ["*"],
+    "NewslettersController": ["*"],
+    "FormsController": ["showall", "showDetails"],
+    "GuestsController": ["*"],
+    "AssetsController": ["*"],
+    "LoginController": ["*"],
+    "UsersController": [
+      "checkout",
+      "checkout2",
+      "account",
+      "emailverified",
+      "resetpassword",
+      "resetpassword",
+      "payment_success"
+    ],
+    "CheckoutController": ["proceedtobuy"],
+    "PaymentgatewayController": ["getStripekeys"],
+    "TestController": ["*"]
+  },
+  "LoggedIn": {
+    "denied": {
+      "AuthController": ["login", "register"]
+    },
+    "AuthController": ["*"],
+    "BackendController": ["login"],
+    "MembersController": ["*"],
+    "UsersprofileController": ["*"],
+    "UsersfeedbackController": ["*"],
+    "UsersnotificationController": ["*"],
+    "FormsController": ["*"],
+    "AssocController": ["*"],
+    "TablesController": ["*"],
+    "CommentsController": ["*"],
+    "AssetsController": ["*"],
+    "UsersController": ["profile", "payment"],
+    "CheckoutController": ["*"]
+  },
+  "admin": {
+    "denied": {},
+    "AdminController": ["*"],
+    "VisitorsController": ["*"],
+    "TablesController": ["*"]
+  },
+  "user": {
+    "denied": {},
+    "AdminController": ["*"]
+  },
+  "customer": {
+    "denied": {}
+  },
+  "vendor": {
+    "denied": {}
+  },
+  "assoc": {
+    "denied": {},
+    "UsersassocController": ["*"]
+  }
+}

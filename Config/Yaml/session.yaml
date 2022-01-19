@@ -1,0 +1,26 @@
+session_name: "kngellEcommerce__"
+lifetime: 0
+path: "/"
+domain: ""
+secure: false
+samsite: lax
+httponly: true
+gc_maxlifetime: "1800"
+gc_probability: "1000"
+gc_divisor: "1"
+use_cookies: "1"
+cookie_lifetime: "1"
+http_only: false
+# driver:
+#   file:
+#     class: NativeSessionStorage
+#     alias: native_storage
+#     default: true
+#   database:
+#     class: PDOSessionStorage
+#     alias: pdo_storage
+#     default: false
+#   array:
+#     class: ArraySessionStorage
+#     alias: array_storage
+#     default: false

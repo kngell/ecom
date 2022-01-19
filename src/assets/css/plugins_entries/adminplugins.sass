@@ -1,0 +1,34 @@
+@use "corecss/mixins" as *
+@use "../custom/backend/admin/base/datatable_action"
+@import "datatables.net-dt/css/jquery.dataTables.css"
+@import "datatables.net-responsive-dt/css/responsive.dataTables.css"
+@import "sweetalert2/src/sweetalert2.scss"
+// @import "select2/src/scss/core.scss"
+
+.page-container 
+  .topbar 
+    @include background("img/base_Bandeau.png")
+    .top-right-menu 
+      .user-setting-list 
+        background: transparent
+        .nav-profile 
+          img 
+            width: 30px
+            height: 30px
+  form
+    input,textarea
+      &:focus::placeholder
+        opacity: 0
+  td
+    .badge
+      cursor: pointer
+      transition: .2s
+      &:hover
+        filter: brightness(75%)
+.select2-container--open
+  z-index: 9999999
+        
+      
+    
+  
+
