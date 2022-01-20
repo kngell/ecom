@@ -3,7 +3,7 @@
 .babelrc
 .htacess
 .npmrc
-.browerslistrc
+.browserslistrc
 .php-cs-fixer.php
 /temp
 /public

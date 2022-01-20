@@ -87,31 +87,31 @@ final class ControllerHelper
     public function form_params()
     {
         return [
-            'global'=> [
-                'action'=>'#',
+            'global' => [
+                'action' => '#',
                 'method' => 'post',
                 'formClass' => 'needs-validation',
                 'formCustomAttr' => 'novalidate',
-                'fieldWrapperClass'=>'input-box',
-                'token'=>$this->token,
-                'enctype'=>'multipart/form-data',
-                'autocomplete'=>'nope',
-                'alertErr'=>true,
-                'fieldCommonclass'=>[
+                'fieldWrapperClass' => 'input-box',
+                'token' => $this->token,
+                'enctype' => 'multipart/form-data',
+                'autocomplete' => 'nope',
+                'alertErr' => true,
+                'fieldCommonclass' => [
                     'fieldclass' => 'input-box__input',
                     'labelClass' => 'input-box__label',
                 ],
 
             ],
-            'login'=> [
-                'inputHidden'=>[
-                    'checkout'=> [
-                        'id'=>'input_checkout',
+            'login' => [
+                'inputHidden' => [
+                    'checkout' => [
+                        'id' => 'input_checkout',
                     ],
                 ],
                 'formID' => 'login-frm',
             ],
-            'register'=>[
+            'register' => [
                 'formID' => 'register-frm',
             ],
         ];
@@ -120,23 +120,23 @@ final class ControllerHelper
     private function frm_params(View $view)
     {
         return [
-            'action'=>'#',
+            'action' => '#',
             'method' => 'post',
             'formClass' => 'user-ckeckout-frm needs-validation',
             'formCustomAttr' => 'novalidate',
             'formID' => 'user-ckeckout-frm',
-            'fieldWrapperClass'=>'input-box',
-            'token'=>$this->token,
-            'model'=> $view->user_data,
-            'enctype'=>'multipart/form-data',
-            'autocomplete'=>'nope',
-            'alertErr'=>true,
-            'inputHidden'=>[
-                'total-ttc'=>isset($view->user_cart[2][1]) ? $view->user_cart[2][1] : '',
-                'total-ht'=>isset($view->user_cart[2][0]) ? $view->user_cart[2][0] : '',
+            'fieldWrapperClass' => 'input-box',
+            'token' => $this->token,
+            'model' => $view->user_data,
+            'enctype' => 'multipart/form-data',
+            'autocomplete' => 'nope',
+            'alertErr' => true,
+            'inputHidden' => [
+                'total-ttc' => isset($view->user_cart[2][1]) ? $view->user_cart[2][1] : '',
+                'total-ht' => isset($view->user_cart[2][0]) ? $view->user_cart[2][0] : '',
             ],
-            'nestField'=>true,
-            'fieldCommonclass'=>[
+            'nestField' => true,
+            'fieldCommonclass' => [
                 'fieldclass' => 'input-box__input',
                 'labelClass' => 'input-box__label',
             ],

@@ -48,7 +48,7 @@ class Files implements FileInterface
         if (isset($clientAry) && isset($dbAry)) {
             foreach ($clientAry as $cm) {
                 if (null != $cm) {
-                    foreach ($dbAry as $key=>$bm) {
+                    foreach ($dbAry as $key => $bm) {
                         if ($cm == $bm) {
                             unset($dbAry[$key]);
                         }
@@ -143,7 +143,7 @@ class Files implements FileInterface
             }
             if (is_array($fileToRemove) && !empty($fileToRemove)) {
                 foreach ($fileToRemove as $file) {
-                    $urls = $m->getAllItem(['where'=>[$m->get_media()=>serialize($fileToRemove)], 'return_mode'=>'class']);
+                    $urls = $m->getAllItem(['where' => [$m->get_media() => serialize($fileToRemove)], 'return_mode' => 'class']);
                     if ($urls->count() <= 0) {
                         file_exists(IMAGE_ROOT . $file) ? unlink(IMAGE_ROOT . $file) : '';
                         file_exists(IMAGE_ROOT_SRC . $file) ? unlink(IMAGE_ROOT_SRC . $file) : '';

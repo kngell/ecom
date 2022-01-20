@@ -41,7 +41,7 @@ class ProductsTest extends DatabaseDependantTestCase
         $this->entityManager->flush();
         // MAKE ASSERTIONS
         $this->assertDataBaseHas('products', [
-            'name'        => $name,
+            'name' => $name,
             'description' => $description,
         ]);
     }

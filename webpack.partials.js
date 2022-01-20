@@ -35,19 +35,21 @@ exports.alias = {
  */
 const serverOpt = {
   static: ["./"],
-  open: {
-    app: {
-      name: "Chrome",
-    },
-  },
+  // open: {
+  //   app: {
+  //     name: "Chrome",
+  //   },
+  // },
   compress: true,
   host: "localhost",
   port: 8001,
-  https: {
-    key: "/mnt/d/ssl/local/ssl/localhost.key", //"D:/ssl/local/ssl/localhost.key", //"/mnt/d/ssl/local/localhost.key"
-    cert: "/mnt/d/ssl/local/ssl/localhost.crt", //"D:/ssl/local/ssl/localhost.crt", // "/mnt/d/ssl/local/localhost.crt"
+  server: {
+    type: "https",
+    options: {
+      key: "/mnt/d/ssl/local/ssl/localhost.key", //"D:/ssl/local/ssl/localhost.key", //"/mnt/d/ssl/local/localhost.key"
+      cert: "/mnt/d/ssl/local/ssl/localhost.crt", //"D:/ssl/local/ssl/localhost.crt", // "/mnt/d/ssl/local/localhost.crt"
+    },
   },
-
   proxy: {
     context: () => true,
     "/**": {

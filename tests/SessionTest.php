@@ -48,13 +48,13 @@ class SessionTest extends TestCase
         $session->start();
         //DO SOMETHING
         $session->set('cart.items', [
-            $productId1=>[
-                'quantity'=>1,
-                'price'=>1099,
+            $productId1 => [
+                'quantity' => 1,
+                'price' => 1099,
             ],
-            $productId2=>[
-                'quantity'=>2,
-                'price'=>599,
+            $productId2 => [
+                'quantity' => 2,
+                'price' => 599,
             ],
         ]);
         //MAKE ASSERTIONS

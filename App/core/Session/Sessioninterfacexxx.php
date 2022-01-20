@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Session;
 
-interface Sessioninterface
+interface Sessioninterfacexxx
 {
     public function has(string $key) : bool;
 

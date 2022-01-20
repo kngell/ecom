@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Session;
 
-class Session implements Sessioninterface
+class Sessionxxx implements Sessioninterface
 {
     private bool $isStarted = false;
 

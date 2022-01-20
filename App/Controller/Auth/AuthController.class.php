@@ -60,7 +60,7 @@ class AuthController extends Controller
                         $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('warning text-center', 'Your user account does not exist! Please register')]);
                     }
                 } else {
-                    $this->jsonResponse(['result' => 'error-field', 'msg' =>   $model->getErrorMessages()]);
+                    $this->jsonResponse(['result' => 'error-field', 'msg' => $model->getErrorMessages()]);
                 }
             } else {
                 $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Invalid Token! Please try again')]);
