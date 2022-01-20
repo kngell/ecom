@@ -113,7 +113,6 @@ class Datatable extends AbstractDatatable
 
         $element .= '</nav>';
         $element .= '</section>';
-
         return $element;
     }
 
