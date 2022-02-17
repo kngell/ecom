@@ -47,7 +47,7 @@
                         <!-- <i class="fa fa-shopping-cart"></i> -->
                         <span class="shopping-cart-icon"></span>
                     </span>
-                    <span class="px-3 py-2 rounded-pill text-dark bg-light cart_nb_elt"><?=$this->user_cart && is_array($this->user_cart[0]) ? count(array_filter($this->user_cart[0], function ($item) {
+                    <span class="px-3 py-2 rounded-pill text-dark bg-light cart_nb_elt"><?=isset($this->user_cart) && is_array($this->user_cart[0]) ? count(array_filter($this->user_cart[0], function ($item) {
                         return $item->c_content == 'cart';
                     })) : 0?></span>
                 </a>

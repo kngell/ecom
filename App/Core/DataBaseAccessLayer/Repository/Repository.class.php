@@ -225,12 +225,12 @@ class Repository extends AbstractRepository implements RepositoryInterface
             }
             $results = $this->findBySearch($args['filter_by'], $searchCond);
         } else {
-            $queryCond = array_merge($args['additionnal_conditions'], $conditions);
+            $queryCond = array_merge($args['additional_conditions'], $conditions);
             $results = $this->findBy($args['selectors'], $queryCond, $parameters, $optionnals);
         }
 
         return [
-            $results,
+            $results->get_results(),
             $pagin->getPage(),
             $pagin->getTotalPages(),
             $totalRecords,
@@ -266,7 +266,6 @@ class Repository extends AbstractRepository implements RepositoryInterface
     private function getCurrentQueryStatus(Object $request, array $args)
     {
         $totalRecords = 0;
-        $conditions = [];
         $req = $request->query;
         $status = $req->getAlnum($args['query']);
         $searchResults = $req->getAlnum($args['filter_alias']);
@@ -275,16 +274,16 @@ class Repository extends AbstractRepository implements RepositoryInterface
                 $conditions = [$args['filter_by'][$i] => $searchResults];
                 $totalRecords = $this->em->getCrud()->countRecords($conditions, $args['filter_by'][$i]);
             }
-        } elseif ($status) {
+        } elseif ($status != '') {
             $conditions = [$args['query'] => $status];
             $totalRecords = $this->em->getCrud()->countRecords($conditions);
         } else {
             $conditions = [];
             $totalRecords = $this->em->getCrud()->countRecords($conditions);
         }
-
         return [
-            $conditions, $totalRecords,
+            $conditions,
+            $totalRecords,
         ];
     }
 }

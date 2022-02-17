@@ -3,7 +3,7 @@
 declare(strict_types=1);
 class Model extends ModelCruds
 {
-    protected Object $repository;
+    protected RepositoryInterface $repository;
     protected ContainerInterface $container;
     protected MoneyManager $money;
     protected Entity $entity;
@@ -58,9 +58,9 @@ class Model extends ModelCruds
     /**
      * Get Data Repository method
      * ===============================================================.
-     * @return DataRepositoryInterface
+     * @return RepositoryInterface
      */
-    public function getRepository() : Repository
+    public function getRepository() : RepositoryInterface
     {
         return $this->repository;
     }

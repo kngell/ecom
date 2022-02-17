@@ -16,7 +16,7 @@ const {
 } = require("./webpack.partials");
 const ASSET_PATH =
   process.env.ASSET_PATH ||
-  `${path.sep}kngell${path.sep}public${path.sep}assets${path.sep}`;
+  `${path.sep}ecom${path.sep}public${path.sep}assets${path.sep}`;
 
 const commonConfig = merge(plugins, {
   devtool: false,
@@ -87,7 +87,7 @@ const productionConfig = {
             ["jpegtran", { progressive: true }],
             ["optipng", { optimizationLevel: 5 }],
             // Svgo configuration here https://github.com/svg/svgo#configuration
-            [ ],
+            [],
           ],
         },
       },

@@ -17,7 +17,7 @@ class UserDataColumn extends AbstractDatatableColumns
             'dt_row' => $entity->display($field),
             'class' => '',
             'show_column' => true,
-            'sortable' => false,
+            'sortable' => true,
             'formatter' => '',
            ];
         }
@@ -42,7 +42,7 @@ class UserDataColumn extends AbstractDatatableColumns
                 'db_row' => 'lastName',
                 'dt_row' => 'lastName',
                 'class' => '',
-                'show_column' => true,
+                'show_column' => false,
                 'sortable' => false,
                 'formatter' => '',
             ],
@@ -51,7 +51,7 @@ class UserDataColumn extends AbstractDatatableColumns
                 'dt_row' => 'Email Address',
                 'class' => '',
                 'show_column' => true,
-                'sortable' => true,
+                'sortable' => false,
                 'formatter' => '',
             ],
             [

@@ -4,38 +4,51 @@ declare(strict_types=1);
 
 class Application extends Container implements ApplicationInterface
 {
-    public static string $appRoot;
-    public Controller $controller;
-    protected RooterInterface $rooter;
+    public RequestHandler $request;
+    private static string $appRoot;
+    private Controller $controller;
 
     /**
      * Main constructor
      * =========================================================.
      * @param string $appRoot
      */
-    public function __construct(?string $appRoot = null)
+    public function __construct()
     {
-        if ($appRoot) {
-            $this->setAppRoot($appRoot);
-        }
+        $this->registerBaseBindings();
+        $this->registerBaseAppSingleton();
+        $this->environment();
+        $this->errorHandler();
+        $this->request = $this->make(RequestHandler::class);
     }
 
     /**
      * Run
-     * =====================================================.
-     * @return self
+     * ================================================.
+     * @return self|null
      */
-    public function run() :self
+    public function run() : ?self
     {
-        if (version_compare($phpVersion = PHP_VERSION, $coreVersion = Config::APP_MIN_VERSION, '<')) {
-            die(sprintf('You are running php %s, but, the core framwork required at least PHP %s', $phpVersion, $coreVersion));
+        try {
+            if (version_compare($phpVersion = PHP_VERSION, $coreVersion = Config::APP_MIN_VERSION, '<')) {
+                die(sprintf('You are running php %s, but, the core framwork required at least PHP %s', $phpVersion, $coreVersion));
+            }
+            $this->registerDatabaseAccessLayerClass();
+            $this->make(RooterFactory::class)->create($this->request, YamlFile::get('routes'))
+                ->buildRoutes()
+                ->resolve();
+            return $this;
+        } catch (\Exception $e) {
+            $this->make(ResponseHandler::class)->setStatusCode($e->getCode());
+            $this->make(ErrorsController::class)->iniParams(ErrorsController::class, 'index', [], 'Client/')
+                ->index(['exception' => $e]);
+            return null;
         }
-        $this->registerBaseBindings();
-        $this->registerBaseAppSingleton();
+    }
+
+    public function setConst() : self
+    {
         $this->make(ConstantConfig::class)->ds()->appConstants(self::$appRoot)->rootPath();
-        $this->registerDatabaseAccessLayerClass();
-        $this->environment();
-        $this->errorHandler();
         return $this;
     }
 
@@ -58,12 +71,11 @@ class Application extends Container implements ApplicationInterface
      * Set the base path for the application.
      *
      * @param  string  $basePath
-     * @return $this
+     * @return self
      */
-    public function setAppRoot($appRoot)
+    public function setAppRoot($appRoot) : self
     {
         self::$appRoot = rtrim($appRoot, '\/');
-
         $this->bindPathsInContainer();
         return $this;
     }
@@ -107,17 +119,16 @@ class Application extends Container implements ApplicationInterface
         return $this;
     }
 
-    public function setrouteHandler(?string $url = null) :self
+    public function setrouteHandler(?string $url = null) : self
     {
         try {
-            $url = ($url) ? $url : strtolower($this->make(RequestHandler::class)->getPath());
-            $this->rooter = $this->make(RooterFactory::class)->create($url, YamlFile::get('routes'))->buildRoutes();
+            $this->rooter = $this->make(RooterFactory::class)->create(YamlFile::get('routes'))
+                ->buildRoutes()
+                ->revolve();
         } catch (\Exception $e) {
-            // $this->rooter->getResponse()->setStatusCode($e->getCode());
-            // $this->make(ErrorsController::class)->set_path('Client' . DS)
-            //     ->set_token()
-            //     ->iniParams(ErrorsController::class, '_errors')
-            //     ->index(['exception' => $e]);
+            $this->make(ResponseHandler::class)->setStatusCode($e->getCode());
+            $this->make(ErrorsController::class)->iniParams(ErrorsController::class, 'index', [], 'Client/')
+                ->index(['exception' => $e]);
         }
         return $this;
     }

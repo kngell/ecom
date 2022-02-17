@@ -6,7 +6,9 @@ use DateTimeInterface;
 
 class UsersEntity extends Entity
 {
+    /** @id */
     private int $userID;
+    /** @First Name */
     private string $lastName;
     private string $firstName;
     private string $userName;

@@ -228,7 +228,7 @@ class Crud implements CrudInterface
 
     public function aggregate(string $type, ?string $fields = 'id', array $conditions = [])
     {
-        $args = ['table' => $this->getSchema(), 'primary_key' => $this->getSchemaID(), 'type' => 'select', 'aggregate' => $type, 'aggregate_field' => $fields, 'conditions' => $conditions];
+        $args = ['table' => $this->getSchema(), 'primary_key' => $this->getSchemaID(), 'type' => 'select', 'aggregate' => $type, 'aggregate_field' => $fields, 'conditions' => $conditions, 'extras' => ['orderby' => '']];
         $query = $this->querybuilder->buildQuery($args)->select();
         $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($conditions));
         if ($this->datamapper->numrow() > 0) {

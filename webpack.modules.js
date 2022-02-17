@@ -1,6 +1,9 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const devMode = process.env.NODE_ENV !== "production";
+const ASSET_PATH =
+  process.env.ASSET_PATH ||
+  `${path.sep}ecom${path.sep}public${path.sep}assets${path.sep}`;
 
 exports.viewRules = {
   mode: "development",
@@ -36,7 +39,7 @@ exports.viewRules = {
               name: "[name].[ext]",
               outputPath: "../../public/assets/img",
               publicPath: (url) => {
-                return "/kngell/public/assets/img/" + url;
+                return ASSET_PATH + "img/" + url;
               },
             },
           },
@@ -50,7 +53,7 @@ exports.assetsRuless = {
   module: {
     generator: {
       "asset/resource": {
-        publicPath: "https://localhost/kngell/public/assets/",
+        publicPath: "https://localhost/ecom/public/assets/",
       },
     },
     rules: [

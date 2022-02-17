@@ -48,7 +48,7 @@ class Controller
 
     /**
      * Init controller.
-     * ==================================================================================================.
+     * ==================================================================.
      * @param string $controller
      * @param string $method
      * @return self
@@ -96,6 +96,22 @@ class Controller
             throw new BaseLogicException('You cannot use the render method if the View is not available !');
         }
         return $this->view_instance->render($viewName, $context);
+    }
+
+    public function set_siteTitle(?string $title = null)
+    {
+        if ($this->view_instance === null) {
+            throw new BaseLogicException('You cannot use the render method if the View is not available !');
+        }
+        return $this->view_instance->set_siteTitle($title);
+    }
+
+    public function set_pageTitle(?string $page = null)
+    {
+        if ($this->view_instance === null) {
+            throw new BaseLogicException('You cannot use the render method if the View is not available !');
+        }
+        return $this->view_instance->set_pageTitle($page);
     }
 
     /**
@@ -178,18 +194,19 @@ class Controller
      */
     protected function before()
     {
-        $this->view_instance->set_path($this->filePath);
+        $this->view_instance->initParams($this->filePath);
+        $this->view_instance->token = $this->token;
         if ($this->filePath == 'Client' . DS) {
             // $this->view_instance->settings = $this->helper->getSettings();
             // $this->session->set(BRAND_NUM, $this->brand());
             // $data = $this->helper->get_product_and_cart((int) $this->session->get(BRAND_NUM));
-            // $this->view_instance->userFrm = $this->container->make(Form::class);
-            // $this->view_instance->userFrmAttr = $this->helper->form_params();
+            $this->view_instance->userFrm = $this->container->make(Form::class);
+            $this->view_instance->userFrmAttr = $this->helper->form_params();
             // $this->view_instance->set_siteTitle("K'nGELL Ingénierie Logistique");
             // $this->view_instance->products = $data['products'];
             // $this->view_instance->user_cart = $data['cart'];
-            // $this->view_instance->search_box = file_get_contents(FILES . 'template' . DS . 'base' . DS . 'search_box.php');
-            // $this->view_instance->productManager = $this->container->make(ProductsManager::class);
+            $this->view_instance->search_box = file_get_contents(FILES . 'template' . DS . 'base' . DS . 'search_box.php');
+        // $this->view_instance->productManager = $this->container->make(ProductsManager::class);
         } elseif ($this->filePath == 'Backend' . DS) {
             $this->view_instance->set_siteTitle("K'nGELL Administration");
             $this->view_instance->set_Layout('admin');

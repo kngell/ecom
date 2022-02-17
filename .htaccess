@@ -1,7 +1,14 @@
 <IfModule mod_rewrite.c>
- RewriteEngine On
- RewriteRule ^$ public/ [L]
- RewriteRule ^(.*) public/$1 [L,NC]
+  RewriteEngine On
+  RewriteBase /ecom
+  RewriteRule ^$ public/ [L]
+  RewriteRule ^(.*) public/$1 [L,NC]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch ".(eot|otf|ttf|woff|woff2)">
+    Header always set Access-Control-Allow-Origin "*"
+  </FilesMatch>
 </IfModule>
 
 

@@ -62,7 +62,6 @@ class Datatable extends AbstractDatatable
 
         $element = '<section class="uk-margin-medium-top uk-padding-small uk-padding-remove-bottom">';
         $element .= '<nav aria-label="Pagination" uk-navbar>';
-
         /*
          * table meta information
          */
@@ -70,18 +69,14 @@ class Datatable extends AbstractDatatable
         $element .= sprintf('&nbsp;Showing&nbsp<span>%s</span> - <span>%s</span>&nbsp; of &nbsp;<span>%s</span>&nbsp;', $this->currentPage, $this->totalPages, $this->totalRecords);
         $element .= '<span class="uk-text-meta uk-text-warning uk-margin-small-left"></span>';
         $element .= '</div>';
-
         $queryStatus = ($this->sortController['query'] ? $this->sortController['query'] : '');
         $status = (isset($_GET[$queryStatus]) ? $_GET[$queryStatus] : '');
-
         /*
          * pagination simple or numbers
          */
         $element .= '<div class="uk-navbar-right">';
         $element .= '<ul class="uk-pagination">';
-
         $element .= '<li class="' . ($this->currentPage == 1 ? 'uk-disabled' : 'uk-active') . '">';
-
         if ($this->currentPage == 1) {
             $element .= sprintf('<a href="%s"><span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a>', 'javascript:void(0);');
         } else {
@@ -93,7 +88,6 @@ class Datatable extends AbstractDatatable
             $element .= '<span class="uk-margin-small-right" uk-pagination-previous></span> Previous</a>';
         }
         $element .= '</li>';
-
         /* NEXT */
         $element .= '<li class="uk-margin-auto-left ' . ($this->currentPage == $this->totalPages ? 'uk-disabled' : 'uk-active') . '">';
         if ($this->currentPage == $this->totalPages) {
@@ -107,10 +101,8 @@ class Datatable extends AbstractDatatable
             $element .= 'Next <span class="uk-margin-small-left" uk-pagination-next></span></a>';
         }
         $element .= '</li>';
-
         $element .= '</ul>';
         $element .= '</div>';
-
         $element .= '</nav>';
         $element .= '</section>';
         return $element;

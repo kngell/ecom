@@ -47,7 +47,7 @@
                         <!-- <i class="fa fa-shopping-cart"></i> -->
                         <span class="shopping-cart-icon"></span>
                     </span>
-                    <span class="px-3 py-2 rounded-pill text-dark bg-light cart_nb_elt"><?=$this->user_cart && is_array($this->user_cart[0]) ? count(array_filter($this->user_cart[0], function ($item) {
+                    <span class="px-3 py-2 rounded-pill text-dark bg-light cart_nb_elt"><?=isset($this->user_cart) && is_array($this->user_cart[0]) ? count(array_filter($this->user_cart[0], function ($item) {
                         return $item->c_content == 'cart';
                     })) : 0?></span>
                 </a>
@@ -58,7 +58,7 @@
     <!-- Primary navigation -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="<?= PROOT ?>"><img src="/kngell/public/assets/img/logo1.png" alt="Logo"></a>
+            <a class="navbar-brand" href="<?= PROOT ?>"><img src="/ecom/public/assets/img/logo1.png" alt="Logo"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-menu"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="bar"><i class="far fa-bars"></i></span>

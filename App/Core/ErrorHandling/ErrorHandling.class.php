@@ -51,7 +51,7 @@ class ErroHandling
             $message .= '\nStack trace : ' . $exception->getTraceAsString();
             $message .= '\nThrown in : ' . $exception->getFile() . ' on line ' . $exception->getLine();
             error_log($message);
-            echo Container::getInstance()->make(View::class)->render('Error', ['erro_message' => $message]);
+            echo Container::getInstance()->make(View::class)->render('errors' . DS . '_errors', ['erro_message' => $message]);
         }
     }
 }

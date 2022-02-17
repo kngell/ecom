@@ -1,6 +1,16 @@
-"":
-  controller: home
-  method: index
-login:
-  controller: security
-  method: login
+get: # Http Get ===========================================
+  "":
+    controller: home
+    method: index
+    namespace: Client
+  login:
+    controller: security
+    method: login
+  admin/{controller}/{method}:
+    namespace: Admin
+  admin/{controller}/{method}/{id:[\da-f]+}:
+    namespace: Admin
+  client/{controller}/{method}:
+    namespace: Client
+  client/{controller}/{method}/{id:[\da-f]+}:
+    namespace: Client

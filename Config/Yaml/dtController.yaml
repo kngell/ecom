@@ -2,7 +2,7 @@ user:
   additional_conditions: []
   selectors: []
   records_per_page: 10
-  query: status
+  query: verified
   filter_by: ["lastName"]
   filter_alias: "search"
   sort_columns:

@@ -79,10 +79,11 @@ class Home {
 
       phpPlugin.specialPrice.find(".grid-item").height(maxHeight);
     }
-    //=======================================================================
-    //Isotope Filter
-    //=======================================================================
-    function special_price() {
+    /**
+     * Special Price
+     * ====================================================
+     */
+    (async () => {
       return new Promise((resolve, reject) => {
         var gridIMG = phpPlugin.specialPrice.find(".grid .grid-item img");
         var elem = document.querySelector(".grid");
@@ -102,8 +103,7 @@ class Home {
           })
           .catch(() => console.log("error image"));
       });
-    }
-    special_price()
+    })()
       .then((mod) => {
         phpPlugin.specialPrice
           .find(".button-group")

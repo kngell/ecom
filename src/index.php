@@ -7,5 +7,5 @@ $autoload = ROOT_DIR . '/vendor/autoload.php';
 if (is_file($autoload)) {
     require_once $autoload;
 }
-$app = new Application(ROOT_DIR);
-$app->run()->setSession()->handleCors()->setrouteHandler();
+$app = (new Application())->setAppRoot(ROOT_DIR);
+$app->setConst()->setSession()->handleCors()->run();

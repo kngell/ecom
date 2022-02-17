@@ -3,8 +3,6 @@
 declare(strict_types=1);
 class RooterFactory
 {
-    /** @var string */
-    protected string $dispatchedUrl;
     /** @var array */
     protected array $routes;
 
@@ -15,10 +13,10 @@ class RooterFactory
     {
     }
 
-    public function create(?string $dispatchedUrl, array $routes) : self
+    public function create(RequestHandler $request, array $routes) : self
     {
-        $this->dispatchedUrl = $dispatchedUrl;
         $this->routes = $routes;
+        $this->rooter->setRequest($request);
         if (empty($routes)) {
             throw new BaseNoValueException("There are one or more empty arguments. In order to continue, please ensure your <code>routes.yaml</code> has your defined routes and you are passing the correct variable ie 'QUERY_STRING'");
         }
@@ -29,28 +27,32 @@ class RooterFactory
     }
 
     /**
-     * Build Routes
-     * ==========================================================.
+     * Building Routes
+     * =========================================================.
      * @return RooterInterface|null
      */
     public function buildRoutes() : ?RooterInterface
     {
         if (is_array($this->routes) && !empty($this->routes)) {
             $args = [];
-            foreach ($this->routes as $key => $route) {
-                if (isset($route['controller']) && $route['controller'] != '') {
-                    $args = [
-                        'controller' => $route['controller'],
-                        'method' => $route['method'],
-                    ];
-                }
-                if (isset($key)) {
-                    $this->rooter->add($key, $args);
+            foreach ($this->routes as $mthd => $routes) {
+                foreach ($routes as $route => $params) {
+                    if (isset($params['namespace']) && $params['namespace'] != '') {
+                        $args = ['namespace' => $params['namespace']];
+                    }
+                    if (isset($params['controller']) && $params['controller'] != '') {
+                        $args['controller'] = $params['controller'];
+                    }
+                    if (isset($params['method']) && $params['method'] != '') {
+                        $args['method'] = $params['method'];
+                    }
+                    if (isset($route)) {
+                        $this->rooter->add($mthd, $route, $args);
+                    }
                 }
             }
-            $this->rooter->dispatch($this->dispatchedUrl);
-            return $this->rooter;
+            // $this->rooter->resolve($this->dispatchedUrl);
         }
-        return null;
+        return $this->rooter;
     }
 }

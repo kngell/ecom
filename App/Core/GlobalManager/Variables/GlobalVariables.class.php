@@ -19,7 +19,6 @@ class GlobalVariables implements GlobalVariablesInterface
         if (null != $key) {
             return $global[$key] ?? null;
         }
-
         return array_map('strip_tags', $global ?? []);
     }
 
@@ -35,7 +34,6 @@ class GlobalVariables implements GlobalVariablesInterface
         if (null != $key) {
             return $post[$key] ?? null;
         }
-
         return array_map('strip_tags', $global ?? []);
     }
 

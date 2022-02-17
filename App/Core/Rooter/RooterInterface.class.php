@@ -8,17 +8,18 @@ interface RooterInterface
      * ======================================================.
      *
      * @param string $route
+     * @param string $method
      * @param array $params
      * @return void
      */
-    public function add(string $route, array $params) : void;
+    public function add(string $method, string $route, array $params) : void;
 
     /**
-     * Dispatch
+     * Resolve
      * ======================================================.
-     * Create a controller.
-     * @param string $url
      * @return void
      */
-    public function dispatch(string $url) : void;
+    public function resolve() : void;
+
+    public function setRequest(RequestHandler $request) : self;
 }

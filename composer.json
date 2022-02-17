@@ -35,6 +35,7 @@
     "ext-json": "*",
     "ext-intl": "*",
     "ext-curl": "*",
+    "ext-imap": "*",
     "ext-simplexml": "*",
     "symfony/var-dumper": "^6.0",
     "brick/money": "^0.5.2",

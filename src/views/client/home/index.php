@@ -6,7 +6,8 @@ $this->start('head'); ?>
 <?php $this->start('body'); ?>
 <!-- Start Main -->
 <main id="main-site">
-
+<?=$table?>
+<?=$pagination?>
     <!-- End blog -->
     <input type="hidden" id="ip_address" style="display:none" value="<?=H_visitors::getIP()?>">
 </main>

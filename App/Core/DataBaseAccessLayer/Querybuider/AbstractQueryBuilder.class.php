@@ -99,7 +99,6 @@ abstract class AbstractQueryBuilder
                 }
             }
         }
-
         return $sql;
     }
 
@@ -175,7 +174,6 @@ abstract class AbstractQueryBuilder
             }
             unset($this->key['extras']['group_by']);
         }
-
         return $groupBy;
     }
 
@@ -183,7 +181,7 @@ abstract class AbstractQueryBuilder
     {
         // Append the orderby statement if set
         if (isset($this->key['extras']['orderby']) && $this->key['extras']['orderby'] != '') {
-            $this->key['orderby'] = array_merge($this->key['orderby'], $this->key['extras']['orderby']);
+            $this->key['orderby'] = implode(' ,', $this->key['orderby']) . ' ' . $this->key['extras']['orderby'];
         }
         if (isset($this->key['orderby']) && !empty($this->key['orderby'])) {
             $this->sql .= ' ORDER BY ' . $this->key['orderby'] . ' ';

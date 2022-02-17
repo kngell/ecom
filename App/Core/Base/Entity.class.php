@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 abstract class Entity
 {
+    private ReflectionClass $reflect;
+
     /**
      * Sanitize
      * =========================================================.
@@ -21,11 +23,28 @@ abstract class Entity
         }
     }
 
+    public function getEntityFields() : array
+    {
+        $this->getReflect();
+        return array_column($this->reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PRIVATE), 'name');
+    }
+
+    public function display(string $field) : string
+    {
+        $this->getReflect();
+        $docs = $this->reflect->getProperty($field)->getDocComment();
+        if (!$docs == false) {
+            $docs = explode('@', $docs);
+            $docs = rtrim($docs[1], ' /**');
+            return $docs;
+        }
+        return '';
+    }
+
     public function populateEntity(array $params) : self
     {
-        $reflect = new ReflectionClass($this);
-        $props = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PRIVATE);
-        $props = array_column($props, 'name');
+        $this->getReflect();
+        $props = $this->getEntityFields();
         foreach ($props as $field) {
             if (in_array($field, array_keys($params))) {
                 if (method_exists($this, 'set' . ucwords($field))) {
@@ -62,6 +81,14 @@ abstract class Entity
     {
         // $headercontent = preg_match_all('|<h[^>]+>(.*)</h[^>]+>|iU', htmlspecialchars_decode($content, ENT_NOQUOTES), $headings);
         return substr(strip_tags($this->htmlDecode($content)), 0, 200) . '...';
+    }
+
+    private function getReflect()
+    {
+        if (!isset($this->reflect)) {
+            return $this->reflect = new ReflectionClass($this);
+        }
+        return $this->reflect;
     }
 
     /**

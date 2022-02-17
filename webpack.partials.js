@@ -8,7 +8,7 @@ const adminEntries = require("./src/entries/assets/backend/admin/adminEntries");
 const { viewRules, assetsRuless } = require("./webpack.modules");
 const ASSET_PATH =
   process.env.ASSET_PATH ||
-  `${path.sep}kngell${path.sep}public${path.sep}assets${path.sep}`;
+  `${path.sep}ecom${path.sep}public${path.sep}assets${path.sep}`;
 
 /**
  * Alias

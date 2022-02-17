@@ -17,7 +17,7 @@ class RequestHandler extends GlobalVariables
     public function handler() : Request
     {
         if (!isset($request)) {
-            $request = Container::getInstance()->make(Request::class);
+            $request = new Request();
             if ($request) {
                 $create = $request->createFromGlobals();
                 if ($create) {
@@ -35,12 +35,14 @@ class RequestHandler extends GlobalVariables
      */
     public function getPath() : string
     {
-        $path = $this->getGet('url') ?? '/';
+        $path = $this->getGet('url');
+        if (empty($path)) {
+            return '/';
+        }
         $position = strpos($path, '?');
         if ($position === false) {
             return $path;
         }
-
         return substr($path, 0, $position);
     }
 
@@ -60,14 +62,14 @@ class RequestHandler extends GlobalVariables
      * ==================================================================================.
      * @return string
      */
-    public function getHttpMethod() : string
+    public function getMethod() : string
     {
         return strtolower($this->getServer('REQUEST_METHOD'));
     }
 
     public function exists($type)
     {
-        $global = $this->getHttpMethod();
+        $global = $this->getMethod();
         switch ($type) {
             case 'post':
                 return ($global == 'post') ? true : false;
@@ -163,7 +165,7 @@ class RequestHandler extends GlobalVariables
      */
     public function isGet() : bool
     {
-        return $this->getHttpmethod() === 'get';
+        return $this->getMethod() === 'get';
     }
 
     /**
@@ -173,7 +175,7 @@ class RequestHandler extends GlobalVariables
      */
     public function isPost() : bool
     {
-        return $this->getHttpmethod() === 'post';
+        return $this->getMethod() === 'post';
     }
 
     /**
