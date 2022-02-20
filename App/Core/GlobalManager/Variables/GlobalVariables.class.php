@@ -61,11 +61,12 @@ class GlobalVariables implements GlobalVariablesInterface
      */
     public function getServer(?string $key = null) : mixed
     {
-        $global = filter_input_array(INPUT_SERVER, FILTER_SANITIZE_SPECIAL_CHARS) ?? null;
-        if (null != $key) {
-            return $global[$key] ?? '/';
+        if (isset($_SERVER)) {
+            $global = filter_input_array(INPUT_SERVER, FILTER_SANITIZE_SPECIAL_CHARS) ?? null;
+            if (null != $key) {
+                return $global[$key] ?? '/';
+            }
         }
-
         return array_map('strip_tags', $global ?? []);
     }
 

@@ -9,6 +9,7 @@ final class AppHelper
         return [
             'ConstantConfig' => fn () => new ConstantConfig(),
             'GlobalVariables' => fn () => new GlobalVariables(),
+            'SessionConfig' => fn () => new SessionConfig(),
             'NativeSessionStorage' => fn () => new NativeSessionStorage($app->make(GlobalVariables::class)),
             'SessionStorageInterface' => fn () => $app->make(NativeSessionStorage::class),
             'SessionFactory' => fn () => new SessionFactory($app->make(SessionStorageInterface::class)),
@@ -16,9 +17,6 @@ final class AppHelper
             'Sanitizer' => fn () => new Sanitizer(),
             'ResponseHandler' => fn () => new ResponseHandler(),
             'RequestHandler' => fn () => new RequestHandler($app->make(Sanitizer::class)),
-            'RooterHelper' => fn () => new RooterHelper(),
-            'RooterInterface' => fn () => new Rooter($app->make(RooterHelper::class)),
-            'RooterFactory' => fn () => new RooterFactory($app->make(RooterInterface::class)),
             'View' => fn () => new View(),
             'Token' => fn () => new Token(),
             'MoneyManager' => fn () => new MoneyManager(),
@@ -26,6 +24,11 @@ final class AppHelper
             'UsersManager' => fn () => new UsersManager(),
             'UsersEntity' => fn () => new UsersEntity(),
             'ModelHelper' => fn () => new ModelHelper(),
+            'RooterHelper' => fn () => new RooterHelper(),
+            'RooterInterface' => fn () => new Rooter($app->make(RooterHelper::class)),
+            'RooterFactory' => fn () => new RooterFactory($app->make(RooterInterface::class), $app->make(View::class)),
+            'CookieStoreInterface' => fn () => new NativeCookieStore($app->make(CookieEnvironment::class)),
+            'CookieInterface' => fn () => new Cookie($app->make(CookieStoreInterface::class)),
 
         ];
     }

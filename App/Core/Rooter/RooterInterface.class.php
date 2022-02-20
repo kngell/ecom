@@ -17,9 +17,17 @@ interface RooterInterface
     /**
      * Resolve
      * ======================================================.
-     * @return void
+     * @return self
      */
-    public function resolve() : void;
+    public function resolve() : self;
 
     public function setRequest(RequestHandler $request) : self;
+
+    public function setResponse(ResponseHandler $response) : self;
+
+    public function setView(View $view) : self;
+
+    public function setNewRouter(string $newRouter) : self;
+
+    public function setRouteHandler(string $routeHandler) : self;
 }

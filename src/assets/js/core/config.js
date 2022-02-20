@@ -1,4 +1,4 @@
-export const BASE_URL = /kngell/;
+export const BASE_URL = /ecom/;
 export const HOST = "https://localhost";
 export const AVATAR = BASE_URL + "public/assets/img/users/avatar.png";
 export const IMG = BASE_URL + "public/assets/img/";

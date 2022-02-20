@@ -1,5 +1,5 @@
 //Get visitors Data
-import { BASE_URL } from "./config";
+
 export const get_visitors_data = () => {
   return new Promise((resolve, reject) => {
     let data = {
@@ -15,7 +15,7 @@ export const get_visitors_data = () => {
 
 export const send_visitors_data = (data, manageR) => {
   $.ajax({
-    url: BASE_URL + data.url,
+    url: data.url,
     method: "post",
     data: {
       table: data.table,

@@ -1,0 +1,12 @@
+request: App\Core\Http\RequestHandler
+response: App\Core\Http\ResponseHandler
+formBuilder: App\Core\FormBuilder\FormBuilder
+eventDispatcher: App\Core\EventDispatcher\EventDispatcher
+error: App\Core\Error\Error
+tableGrid: App\Core\Datatable\Datatable
+collection: App\Core\Collection\Collection
+global: App\Core\Session\GlobalManager\GlobalManager
+flatDb: App\Core\DataObjectLayer\FileStorageRepository\FileStorage
+FlatRepository: App\Core\DataObjectLayer\FileStorageRepository\FileStorageRepository
+controllerSettings: App\Core\Settings\Model\ControllerSettingModel
+settings: App\Core\Settings\Settings

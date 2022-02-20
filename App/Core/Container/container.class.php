@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 class Container implements ContainerInterface
 {
-    /** @var static */
-    protected static Application $instance;
-
-    /** @var array[] */
-    protected array $bindings = [];
+    /** @var mixed */
+    protected static $instance;
 
     /** @var object[] */
     protected array $instances = [];
+
+    /** @var array[] */
+    protected array $bindings = [];
     /**
      * All of the registered rebound callbacks.
      *
@@ -30,21 +30,20 @@ class Container implements ContainerInterface
 
     /**
      * Get container instance
-     * ====================================================================================================.
-     * @return static
+     * ===============================================.
+     * @return mixed
      */
-    public static function getInstance(): static
+    final public static function getInstance() : mixed
     {
         if (!isset(static::$instance)) {
             static::$instance = new static();
         }
-
         return static::$instance;
     }
 
     /**
      * Check is Container as singleton
-     *  ===================================================================================================.
+     *  ==============================================.
      * @param string $id Identifier of the entry to look for.
      * @return bool
      */
@@ -79,11 +78,9 @@ class Container implements ContainerInterface
     {
         $isBound = $this->bound($abstract);
         $this->instances[$abstract] = $instance;
-
         if ($isBound) {
             $this->rebound($abstract);
         }
-
         return $instance;
     }
 

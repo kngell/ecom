@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class Files implements FileInterface
+class FilesSyst implements FileInterface
 {
     /**
      * Get Files

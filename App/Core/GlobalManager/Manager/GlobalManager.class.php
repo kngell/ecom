@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Throwable;
 
-class GlobalsManager implements GlobalsManagerInterface
+class GlobalManager implements GlobalManagerInterface
 {
     /**
      * @inheritdoc

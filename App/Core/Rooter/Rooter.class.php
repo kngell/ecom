@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 class Rooter implements RooterInterface
 {
+    private string $route = '/';
+    private array $arguments = [];
     private array $routes = [];
     private mixed $params;
     private string $controllerSuffix = 'Controller';
+    private string $routeHandler;
+    private string $newRouter;
     private Container $container;
     private RequestHandler $request;
+    private ResponseHandler $response;
+    private View $view;
 
     public function __construct(private RooterHelper $helper)
     {
@@ -25,31 +31,6 @@ class Rooter implements RooterInterface
         $this->routes[$method][$route] = $params;
     }
 
-    /**
-     * Parse URL
-     * =========================================================.
-     * @return array
-     */
-    public function parseUrl(?string $urlroute = null) : string
-    {
-        $url = [];
-        if (isset($urlroute) && !empty($urlroute)) {
-            if ($urlroute == '/') {
-                return $this->route = $urlroute;
-            }
-            if ($urlroute == 'favicon.ico') {
-                $this->params = [$urlroute];
-                return 'assets';
-            }
-            $url = explode('/', filter_var(rtrim($urlroute, '/'), FILTER_SANITIZE_URL));
-            $route = isset($url[0]) ? strtolower($url[0]) : $this->route;
-            unset($url[0]);
-            $this->params = count($url) > 0 ? array_values($url) : [];
-            return $route;
-        }
-        return $this->route;
-    }
-
     public function get(string $path, mixed $callback)
     {
         $this->routes['get'][$path] = $callback;
@@ -60,28 +41,58 @@ class Rooter implements RooterInterface
         $this->routes['post'][$path] = $callback;
     }
 
-    /** @inheritDoc */
-    public function resolve(): void
+    /**
+     * Parse URL
+     * =========================================================.
+     * @return string
+     */
+    public function parseUrl(?string $urlroute = null) : string
     {
-        $url = $this->helper->formatQueryString(strtolower($this->request->getPath()));
-        list($this->params, $match) = $this->getRoute($url, $this->routes[$this->request->getMethod()]);
+        $url = [];
+        if (isset($urlroute) && !empty($urlroute)) {
+            if ($urlroute == '/') {
+                return $this->route = $urlroute;
+            }
+            if ($urlroute == 'favicon.ico') {
+                $this->arguments = [$urlroute];
+
+                return 'assets';
+            }
+            $url = explode('/', filter_var(rtrim($urlroute, '/'), FILTER_SANITIZE_URL));
+            $route = isset($url[0]) ? strtolower($url[0]) : $this->route;
+            unset($url[0]);
+            $this->arguments = count($url) > 0 ? array_values($url) : [];
+
+            return $route;
+        }
+
+        return $this->route;
+    }
+
+    /** @inheritDoc */
+    public function resolve(): self
+    {
+        $url = $this->parseUrl($this->helper->formatQueryString(strtolower($this->request->getPath())));
+        list($this->params, $match) = $this->getMatchRoute($url, $this->routes[$this->request->getMethod()]);
         if (!$match) {
             throw new RouterNoRoutesFound('Page not found', 1);
         }
         if (is_string($this->params)) {
+            $this->view->render('', []);
         }
         $controllerString = $this->helper->transformCtrlToCmCase($this->params['controller']) . $this->controllerSuffix;
         if (class_exists($controllerString)) {
             $method = $this->helper->transformCmCase($this->params['method']);
             $controllerObject = $this->controllerObject($controllerString, $method);
             if (\is_callable([$controllerObject, $method], true, $callableName)) {
-                $controllerObject->$method();
+                $controllerObject->$method($this->arguments);
             } else {
                 throw new NoActionFoundException('No method existe or not callable', 1);
             }
         } else {
             throw new RouterNoControllerFoundException('No controller exists', 1);
         }
+        return $this;
     }
 
     /**
@@ -93,7 +104,7 @@ class Rooter implements RooterInterface
      * @param array $routes
      * @return array
      */
-    public function getRoute(string $url, array $routes) : array
+    public function getMatchRoute(string $url, array $routes) : array
     {
         foreach ($routes as $route => $params) {
             if (preg_match($route, $url, $matches)) {
@@ -124,6 +135,30 @@ class Rooter implements RooterInterface
     public function setRequest(RequestHandler $request) : self
     {
         $this->request = $request;
+        return $this;
+    }
+
+    public function setResponse(ResponseHandler $response) : self
+    {
+        $this->response = $response;
+        return $this;
+    }
+
+    public function setView(View $view) : self
+    {
+        $this->view = $view;
+        return $this;
+    }
+
+    public function setNewRouter(string $newRouter) : self
+    {
+        $this->newRouter = $newRouter;
+        return $this;
+    }
+
+    public function setRouteHandler(string $routeHandler) : self
+    {
+        $this->routeHandler = $routeHandler;
         return $this;
     }
 

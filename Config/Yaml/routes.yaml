@@ -1,11 +1,14 @@
 get: # Http Get ===========================================
-  "":
+  "/":
     controller: home
     method: index
     namespace: Client
   login:
     controller: security
     method: login
+  assets:
+    controller: assets
+    method: get_asset
   admin/{controller}/{method}:
     namespace: Admin
   admin/{controller}/{method}/{id:[\da-f]+}:
@@ -14,3 +17,8 @@ get: # Http Get ===========================================
     namespace: Client
   client/{controller}/{method}/{id:[\da-f]+}:
     namespace: Client
+  test: errors
+post: # Http Post method
+  visitors:
+    controller: visitors
+    method: track

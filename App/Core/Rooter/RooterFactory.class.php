@@ -9,14 +9,19 @@ class RooterFactory
     /**
      * Main constructor.
      */
-    public function __construct(private RooterInterface $rooter)
+    public function __construct(private RooterInterface $rooter, private View $view)
     {
     }
 
-    public function create(RequestHandler $request, array $routes) : self
+    public function create(RequestHandler $request, ResponseHandler $response, array $routes, ?string $newRouter = null, ?string $routeHandler = null) : self
     {
         $this->routes = $routes;
-        $this->rooter->setRequest($request);
+        $this->rooter
+            ->setRequest($request)
+            ->setResponse($response)
+            ->setView($this->view)
+            ->setNewRouter($newRouter)
+            ->setRouteHandler($routeHandler);
         if (empty($routes)) {
             throw new BaseNoValueException("There are one or more empty arguments. In order to continue, please ensure your <code>routes.yaml</code> has your defined routes and you are passing the correct variable ie 'QUERY_STRING'");
         }

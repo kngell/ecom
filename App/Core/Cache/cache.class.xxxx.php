@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-final class Cache
+final class Cachexx
 {
     protected string $dirname;
     protected int $duration = 25;

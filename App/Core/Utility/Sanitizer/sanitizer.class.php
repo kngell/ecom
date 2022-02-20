@@ -7,9 +7,9 @@ class Sanitizer
      * Clean Data
      * =======================================================.
      * @param mixed $dirtydata
-     * @return array
+     * @return mixed
      */
-    public static function clean(mixed $dirtydata) : array
+    public static function clean(mixed $dirtydata) : mixed
     {
         $input = [];
         if (is_array($dirtydata) && count($dirtydata) > 0) {
@@ -44,10 +44,10 @@ class Sanitizer
     /**
      * Support clean Data
      * ======================================================================================.
-     * @param [type] $value
-     * @return void
+     * @param mixed $value
+     * @return mixed
      */
-    private static function sanitizeInput(mixed $value)
+    private static function sanitizeInput(mixed $value) : mixed
     {
         switch (true) {
             case is_int($value):
@@ -67,14 +67,14 @@ class Sanitizer
                             if (is_int($v)) {
                                 $arr[$k] = isset($v) ? filter_var($value, FILTER_SANITIZE_NUMBER_INT) : '';
                             } else {
-                                $arr[$k] = isset($v) ? filter_var($value, FILTER_SANITIZE_STRING) : '';
+                                $arr[$k] = isset($v) ? filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
                             }
                         }
                         return $arr;
                     }
                  break;
             default:
-             return isset($value) ? filter_var($value, FILTER_SANITIZE_STRING) : '';
+             return isset($value) ? filter_var($value, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
                 break;
         }
     }
