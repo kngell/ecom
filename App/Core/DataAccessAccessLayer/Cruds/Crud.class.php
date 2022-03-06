@@ -7,13 +7,13 @@ use Throwable;
 class Crud implements CrudInterface
 {
     /**
-     * DataMapper Object.
+     * dataMapper Object.
      */
-    protected DataMapper $datamapper;
+    protected DataMapper $dataMapper;
     /**
      * Query Builder.
      */
-    protected QueryBuilder $querybuilder;
+    protected queryBuilder $queryBuilder;
     /**
      * Table Name.
      */
@@ -24,22 +24,27 @@ class Crud implements CrudInterface
     protected string $tableSchemaID;
     protected array $options;
 
+    public function __construct()
+    {
+    }
+
     /**
-     * Main constructor
+     * Set Params
      * =====================================================================.
      * @param DataMapperInterface $datamapper
-     * @param QueryBuilderInterface $querybuilder
+     * @param QueryBuilderInterface $queryBuilder
      * @param string $tableSchma
      * @param string $tableSchmaID
      *@return void
      */
-    public function __construct(?DataMapperInterface $datamapper = null, ?QueryBuilderInterface $querybuilder = null, string $tableSchema = '', string $tableSchmaID = '', ?array $options = [])
+    public function setParams(DataMapperInterface $dataMapper, queryBuilderInterface $queryBuilder, string $tableSchema = '', string $tableSchmaID = '', ?array $options = []) : self
     {
-        $this->datamapper = $datamapper;
-        $this->querybuilder = $querybuilder;
         $this->tableSchema = $tableSchema;
         $this->tableSchemaID = $tableSchmaID;
         $this->options = $options;
+        $this->dataMapper = $dataMapper;
+        $this->queryBuilder = $queryBuilder;
+        return $this;
     }
 
     /**
@@ -63,7 +68,7 @@ class Crud implements CrudInterface
      */
     public function lastID(): int
     {
-        return $this->datamapper->getLasID();
+        return $this->dataMapper->getLasID();
     }
 
     /**
@@ -73,9 +78,9 @@ class Crud implements CrudInterface
     {
         try {
             $arg = ['table' => $this->getSchema(), 'type' => 'insert', 'fields' => $fields];
-            $query = $this->querybuilder->buildQuery($arg)->insert();
-            $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($fields));
-            if ($this->datamapper->numrow() == 1) {
+            $query = $this->queryBuilder->buildQuery($arg)->insert();
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($fields));
+            if ($this->dataMapper->numrow() == 1) {
                 return $this->lastID();
             }
         } catch (Throwable $th) {
@@ -102,13 +107,13 @@ class Crud implements CrudInterface
                 'table_join' => isset($options['table_join']) ? $options['table_join'] : [],
             ];
             // $params = ModelHelper::get_params_args($params);
-            $query = $this->querybuilder->buildQuery($arg)->select();
-            $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($arg['where'], $params));
-            if ($this->datamapper->numrow() > 0) {
-                return $this->datamapper->results($options);
+            $query = $this->queryBuilder->buildQuery($arg)->select();
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($arg['where'], $params));
+            if ($this->dataMapper->numrow() > 0) {
+                return $this->dataMapper->results($options);
             }
 
-            return $this->datamapper;
+            return $this->dataMapper;
         } catch (\Throwable $th) {
             throw $th;
         }
@@ -121,10 +126,10 @@ class Crud implements CrudInterface
                 'table' => $this->getSchema(),
                 'type' => 'show',
             ];
-            $query = $this->querybuilder->buildQuery($arg)->showColumn();
-            $this->datamapper->persist($query, $this->datamapper->buildQueryParameters([], []));
-            if ($this->datamapper->numrow() > 0) {
-                return $this->datamapper->results($options);
+            $query = $this->queryBuilder->buildQuery($arg)->showColumn();
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters([], []));
+            if ($this->dataMapper->numrow() > 0) {
+                return $this->dataMapper->results($options);
             }
         } catch (\Throwable $th) {
             throw $th;
@@ -145,10 +150,10 @@ class Crud implements CrudInterface
                 'fields' => $fields,
                 'where' => $conditions,
             ];
-            $query = $this->querybuilder->buildQuery($arg)->update();
-            $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($fields, $conditions));
-            if ($this->datamapper->numrow() == 1) {
-                return $this->datamapper->numrow();
+            $query = $this->queryBuilder->buildQuery($arg)->update();
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($fields, $conditions));
+            if ($this->dataMapper->numrow() == 1) {
+                return $this->dataMapper->numrow();
             }
 
             return 0;
@@ -170,10 +175,10 @@ class Crud implements CrudInterface
                 'type' => 'delete',
                 'conditions' => $conditions,
             ];
-            $query = $this->querybuilder->buildQuery($arg)->delete();
-            $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($conditions));
-            if ($this->datamapper->numrow() >= 1) {
-                return $this->datamapper->numrow();
+            $query = $this->queryBuilder->buildQuery($arg)->delete();
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
+            if ($this->dataMapper->numrow() >= 1) {
+                return $this->dataMapper->numrow();
             }
 
             return 0;
@@ -194,10 +199,10 @@ class Crud implements CrudInterface
                 'selectors' => $selectors,
                 'conditions' => $searchconditions,
             ];
-            $query = $this->querybuilder->buildQuery($arg)->search();
-            $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($searchconditions));
-            if ($this->datamapper->numrow() > 0) {
-                return $this->datamapper->results();
+            $query = $this->queryBuilder->buildQuery($arg)->search();
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($searchconditions));
+            if ($this->dataMapper->numrow() > 0) {
+                return $this->dataMapper->results();
             }
         } catch (\Throwable $th) {
             throw $th;
@@ -216,10 +221,10 @@ class Crud implements CrudInterface
                 'custom' => $query,
                 'conditions' => $conditions,
             ];
-            $query = $this->querybuilder->buildQuery($arg)->customQuery();
-            $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($conditions));
-            if ($this->datamapper->numrow() > 0) {
-                return $this->datamapper->results();
+            $query = $this->queryBuilder->buildQuery($arg)->customQuery();
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
+            if ($this->dataMapper->numrow() > 0) {
+                return $this->dataMapper->results();
             }
         } catch (\Throwable $th) {
             throw $th;
@@ -229,10 +234,10 @@ class Crud implements CrudInterface
     public function aggregate(string $type, ?string $fields = 'id', array $conditions = [])
     {
         $args = ['table' => $this->getSchema(), 'primary_key' => $this->getSchemaID(), 'type' => 'select', 'aggregate' => $type, 'aggregate_field' => $fields, 'conditions' => $conditions, 'extras' => ['orderby' => '']];
-        $query = $this->querybuilder->buildQuery($args)->select();
-        $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($conditions));
-        if ($this->datamapper->numrow() > 0) {
-            return $this->datamapper->column();
+        $query = $this->queryBuilder->buildQuery($args)->select();
+        $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
+        if ($this->dataMapper->numrow() > 0) {
+            return $this->dataMapper->column();
         }
     }
 
@@ -253,10 +258,10 @@ class Crud implements CrudInterface
     public function get(array $selectors = [], array $conditions = []) : ?Object
     {
         $args = ['table' => $this->getSchema(), 'type' => 'select', 'selectors' => $selectors, 'conditions' => $conditions];
-        $query = $this->querybuilder->buildQuery($args)->select();
-        $this->datamapper->persist($query, $this->datamapper->buildQueryParameters($conditions));
-        if ($this->datamapper->numrow() >= 0) {
-            return $this->datamapper->result();
+        $query = $this->queryBuilder->buildQuery($args)->select();
+        $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions));
+        if ($this->dataMapper->numrow() >= 0) {
+            return $this->dataMapper->result();
         }
     }
 }

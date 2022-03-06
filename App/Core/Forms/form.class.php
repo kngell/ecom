@@ -44,7 +44,6 @@ class Form
         foreach ($attrs as $key => $attr) {
             $this->{$key} = $attr;
         }
-
         return $this;
     }
 
@@ -75,25 +74,12 @@ class Form
     {
         $id = $alertid != '' ? $alertid : 'alertErr';
 
-        return sprintf(
-            '<form action ="%s" method="%s" class="%s" id="%s" enctype="%s" autocomplete="%s" %s> %s %s %s',
-            $this->action,
-            $this->method,
-            $this->formClass,
-            $this->formID,
-            $this->enctype,
-            $this->autocomplete,
-            $this->formCustomAttr,
-            isset($this->token) ? FH::csrfInput('csrftoken', $this->token->generate_token(8, $this->formID)) : '',
-            $this->alertErr ? '<div id="' . $id . '"></div>' : '',
-            $this->inputHidden()
-        );
+        return sprintf('<form action ="%s" method="%s" class="%s" id="%s" enctype="%s" autocomplete="%s" %s> %s %s %s', $this->action, $this->method, $this->formClass, $this->formID, $this->enctype, $this->autocomplete, $this->formCustomAttr, isset($this->token) ? FH::csrfInput('csrftoken', $this->token->generate_token(8, $this->formID)) : '', $this->alertErr ? '<div id="' . $id . '"></div>' : '', $this->inputHidden());
     }
 
     public function btnId(string $bntID)
     {
         $this->btnID = $bntID;
-
         return $this;
     }
 
@@ -229,7 +215,7 @@ class Form
     {
         $h_input = '';
         if (!empty($this->inputHidden)) {
-            foreach ($this->inputHidden as $name=>$value) {
+            foreach ($this->inputHidden as $name => $value) {
                 $attr = '';
                 if (is_array($value)) {
                     foreach ($value as $key => $val) {

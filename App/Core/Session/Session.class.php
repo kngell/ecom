@@ -4,17 +4,34 @@ declare(strict_types=1);
 
 class Session extends AbstractSession implements SessionInterface
 {
+    private string $sessionIdentifier;
+
     /**
      * Constructor.
      * ===========================================================.
      * @param SessionStorageInterface|null $storage
      * @param string $sessionIdentifier
      */
-    public function __construct(private ?SessionStorageInterface $storage, private string $sessionIdentifier)
+    public function __construct(private ?SessionStorageInterface $storage)
+    {
+    }
+
+    public function setParams(string $sessionIdentifier) : self
     {
         if ($this->isSessionKeyValid($sessionIdentifier) === false) {
             throw new SessionStorageInvalidArgument($sessionIdentifier . ' is not a valid session name');
         }
+        $this->sessionIdentifier = $sessionIdentifier;
+        return $this;
+    }
+
+    /**
+     * Return the storage object.
+     * @return SessionStorageInterface|null
+     */
+    public function getStorage(): ?SessionStorageInterface
+    {
+        return $this->storage;
     }
 
     /**
@@ -33,11 +50,6 @@ class Session extends AbstractSession implements SessionInterface
         } catch (Throwable $throwable) {
             throw new SessionException('An exception was thrown in retrieving the key from the session storage. ' . $throwable);
         }
-    }
-
-    public function getStorage()
-    {
-        return $this->storage;
     }
 
     /**
@@ -70,7 +82,7 @@ class Session extends AbstractSession implements SessionInterface
         try {
             return $this->storage->getSession($key, $default);
         } catch (\Throwable $th) {
-            throw new SessionException();
+            throw new SessionException('An exception was thrown in retrieving the key from the session storage. ' . $th);
         }
     }
 
@@ -87,8 +99,8 @@ class Session extends AbstractSession implements SessionInterface
             $this->storage->deleteSession($key);
 
             return true;
-        } catch (\Throwable $th) {
-            throw new SessionException();
+        } catch (\Throwable $e) {
+            throw $e;
         }
     }
 
@@ -115,7 +127,7 @@ class Session extends AbstractSession implements SessionInterface
         try {
             $this->storage->flushSession($key, $value);
         } catch (\Throwable $th) {
-            throw new SessionException();
+            throw $th;
         }
     }
 
@@ -128,10 +140,6 @@ class Session extends AbstractSession implements SessionInterface
     public function exists(string $key): bool
     {
         $this->ensureSessionKeyIsValid($key);
-        try {
-            return $this->storage->SessionExists($key);
-        } catch (\Throwable $th) {
-            throw new SessionException();
-        }
+        return $this->storage->SessionExists($key);
     }
 }

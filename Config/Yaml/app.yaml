@@ -27,15 +27,15 @@ settings:
 theme_builder:
   libraries:
     uikit:
-      class: App\Core\Themes\libs\Library\Uikit\Uikit
+      class: Uikit
       default: true
       version: 1.0
     bootstrap:
-      class: App\Core\Themes\Libs\Library\Bootstrap\Bootstrap
+      class: Bootstrap
       default: false
       version: 1.0
     tailwind:
-      class: \MagmaCore\Themes\Library\Tailwind
+      class: Tailwind
       default: false
       version: 1.0
 

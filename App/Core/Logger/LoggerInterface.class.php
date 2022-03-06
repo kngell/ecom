@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 interface LoggerInterface
 {
+    public function getLoggerHandler() : LoggerHandlerInterface;
+
     /**
      * System is unusable.
      *

@@ -59,6 +59,13 @@ class Controller
         $this->method = $method;
         $this->routeParams = $rParams;
         $this->filePath = $path;
+        $this->view_instance->initParams($path);
+        $this->view_instance->token = $this->token;
+        if ($path == 'Client' . DS) {
+            $this->view_instance->search_box = file_get_contents(FILES . 'Template' . DS . 'Base' . DS . 'search_box.php');
+            // $this->view_instance->userFrm = $this->container->make(Form::class);
+            // $this->view_instance->userFrmAttr = $this->helper->form_params();
+        }
         return $this;
     }
 
@@ -194,23 +201,26 @@ class Controller
      */
     protected function before()
     {
-        $this->view_instance->initParams($this->filePath);
-        $this->view_instance->token = $this->token;
+        $this->authFrm();
         if ($this->filePath == 'Client' . DS) {
             // $this->view_instance->settings = $this->helper->getSettings();
             // $this->session->set(BRAND_NUM, $this->brand());
             // $data = $this->helper->get_product_and_cart((int) $this->session->get(BRAND_NUM));
-            $this->view_instance->userFrm = $this->container->make(Form::class);
-            $this->view_instance->userFrmAttr = $this->helper->form_params();
-            // $this->view_instance->set_siteTitle("K'nGELL Ingénierie Logistique");
+        // $this->view_instance->userFrmAttr = $this->helper->form_params();
+        // $this->view_instance->set_siteTitle("K'nGELL Ingénierie Logistique");
             // $this->view_instance->products = $data['products'];
             // $this->view_instance->user_cart = $data['cart'];
-            $this->view_instance->search_box = file_get_contents(FILES . 'template' . DS . 'base' . DS . 'search_box.php');
         // $this->view_instance->productManager = $this->container->make(ProductsManager::class);
         } elseif ($this->filePath == 'Backend' . DS) {
             $this->view_instance->set_siteTitle("K'nGELL Administration");
             $this->view_instance->set_Layout('admin');
         }
+    }
+
+    protected function authFrm() : void
+    {
+        $this->view_instance->loginFrm = $this->container->make(LoginForm::class)->createForm('security' . DS . 'login');
+        $this->view_instance->registerFrm = $this->container->make(RegisterForm::class)->createForm('security' . DS . 'login');
     }
 
     protected function after()

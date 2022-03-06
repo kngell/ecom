@@ -4,15 +4,6 @@ declare(strict_types=1);
 
 class EntityManagerFactory
 {
-    /**
-     *propertty.
-     */
-    private null|DataMapperInterface $datamapper;
-    /**
-     *property.
-     */
-    private null|QueryBuilderInterface $querybuilder;
-
     private ContainerInterface $container;
 
     /**
@@ -22,27 +13,24 @@ class EntityManagerFactory
      * @param DataMapperInterface $datamapper
      * @param QueryBuilderInterface $querybuilder
      */
-    public function __construct(?DataMapperInterface $datamapper = null, ?QueryBuilderInterface $querybuilder = null)
+    public function __construct(private DataMapperInterface $dataMapper, private QueryBuilderInterface $queryBuilder)
     {
         $this->container = Container::getInstance();
-        $this->datamapper = $datamapper;
-        $this->querybuilder = $querybuilder;
     }
 
     /**
      * Create EntityManager
      * =====================================================================.
      *
-     * @param string $crudString
      * @param string $tableSchma
      * @param string $tableShameID
      * @param array $options
      * @return EntityManagerInterface
      */
-    public function create() : EntityManagerInterface
+    public function create(string $tableSchema, string $tableSchmaID, array $options) : EntityManagerInterface
     {
-        $this->container->bind(EntityManagerInterface::class, fn () => $this->container->make(EntityManager::class));
         $em = $this->container->make(EntityManagerInterface::class);
+        $em->getCrud()->setParams($this->dataMapper, $this->queryBuilder, $tableSchema, $tableSchmaID, $options);
         if (!$em instanceof EntityManagerInterface) {
             throw new EntityManagerExceptions(get_class($em) . ' is not a valid entityManager object!');
         }
@@ -52,16 +40,16 @@ class EntityManagerFactory
     /**
      * Get main constructor.
      */
-    public function getDatamapper() : DataMapperInterface
+    public function getDataMapper() : DataMapperInterface
     {
-        return $this->datamapper;
+        return $this->dataMapper;
     }
 
     /**
      * Get main constructor.
      */
-    public function getQuerybuilder() :QueryBuilderInterface
+    public function getQueryMuilder() :QueryBuilderInterface
     {
-        return $this->querybuilder;
+        return $this->queryBuilder;
     }
 }

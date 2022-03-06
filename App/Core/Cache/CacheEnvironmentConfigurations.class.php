@@ -18,10 +18,16 @@ class CacheEnvironmentConfigurations
      * @param string|null $fileCacheBasePath
      * @param int $maximumPathLength
      */
-    public function __construct(?string $cacheIdentifier, ?string $fileCacheBasePath, int $maximumPathLength = PHP_MAXPATHLEN) {
+    public function __construct()
+    {
+    }
+
+    public function setParams(?string $cacheIdentifier, ?string $fileCacheBasePath, int $maximumPathLength = PHP_MAXPATHLEN) : self
+    {
         $this->cacheIdentifier = $cacheIdentifier;
         $this->fileCacheBasePath = $fileCacheBasePath;
         $this->maximumPathLength = $maximumPathLength;
+        return $this;
     }
 
     /**

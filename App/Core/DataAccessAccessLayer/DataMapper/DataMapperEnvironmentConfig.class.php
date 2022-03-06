@@ -10,15 +10,14 @@ class DataMapperEnvironmentConfig
      */
     private array $credentials = [];
 
-    /**
-     * Constructor
-     * --------------------------------------------------------------------------------------------------.
-     *@param array credentials
-     * @return self
-     */
-    public function __construct(array $credentials)
+    public function __construct()
+    {
+    }
+
+    public function setCredentials(array $credentials) : self
     {
         $this->credentials = $credentials;
+        return $this;
     }
 
     /**
@@ -27,7 +26,7 @@ class DataMapperEnvironmentConfig
      *@param string $driver
      * @return array
      */
-    public function getDatabaseCredentials(string $driver) : array
+    public function getCredentials(string $driver) : array
     {
         $this->isCredentialsValid($driver);
         $connexionArray = [];

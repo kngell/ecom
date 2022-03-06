@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 class Repository extends AbstractRepository implements RepositoryInterface
 {
-    protected EntityManagerInterface $em;
-
     /**
      * Main constructor
      * ====================================================================.
      * @param EntityManagerInterface $em
      */
-    public function __construct(?EntityManagerInterface $em = null)
+    public function __construct(protected EntityManagerInterface $em)
     {
-        $this->em = $em;
     }
 
     /**

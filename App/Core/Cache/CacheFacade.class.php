@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 class CacheFacade
 {
+    public function __construct(private CacheFactory $cacheFactory)
+    {
+    }
+
     /**
      * Undocumented function.
      *
@@ -12,10 +16,10 @@ class CacheFacade
      * @param array $options
      * @return CacheInterface
      */
-    public function create(?string $cacheIdentifier = null, ?string $storage = null, array $options = []): CacheInterface
+    public function create(?string $cacheIdentifier = null, array $options = []): CacheInterface
     {
         try {
-            return (new CacheFactory())->create($cacheIdentifier, $storage, $options);
+            return $this->cacheFactory->create($cacheIdentifier, $options);
         } catch (CacheException $e) {
             throw $e->getMessage();
         }

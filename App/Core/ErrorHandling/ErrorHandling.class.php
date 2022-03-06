@@ -68,7 +68,6 @@ class ErrorHandling
             $stacktrace = self::$trace;
             Container::getInstance()->make(ErrorsController::class)->iniParams(ErrorsController::class, 'index', [], 'Client/')
                 ->index(['exception' => $exception, 'snippet' => $snippet, 'srcCode' => $srcCode, 'stacktrace' => $stacktrace]);
-        // return ['exception' => $exception, 'snippet' => $snippet, 'srcCode' => $srcCode, 'stacktrace' => $stacktrace];
         } else {
             $logFile = LOG_DIR . '/error-' . date('Y-m-d') . '-.log';
             ini_set('log_errors', 'On');
@@ -79,7 +78,8 @@ class ErrorHandling
             $message .= "\nStack trace: " . $exception->getTraceAsString();
             $message .= "\nThrown in " . $exception->getFile() . ' on line ' . $exception->getLine();
             error_log($message);
-            // include "Resources/Templates/{$code}.php";
+            Container::getInstance()->make(ErrorsController::class)->iniParams(ErrorsController::class, $code, [], 'Client/')
+                ->index(['exception' => $exception, 'snippet' => '', 'srcCode' => '', 'stacktrace' => '']);
         }
     }
 

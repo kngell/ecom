@@ -30,6 +30,6 @@ class SessionFactory
         if (!$this->sessionStorage instanceof SessionStorageInterface) {
             throw new SessionStorageInvalidArgument(get_class($this->sessionStorage) . ' is not a valid session storage object!');
         }
-        return Container::getInstance()->bind(SessionInterface::class, fn () => new Session($this->sessionStorage, $sessionName))->make(SessionInterface::class);
+        return Container::getInstance()->make(SessionInterface::class)->setParams($sessionName);
     }
 }

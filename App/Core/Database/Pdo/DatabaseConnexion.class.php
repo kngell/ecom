@@ -13,13 +13,17 @@ class DatabaseConnexion implements DatabaseConnexionInterface
      */
     private PDO $con;
 
+    public function __construct()
+    {
+    }
+
     /**
-     * Construct
+     * SetCredentials
      * =========================================================.
      * @param array $credentials
      * @return void
      */
-    public function __construct(array $credentials)
+    public function setCredentials(array $credentials) : void
     {
         $this->credentials = $credentials;
     }

@@ -21,10 +21,11 @@ try {
         ->setCookie([])
         ->setCache(YamlFile::get('app')['cache'], null, true)
         ->setRoutes(YamlFile::get('routes'))
+        ->setControllerArray(YamlFile::get('controller'))
         ->setLogger(LOG_DIR, YamlFile::get('app')['logger_handler']['file'], LogLevel::DEBUG, [])
         ->setContainerProviders(YamlFile::get('providers'))
         ->setThemeBuilder(YamlFile::get('app')['theme_builder'], true)
         ->run();
 } catch (Exception $e) {
-    echo $e->getMessage();
+    throw new Exception($e->getMessage());
 }

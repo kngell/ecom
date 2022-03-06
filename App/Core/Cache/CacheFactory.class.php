@@ -7,6 +7,10 @@ class CacheFactory
     /** @var object */
     protected Object $envConfigurations;
 
+    public function __construct(private CacheEnvironmentConfigurations $cacheConfig, private NativeCacheStorage $storage)
+    {
+    }
+
     /**
      * Factory create method which create the cache object and instantiate the storage option
      * We also set a default storage options which is the NativeCacheStorage. So if the second
@@ -18,13 +22,13 @@ class CacheFactory
      * @param array $options
      * @return CacheInterface
      */
-    public function create(?string $cacheIdentifier = null, ?string $storage = null, array $options = []): CacheInterface
+    public function create(?string $cacheIdentifier = null, array $options = []): CacheInterface
     {
-        $this->envConfigurations = new CacheEnvironmentConfigurations($cacheIdentifier, CACHE_PATH);
-        $storageObject = ($storage !== null) ? new $storage($this->envConfigurations, $options) : new NativeCacheStorage($this->envConfigurations, $options);
+        $this->envConfigurations = $this->cacheConfig->setParams($cacheIdentifier, CACHE_PATH);
+        $storageObject = $this->storage->setParams($this->envConfigurations, $options);
         if (!$storageObject instanceof CacheStorageInterface) {
-            throw new cacheInvalidArgumentException('"' . $storage . '" is not a valid cache storage object.', 0);
+            throw new cacheInvalidArgumentException('"' . $this->storage::class . '" is not a valid cache storage object.', 0);
         }
-        return new Cache($cacheIdentifier, $storageObject, $options);
+        return Container::getInstance()->make(CacheInterface::class)->setParams($cacheIdentifier, $storageObject, $options);
     }
 }

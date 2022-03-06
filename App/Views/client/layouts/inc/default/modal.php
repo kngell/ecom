@@ -7,32 +7,7 @@
                     <div class="modal-body">
                         <button type="button" class="close float-end" data-bs-dismiss="modal"
                             aria-label="Close"><span>&times;</span></button>
-                        <div class="form-wrapper rounded bg-light" id="">
-                            <?=$this->userFrm->globalAttr(array_merge($this->userFrmAttr['global'], $this->userFrmAttr['login']))->begin(alertid:'loginAlert')?>
-                            <p class="hint-text">Connectez-vous avec votre compte social média</p>
-                            <div class="social-btn clearfix mb-3">
-                                <a href="javascript:void(0)" class="btn btn-primary  float-start" id="fblink"><i
-                                        class="fab fa-facebook"></i>
-                                    Facebook</a>
-                                <a href="#" class="btn btn-info float-end"><i class="fab fa-twitter"></i>
-                                    Twitter</a>
-                            </div>
-                            <div class="or-seperator"><b>ou</b></div>
-                            <!--Log-->
-                            <?= $this->userFrm->input('email')->label('E-mail:')?>
-                            <?= $this->userFrm->input('password')->label('Password:')->passwordType()?>
-                            <div class="row g-3">
-                                <?= $this->userFrm->checkbox('rem')->Label('Se souvenir')->class('checkbox__input')->spanClass('checkbox__box')->LabelClass('checkbox')->setFieldWrapperClass('col')->id('customCheckRem')?>
-                                <div class="col">
-                                    <a href="#" id="forgot-btn" class="float-end" class="close" data-bs-dismiss="modal"
-                                        data-bs-toggle="modal" data-bs-target="#forgot-box">Mot
-                                        de
-                                        passe oublié</a>
-                                </div>
-                            </div>
-                            <?= $this->userFrm->button()->id('l_btn')->text('Login')->class('button')->submit()?>
-                            <?=$this->userFrm->end()?>
-                        </div>
+                        <?= $this->loginFrm?>
                     </div>
                     <div class="modal-footer">
                         <div class="input-group form-footer d-flex justify-content-center d-inline-block">
@@ -54,37 +29,7 @@
                     <div class="modal-body">
                         <button type="button" class="close float-end" data-bs-dismiss="modal">
                             <span>&times;</span></button>
-                        <div class="form-wrapper rounded bg-light" id="">
-                            <div class="upload-profile-image d-flex justify-content-center pb-1">
-                                <div class="text-center">
-                                    <div class="d-flex justify-content-center"> <img class="camera-icon"
-                                            src="<?=IMG?>camera/camera-solid.svg" alt="camera" />
-                                    </div>
-                                    <img src="<?=IMG?>users/avatar.png" class="img rounded-circle" alt="profile" />
-                                    <small class="form-text">Profile</small>
-                                    <input type="file" form="register-frm" class="form-control upload-profile"
-                                        name="profileUpload" id="upload-profile">
-                                </div>
-                            </div>
-                            <hr class="mb-3">
-                            <?=$this->userFrm->globalAttr(array_merge($this->userFrmAttr['global'], $this->userFrmAttr['register']))->begin(alertid:'regAlert')?>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <?= $this->userFrm->input('lastName')->label('Prénom:')?>
-                                </div>
-                                <div class="col-md-6">
-                                    <?= $this->userFrm->input('firstName')->label('Nom:')?>
-                                </div>
-                            </div>
-                            <?= $this->userFrm->input('userName')->label('Surnom:')?>
-                            <?= $this->userFrm->input('email')->label('E-Mail:')->emailType()->id('reg_email')?>
-                            <?= $this->userFrm->input('password')->label('Mot de passe:')->passwordType()->id('pass')?>
-                            <?= $this->userFrm->input('cpassword')->label('Confirmer:')->passwordType()->id('cpass')?>
-                            <?= $this->userFrm->checkbox('terms')->Label('<div>J\'accepte&nbsp;<a href="#">les termes&nbsp;</a>&amp;&nbsp;<a href="#">conditions</a> d\'utilisation</div>')->class('checkbox__input')->spanClass('checkbox__box')->LabelClass('checkbox')?>
-                            <?= $this->userFrm->button()->id('reg_btn')->text('Register')->class('button')->submit()?>
-                            <?=$this->userFrm->end()?>
-
-                        </div>
+                        <?= $this->registerFrm?>
                     </div>
                     <div class="modal-footer">
                         <div class="form-footer d-flex justify-content-center mb-3">

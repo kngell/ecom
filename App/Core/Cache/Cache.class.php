@@ -6,14 +6,15 @@ class Cache extends AbstractCache
 {
     /**
      * Main class constructor.
-     *
-     * @param string|null $cacheIdentifier
-     * @param CacheStorageInterface $storage
-     * @param array $options
      */
-    public function __construct(?string $cacheIdentifier, CacheStorageInterface $storage, array $options = [])
+    public function __construct()
     {
-        parent::__construct($cacheIdentifier, $storage, $options);
+    }
+
+    public function setParams(?string $cacheIdentifier, ?CacheStorageInterface $storage, array $options = []) : self
+    {
+        parent::setParams($cacheIdentifier, $storage, $options);
+        return $this;
     }
 
     /**

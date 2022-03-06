@@ -58,7 +58,7 @@ abstract class AbstractBaseBootLoader extends Container
 
     public function loadCache()
     {
-        $cache = (new CacheFacade())->create($this->application->getCacheIdentifier(), NativeCacheStorage::class);
+        $cache = $this->make(CacheFacade::class)->create($this->application->getCacheIdentifier());
         if ($this->application->isCacheGlobal() === true) {
             GLobalManager::set($this->application->getGlobalCacheKey(), $cache);
         }
@@ -104,6 +104,11 @@ abstract class AbstractBaseBootLoader extends Container
         return $this->app()->getContainerProviders();
     }
 
+    protected function loadControllerArray(): array
+    {
+        return $this->app()->getControllerArray();
+    }
+
     /**
      * Returns the default route handler mechanism.
      *
@@ -142,7 +147,7 @@ abstract class AbstractBaseBootLoader extends Container
      */
     protected function loadSession(): Object
     {
-        $session = (new SessionFacade($this->app()->getSessions(), $this->app()->getSessions()['session_name'], $this->app()->getSessionDriver()))->setSession();
+        $session = $this->make(SessionFacade::class)->setOptions($this->app()->getSessions(), $this->app()->getSessions()['session_name'], $this->app()->getSessionDriver())->setSession();
         if ($this->application->isSessionGlobal() === true) {
             GlobalManager::set($this->application->getGlobalSessionKey(), $session);
         }
@@ -153,7 +158,7 @@ abstract class AbstractBaseBootLoader extends Container
     {
         $routes = $this->app()->getRoutes();
         $factory = $this->make(RooterFactory::class)
-            ->create($this->app()->getRequest(), $this->app()->getResponse(), $routes, $this->app()->getRouter(), $this->app()->getRouteHandler());
+            ->create($this->app()->getRequest(), $this->app()->getResponse(), $this, $routes, $this->app()->getRouter(), $this->app()->getRouteHandler(), $this->app()->getControllerArray());
         if (count($routes) > 0) {
             return $factory->buildRoutes($this->app()->getRoutes());
         }
@@ -171,8 +176,9 @@ abstract class AbstractBaseBootLoader extends Container
      */
     protected function loadLogger()
     {
-        return (new LoggerFactory())
-            ->create($this->app()->getLoggerFile(), $this->app()->getLogger(), $this->app()->getLogMinLevel(), $this->app()->getLoggerOptions());
+        //$this->app()->getLogger()
+        return $this->make(LoggerFactory::class)
+            ->create($this->app()->getLoggerFile(), $this->app()->getLogMinLevel(), $this->app()->getLoggerOptions());
     }
 
     /**

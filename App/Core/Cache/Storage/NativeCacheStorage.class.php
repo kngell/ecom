@@ -8,13 +8,15 @@ class NativeCacheStorage extends AbstractCacheStorage
 
     /**
      * Undocumented function.
-     *
-     * @param object $envConfigurations
-     * @param array $options
      */
-    public function __construct(Object $envConfigurations, array $options = [])
+    public function __construct()
     {
-        parent::__construct($envConfigurations, $options);
+    }
+
+    public function setParams(CacheEnvironmentConfigurations $envConfigurations, array $options = []) : self
+    {
+        parent::setParams($envConfigurations, $options);
+        return $this;
     }
 
     /**

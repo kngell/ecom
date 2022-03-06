@@ -6,7 +6,6 @@ class DataAccessLayerManager
 {
     protected string $tableSchema;
     protected string $tableSchameID;
-    protected DataMapperEnvironmentConfig $datamapperEnvConfig;
     protected array $options;
     protected ContainerInterface $container;
 
@@ -17,13 +16,23 @@ class DataAccessLayerManager
      * @param string $tableSchema
      * @param string $tableSchemaID
      */
-    public function __construct(DataMapperEnvironmentConfig $env, string $tableSchema, string $tableSchemaID, ?array $options = [])
+    public function __construct(private DataMapperEnvironmentConfig $dataMapperEnvConfig)
     {
-        $this->datamapperEnvConfig = $env;
         $this->container = Container::getInstance();
+    }
+
+    public function setParams(string $tableSchema, string $tableSchemaID, ?array $options = []) : self
+    {
         $this->tableSchema = $tableSchema;
         $this->tableSchameID = $tableSchemaID;
         $this->options = $options;
+        return $this;
+    }
+
+    public function setCredentials() : self
+    {
+        $this->dataMapperEnvConfig->setCredentials(YamlFile::get('database'));
+        return $this;
     }
 
     /**
@@ -33,8 +42,8 @@ class DataAccessLayerManager
      */
     public function initialize()
     {
-        $entitymanagerFactory = $this->container->make(EntityManagerFactory::class);
-        $this->container->bind(CrudInterface::class, fn () => new Crud($entitymanagerFactory->getDatamapper(), $entitymanagerFactory->getQuerybuilder(), $this->tableSchema, $this->tableSchameID, $this->options));
-        return $entitymanagerFactory->create();
+        $emFactory = $this->container->make(EntityManagerFactory::class);
+        $emFactory->getDataMapper()->setCredentials($this->dataMapperEnvConfig->getCredentials('mysql'));
+        return $emFactory->create($this->tableSchema, $this->tableSchameID, $this->options);
     }
 }

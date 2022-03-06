@@ -1,1 +1,0 @@
-<label for="{{inputID}}" class="form-label {{classlabel}}">{{label}} {{req}}</label>

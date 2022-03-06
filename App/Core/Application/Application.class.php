@@ -26,6 +26,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
     protected array $logOptions = [];
     protected string $logMinLevel;
     protected array $themeBuilderOptions = [];
+    protected array $controllerArray = [];
     private RequestHandler $request;
     private ResponseHandler $response;
     private RooterInterface $rooter;
@@ -49,22 +50,16 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
 
     public function run(): void
     {
-        try {
-            BaseConstants::load($this->app());
-            $this->phpVersion();
-            $this->loadErrorHandlers();
-            $this->loadSession();
-            $this->loadCache();
-            $this->loadLogger();
-            $this->loadEnvironment();
-            $this->registerDatabaseAccessLayerClass();
-            //$this->loadThemeBuilder();
-            $this->loadRoutes()->resolve();
-        } catch (\Exception $e) {
-            $this->response->setStatusCode($e->getCode());
-            $this->make(ErrorsController::class)->iniParams(ErrorsController::class, 'index', [], 'Client/')
-                ->index(['exception' => $e]);
-        }
+        BaseConstants::load($this->app());
+        $this->phpVersion();
+        $this->loadErrorHandlers();
+        $this->loadSession();
+        $this->loadCache();
+        $this->loadLogger();
+        $this->loadEnvironment();
+        $this->registerDataAccessLayerClass();
+        //$this->loadThemeBuilder();
+        $this->loadRoutes()->resolve();
     }
 
     /**
@@ -85,14 +80,14 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      *
      * @return string
      */
-    public function getPath(): string
+    public function getPath(string $path = ''): string
     {
-        return self::$appRoot;
+        return self::$appRoot . ($path ? DS . $path : $path);
     }
 
     public function setConst() : self
     {
-        (new ConstantConfig())->ds()->appConstants(self::$appRoot);
+        $this->make(ConstantConfig::class)->ds()->appConstants(self::$appRoot);
         return $this;
     }
 
@@ -189,7 +184,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     public function setSession(array $ymlSession = [], string|null $newSessionDriver = null, bool $isGlobal = false, ?string $globalKey = null): self
     {
-        $this->session = (!empty($ymlSession) ? $ymlSession : (new SessionConfig())->baseConfiguration());
+        $this->session = (!empty($ymlSession) ? $ymlSession : $this->make(SessionConfig::class)->baseConfiguration());
         $this->newSessionDriver = ($newSessionDriver !== null) ? $newSessionDriver : $this->getDefaultSessionDriver();
         $this->isSessionGlobal = $isGlobal;
         $this->globalSessionKey = $globalKey;
@@ -346,7 +341,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     public function setCache(array $ymlCache = [], ?string $newCacheDriver = null, bool $isGloabl = false, ?string $globalKey = null): self
     {
-        $this->cache = (!empty($ymlCache) ? $ymlCache : (new CacheConfig())->baseConfiguration());
+        $this->cache = (!empty($ymlCache) ? $ymlCache : $this->make(CacheConfig::class)->baseConfiguration());
         $this->newCacheDriver = ($newCacheDriver !== null) ? $newCacheDriver : $this->getDefaultCacheDriver();
         $this->isCacheGlobal = $isGloabl;
         $this->globalCacheKey = $globalKey;
@@ -502,19 +497,30 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
         return $this->logMinLevel;
     }
 
-    public function registerDatabaseAccessLayerClass()
+    public function setControllerArray(array $crtl) : self
     {
-        $dataMapperEnvConfig = $this->singleton(DataMapperEnvironmentConfig::class, fn () => new DataMapperEnvironmentConfig(YamlFile::get('database')))->make(DataMapperEnvironmentConfig::class);
-        $credentials = $dataMapperEnvConfig->getDatabaseCredentials('mysql');
-        $this->singleton(DatabaseConnexionInterface::class, fn () => new DatabaseConnexion($credentials));
-        $this->singleton(DataMapper::class, fn () => new DataMapper($this->make(DatabaseConnexionInterface::class)));
-        $this->singleton(QueryBuilder::class, fn () => new QueryBuilder());
-        $this->bind(DataMapperInterface::class, fn () => $this->make(DataMapper::class));
-        $this->bind(QueryBuilderInterface::class, fn () => $this->make(QueryBuilder::class));
-        $this->bind(EntityManagerFactory::class);
-        $this->singleton(DataMapperFactory::class, fn () => new DataMapperFactory($dataMapperEnvConfig));
-        $this->bind(RepositoryInterface::class, fn () => $this->make(Repository::class));
-        $this->bind(RepositoryFactory::class, fn () => new RepositoryFactory($dataMapperEnvConfig));
+        $this->controllerArray = $crtl;
+        return $this;
+    }
+
+    public function getControllerArray() : array
+    {
+        return $this->controllerArray;
+    }
+
+    /**
+     * Register the basic bindings into the container.
+     *
+     * @return void
+     */
+    protected function registerDataAccessLayerClass()
+    {
+        $objs = AppHelper::dataAccessLayerClass($this->app());
+        if (is_array($objs)) {
+            foreach ($objs as $obj => $value) {
+                $this->singleton($obj, $value);
+            }
+        }
     }
 
     /**
@@ -524,7 +530,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     protected function registerBaseAppSingleton()
     {
-        $objs = AppHelper::singleton(self::getInstance());
+        $objs = AppHelper::singleton($this->app());
         if (is_array($objs)) {
             foreach ($objs as $obj => $value) {
                 $this->singleton($obj, $value);
@@ -616,7 +622,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
     //     return $this->response;
     // }
 
-    // public function registerDatabaseAccessLayerClass()
+    // public function registerAccessLayerClass()
     // {
     //     $dataMapperEnvConfig = $this->singleton(DataMapperEnvironmentConfig::class, fn () => new DataMapperEnvironmentConfig(YamlFile::get('database')))->make(DataMapperEnvironmentConfig::class);
     //     $credentials = $dataMapperEnvConfig->getDatabaseCredentials('mysql');

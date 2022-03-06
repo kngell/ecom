@@ -33,10 +33,7 @@ abstract class BaseField implements FieldInterface
 
     public function __toString() : string
     {
-        return sprintf(
-            $this->FieldTemplate(),
-            $this->renderField(),
-        );
+        return sprintf($this->FieldTemplate(), $this->renderField(), );
     }
 
     public function hidden() : self
@@ -127,14 +124,12 @@ abstract class BaseField implements FieldInterface
     public function textClass(string $class) : self
     {
         $this->labelTextClass = $class;
-
         return $this;
     }
 
     public function spanClass(string $class)
     {
         $this->spanClass = $class;
-
         return $this;
     }
 
@@ -143,14 +138,12 @@ abstract class BaseField implements FieldInterface
         foreach ($attrs as $key => $attr) {
             $this->customAttribute .= $key . ' = "' . $attr . '" ';
         }
-
         return $this;
     }
 
     public function nestField(string $formID, bool $nestField) : self
     {
         $this->customAttribute = $nestField ? 'form ' . ' = ' . $formID : '';
-
         return $this;
     }
 
@@ -159,14 +152,12 @@ abstract class BaseField implements FieldInterface
         $actual = $this->fieldclass ?? '';
         $separator = empty($this->fieldclass) ? '' : ' ';
         $this->fieldclass = $actual . $separator . $custom;
-
         return $this;
     }
 
     public function id(string $id)
     {
         $this->fieldID = $id;
-
         return $this;
     }
 
@@ -174,14 +165,12 @@ abstract class BaseField implements FieldInterface
     {
         $this->withLabel = true;
         $this->label = $label;
-
         return $this;
     }
 
     public function labelDescr(string $descr) : self
     {
         $this->labelDescr = $descr;
-
         return $this;
     }
 
@@ -190,7 +179,6 @@ abstract class BaseField implements FieldInterface
         $this->withLabel = true;
         $this->label = $label;
         $this->labelUp = ' {{label}} %s';
-
         return $this;
     }
 
@@ -212,7 +200,6 @@ abstract class BaseField implements FieldInterface
     public function req()
     {
         $this->require = '<span class="text-danger">*</span>';
-
         return $this;
     }
 
@@ -282,7 +269,6 @@ abstract class BaseField implements FieldInterface
         if (isset($this->model)) {
             return (string) $this->model->getFirstError($this->attribute);
         }
-
         return '';
     }
 

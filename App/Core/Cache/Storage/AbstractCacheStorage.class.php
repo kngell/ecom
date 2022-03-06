@@ -47,11 +47,12 @@ abstract class AbstractCacheStorage implements IterableStorageInterface
 
     /**
      * Undocumented function.
-     *
-     * @param object $envConfigurations
-     * @param array $options
      */
-    public function __construct(Object $envConfigurations, array $options)
+    public function __construct()
+    {
+    }
+
+    public function setParams(CacheEnvironmentConfigurations $envConfigurations, array $options = [])
     {
         $this->envConfigurations = $envConfigurations;
         $this->options = $options;

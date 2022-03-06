@@ -66,6 +66,11 @@ class Logger implements LoggerInterface
         $this->loggerHandler = $loggerHandler;
     }
 
+    public function getLoggerHandler() : LoggerHandlerInterface
+    {
+        return $this->loggerHandler;
+    }
+
     /**
      * System is unusable.
      *

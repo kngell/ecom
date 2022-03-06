@@ -6,17 +6,21 @@ use function get_class;
 
 class LoggerFactory
 {
+    public function __construct(private LoggerInterface $logger)
+    {
+    }
+
     /**
      * @param string $handler
      * @param array $options
      * @return LoggerInterface
      */
-    public function create(?string $file, string $handler, ?string $defaultLogLevel, array $options = []): LoggerInterface
+    public function create(?string $file, ?string $defaultLogLevel, array $options = []): LoggerInterface
     {
-        $newHandler = ($handler != null) ? new $handler($file, $defaultLogLevel, $options) : new NativeLoggerHandler($file, $defaultLogLevel, $options);
+        $newHandler = $this->logger->getLoggerHandler()->setParams($file, $defaultLogLevel, $options);
         if (!$newHandler instanceof LoggerHandlerInterface) {
             throw new LoggerHandlerInvalidArgumentException(get_class($newHandler) . ' is invald as it does not implement the correct interface.');
         }
-        return new Logger($newHandler);
+        return $this->logger; //Container::getInstance()->make(LoggerInterface::class)->setParams($newHandler);
     }
 }

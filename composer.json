@@ -28,7 +28,7 @@
     "symfony/yaml": "^6.0",
     "symfony/cache": "^6.0",
     "doctrine/dbal": "^3.2",
-    "php": "^8.0",
+    "php": "^8.0 || ^8.1",
     "ext-mbstring": "*",
     "ext-iconv": "*",
     "ext-pdo": "*",
@@ -42,7 +42,8 @@
     "stripe/stripe-php": "^7.97",
     "symfony/http-foundation": "^6.0",
     "phpmailer/phpmailer": "^6.5",
-    "sendgrid/sendgrid": "^7.9"
+    "sendgrid/sendgrid": "^7.9",
+    "paragonie/anti-csrf": "^2.3"
   },
   "require-dev": {
     "symfony/var-dumper": "^6.0",
@@ -58,5 +59,11 @@
     "psr-4": {
       "App\\Tests\\": "tests/"
     }
+  },
+  "scripts": {
+    "csfix": [
+      "PHP_CS_FIXER_IGNORE_ENV=1 vendor/bin/php-cs-fixer fix",
+      "git add . && git commit -m '🎨 Apply PHP CS Fixer'"
+    ]
   }
 }

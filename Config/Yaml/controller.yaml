@@ -1,20 +1,20 @@
-backend:
-  - AdminController
+admin:
+  - admin
 client:
-  - HomeController
-  - UsersController
-  - RestrictedController
-  - CartController
+  - home
+  - users
+  - restricted
+  - cart
+  - security
 ajax:
-  - FormsController
-  - GuestsController
-  - VisitorsController
-  - CheckoutController
-  - FormsController
-  - TablesController
-  - PaymentgatewayController
+  - forms
+  - guests
+  - visitors
+  - checkout
+  - tables
+  - payment_gateway
 auth:
-  - AuthController
-  - LoginController
+  - auth
+  - login
 asset:
-  - AssetsController
+  - assets

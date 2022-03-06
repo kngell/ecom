@@ -6,8 +6,6 @@ use Throwable;
 
 class DataMapper extends AbstractDataMapper implements DataMapperInterface
 {
-    private DatabaseConnexionInterface $_con;
-
     private PDOStatement $_query;
 
     private int $_count = 0;
@@ -18,9 +16,14 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
      * Set Database connection
      * ===================================================================.
      */
-    public function __construct(DatabaseConnexionInterface $_con)
+    public function __construct(private DatabaseConnexionInterface $_con)
     {
-        $this->_con = $_con;
+    }
+
+    public function setCredentials(array $credentials) : self
+    {
+        $this->_con->setCredentials($credentials);
+        return $this;
     }
 
     /**

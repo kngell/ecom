@@ -13,7 +13,7 @@ class RepositoryFactory
      * Main constructor
      * ==================================================================.
      */
-    public function __construct(private DataMapperEnvironmentConfig $_bd_env)
+    public function __construct()
     {
         $this->container = Container::getInstance();
     }
@@ -43,7 +43,7 @@ class RepositoryFactory
      */
     public function create() : RepositoryInterface
     {
-        $in = $this->initializeLiquidOrmManager();
+        $in = $this->initializeDataAccessManager();
         $repositoryObject = $this->container->make(RepositoryInterface::class);
         if (!$repositoryObject instanceof RepositoryInterface) {
             throw new BaseUnexpectedValueException(get_class($repositoryObject) . ' is not a valid repository Object!');
@@ -51,10 +51,10 @@ class RepositoryFactory
         return $repositoryObject;
     }
 
-    public function initializeLiquidOrmManager()
+    public function initializeDataAccessManager()
     {
-        $this->container->bind(DataAccessLayerManager::class, fn () => new DataAccessLayerManager($this->_bd_env, $this->tableSchema, $this->tableSchemaID));
-        $dbAccessLayer = $this->container->make(DataAccessLayerManager::class);
+        $dbAccessLayer = $this->container->make(DataAccessLayerManager::class)->setParams($this->tableSchema, $this->tableSchemaID);
+        $dbAccessLayer->setCredentials();
         return $dbAccessLayer->initialize();
     }
 }

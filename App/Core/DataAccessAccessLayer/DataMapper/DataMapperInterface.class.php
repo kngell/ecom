@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 interface DataMapperInterface
 {
+    public function setCredentials(array $credentials) : self;
+
     /**
      * --------------------------------------------------------------------------------------------------
      * Prepare the query string.

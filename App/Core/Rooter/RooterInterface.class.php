@@ -25,9 +25,11 @@ interface RooterInterface
 
     public function setResponse(ResponseHandler $response) : self;
 
-    public function setView(View $view) : self;
-
     public function setNewRouter(string $newRouter) : self;
 
     public function setRouteHandler(string $routeHandler) : self;
+
+    public function setContainer(ContainerInterface $container) : self;
+
+    public function setControllerAry(array $ctrlAry) : self;
 }

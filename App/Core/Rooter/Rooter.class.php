@@ -7,14 +7,14 @@ class Rooter implements RooterInterface
     private string $route = '/';
     private array $arguments = [];
     private array $routes = [];
+    private array $controllerAry = [];
     private mixed $params;
     private string $controllerSuffix = 'Controller';
-    private string $routeHandler;
-    private string $newRouter;
-    private Container $container;
+    private string $controllerString = DEFAULT_CONTROLLER;
+    private string $controllerMethod = DEFAULT_METHOD;
+    private ContainerInterface $container;
     private RequestHandler $request;
     private ResponseHandler $response;
-    private View $view;
 
     public function __construct(private RooterHelper $helper)
     {
@@ -48,25 +48,21 @@ class Rooter implements RooterInterface
      */
     public function parseUrl(?string $urlroute = null) : string
     {
-        $url = [];
-        if (isset($urlroute) && !empty($urlroute)) {
-            if ($urlroute == '/') {
-                return $this->route = $urlroute;
-            }
-            if ($urlroute == 'favicon.ico') {
+        if ($urlroute != null) {
+            if ($urlroute == '') {
+                $this->route = $urlroute = DS;
+            } elseif ($urlroute == 'favicon.ico') {
                 $this->arguments = [$urlroute];
-
-                return 'assets';
+                $this->route = $urlroute = 'assets';
+            } else {
+                $url = explode(DS, filter_var(rtrim($urlroute, DS), FILTER_SANITIZE_URL));
+                $this->route = isset($url[0]) ? strtolower($url[0]) : $this->route;
+                unset($url[0]);
+                $this->arguments = count($url) > 0 ? array_values($url) : [];
             }
-            $url = explode('/', filter_var(rtrim($urlroute, '/'), FILTER_SANITIZE_URL));
-            $route = isset($url[0]) ? strtolower($url[0]) : $this->route;
-            unset($url[0]);
-            $this->arguments = count($url) > 0 ? array_values($url) : [];
-
-            return $route;
+            return strtolower($urlroute);
         }
-
-        return $this->route;
+        return DS;
     }
 
     /** @inheritDoc */
@@ -75,7 +71,7 @@ class Rooter implements RooterInterface
         $url = $this->parseUrl($this->helper->formatQueryString(strtolower($this->request->getPath())));
         list($this->params, $match) = $this->getMatchRoute($url, $this->routes[$this->request->getMethod()]);
         if (!$match) {
-            throw new RouterNoRoutesFound('Page not found', 1);
+            throw new RouterNoRoutesFound('Page not found');
         }
         if (is_string($this->params)) {
             $this->view->render('', []);
@@ -107,7 +103,7 @@ class Rooter implements RooterInterface
     public function getMatchRoute(string $url, array $routes) : array
     {
         foreach ($routes as $route => $params) {
-            if (preg_match($route, $url, $matches)) {
+            if (preg_match($route, $this->helper->dynamicNamespace($route, $this->route, $this->controllerAry) . $url, $matches)) {
                 foreach ($matches as $key => $param) {
                     if (is_string($key)) {
                         $params[$key] = $param;
@@ -144,9 +140,15 @@ class Rooter implements RooterInterface
         return $this;
     }
 
-    public function setView(View $view) : self
+    public function setContainer(ContainerInterface $container) : self
     {
-        $this->view = $view;
+        $this->container = $container;
+        return $this;
+    }
+
+    public function setControllerAry(array $ctrlAry) : self
+    {
+        $this->controllerAry = $ctrlAry;
         return $this;
     }
 
