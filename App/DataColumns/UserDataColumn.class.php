@@ -9,17 +9,17 @@ class UserDataColumn extends AbstractDatatableColumns
     {
         /** @var Entity */
         $entity = Container::getInstance()->make(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->_table))) . 'Entity');
-        $fields = $entity->getEntityFields();
+        $fields = $entity->getAllAttributes();
         $columns = [];
         foreach ($fields as $field) {
             $columns[] = [
-            'db_row' => $field,
-            'dt_row' => $entity->display($field),
-            'class' => '',
-            'show_column' => true,
-            'sortable' => true,
-            'formatter' => '',
-           ];
+                'db_row' => $field,
+                'dt_row' => $entity->getPropertyComment($field),
+                'class' => '',
+                'show_column' => true,
+                'sortable' => true,
+                'formatter' => '',
+            ];
         }
         return[
             [

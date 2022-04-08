@@ -9,12 +9,7 @@ const CKEditorWebpackPlugin = require("@ckeditor/ckeditor5-dev-webpack-plugin");
 module.exports = {
   plugins: [
     new DelWebpackPlugin({
-      include: [
-        "*.js",
-        "*.css",
-        "*.hot-update.*",
-        "*vendors-node_modules_ckeditor_*",
-      ], //"*.js",
+      include: ["*.js", "*.css", "*vendors-node_modules_ckeditor_*"], //"*.js",
       info: true,
       keepGeneratedAssets: false,
       allowExternal: false,

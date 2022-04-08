@@ -37,7 +37,7 @@ class AssetsController extends Controller
         }
     }
 
-    public function get_asset(array $data)
+    public function getAsset(array $data)
     {
         $file = array_pop($data);
         $path = array_pop($data);
@@ -60,7 +60,6 @@ class AssetsController extends Controller
                 $type = 'application/x-font-ttf';
                 break;
         }
-
         return $this->read_asset($fileToGet, $type);
     }
 
@@ -85,7 +84,18 @@ class AssetsController extends Controller
         if (!empty($fileToGet) && file_exists($fileToGet)) {
             header('Content-type: ' . $type);
             header('Content-Length: ' . filesize($fileToGet));
-            readfile($fileToGet);
+
+            $handle = fopen($fileToGet, 'rb');
+            $buffer = '';
+            while (!feof($handle)) {
+                $buffer = fread($handle, 4096);
+                echo $buffer;
+                ob_flush();
+                flush();
+            }
+            fclose($handle);
+            // echo file_get_contents($fileToGet);
+            // readfile($fileToGet);
             exit;
         }
     }

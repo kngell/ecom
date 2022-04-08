@@ -11,19 +11,17 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     private int $_count = 0;
     private $_results;
     private $bind_arr = [];
+    private DatabaseConnexionInterface $_con;
+    private Entity $entity;
 
     /**
      * Set Database connection
      * ===================================================================.
      */
-    public function __construct(private DatabaseConnexionInterface $_con)
+    public function __construct(DatabaseConnexionInterface $_con, Entity $entity)
     {
-    }
-
-    public function setCredentials(array $credentials) : self
-    {
-        $this->_con->setCredentials($credentials);
-        return $this;
+        $this->_con = $_con;
+        $this->entity = $entity;
     }
 
     /**
@@ -32,7 +30,6 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     public function prepare(string $sql):self
     {
         $this->_query = $this->_con->open()->prepare($sql);
-
         return $this;
     }
 
@@ -127,9 +124,12 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
                 unset($fields['bind_array']);
             }
             foreach ($fields as $key => $val) {
+                if (in_array($key, ['and', 'or'])) {
+                    $val = current($val);
+                }
                 if (is_array($val)) {
                     switch (true) {
-                        case isset($val['operator']) && in_array($val['operator'], ['!=', '>', '<', '>=', '<=']):
+                        case isset($val['operator']) && in_array($val['operator'], ['=', '!=', '>', '<', '>=', '<=']):
                             $this->bind(":$key", $val['value']);
                             break;
                         case isset($val['operator']) && in_array($val['operator'], ['NOT IN', 'IN']):
@@ -212,7 +212,6 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     {
         if ($this->_query) {
             $this->_results = $this->select_result($this->_query, $options);
-
             return $this;
         }
     }

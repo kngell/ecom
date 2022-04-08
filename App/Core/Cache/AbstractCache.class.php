@@ -13,18 +13,7 @@ abstract class AbstractCache implements CacheInterface
     /** @var array */
     protected array $options = [];
 
-    public function __construct()
-    {
-    }
-
-    /**
-     * Main abstract parent class. Which pipes all the properties to their constructor
-     * arguments.
-     *
-     * @param string|null $cacheIdentifier
-     * @param array $options
-     */
-    public function setParams(?string $cacheIdentifier, ?CacheStorageInterface $storage, array $options = [])
+    public function __construct(?string $cacheIdentifier, ?CacheStorageInterface $storage, array $options = [])
     {
         $this->$cacheIdentifier = $cacheIdentifier;
         if (!empty($storage) && $storage != null) {

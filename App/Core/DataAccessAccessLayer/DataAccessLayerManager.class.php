@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 class DataAccessLayerManager
 {
-    protected string $tableSchema;
-    protected string $tableSchameID;
-    protected array $options;
-    protected ContainerInterface $container;
+    private string $tableSchema;
+    private string $tableSchemaID;
+    private array $options;
+    private ContainerInterface $container;
+    private DataMapperEnvironmentConfig $dataMapperEnvConfig;
+    private Entity $entity;
 
     /**
      * Main contructor
@@ -16,23 +18,13 @@ class DataAccessLayerManager
      * @param string $tableSchema
      * @param string $tableSchemaID
      */
-    public function __construct(private DataMapperEnvironmentConfig $dataMapperEnvConfig)
-    {
-        $this->container = Container::getInstance();
-    }
-
-    public function setParams(string $tableSchema, string $tableSchemaID, ?array $options = []) : self
+    public function __construct(DataMapperEnvironmentConfig $dataMapperEnvConfig, string $tableSchema, string $tableSchemaID, ?array $options, Entity $entity)
     {
         $this->tableSchema = $tableSchema;
-        $this->tableSchameID = $tableSchemaID;
+        $this->tableSchemaID = $tableSchemaID;
         $this->options = $options;
-        return $this;
-    }
-
-    public function setCredentials() : self
-    {
-        $this->dataMapperEnvConfig->setCredentials(YamlFile::get('database'));
-        return $this;
+        $this->entity = $entity;
+        $this->dataMapperEnvConfig = $dataMapperEnvConfig;
     }
 
     /**
@@ -42,8 +34,15 @@ class DataAccessLayerManager
      */
     public function initialize()
     {
-        $emFactory = $this->container->make(EntityManagerFactory::class);
-        $emFactory->getDataMapper()->setCredentials($this->dataMapperEnvConfig->getCredentials('mysql'));
-        return $emFactory->create($this->tableSchema, $this->tableSchameID, $this->options);
+        return $this->container->make(EntityManagerFactory::class, [
+            'tableSchema' => $this->tableSchema,
+            'tableSchamaID' => $this->tableSchemaID,
+            'options' => $this->options,
+            'entity' => $this->entity,
+            'dataMapperEnvConfig' => $this->dataMapperEnvConfig,
+
+        ])->create();
+        // $emFactory->getDataMapper()->setCredentials($this->dataMapperEnvConfig->getCredentials('mysql'));
+        // return $emFactory->create($this->tableSchema, $this->tableSchameID, $this->options);
     }
 }

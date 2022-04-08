@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Throwable;
 
-class Crud implements CrudInterface
+class Crud extends AbstractCrud implements CrudInterface
 {
     /**
      * dataMapper Object.
@@ -24,27 +24,13 @@ class Crud implements CrudInterface
     protected string $tableSchemaID;
     protected array $options;
 
-    public function __construct()
-    {
-    }
-
-    /**
-     * Set Params
-     * =====================================================================.
-     * @param DataMapperInterface $datamapper
-     * @param QueryBuilderInterface $queryBuilder
-     * @param string $tableSchma
-     * @param string $tableSchmaID
-     *@return void
-     */
-    public function setParams(DataMapperInterface $dataMapper, queryBuilderInterface $queryBuilder, string $tableSchema = '', string $tableSchmaID = '', ?array $options = []) : self
+    public function __construct(DataMapperInterface $dataMapper, queryBuilderInterface $queryBuilder, string $tableSchema, string $tableSchemaID, ?array $options = [])
     {
         $this->tableSchema = $tableSchema;
-        $this->tableSchemaID = $tableSchmaID;
+        $this->tableSchemaID = $tableSchemaID;
         $this->options = $options;
         $this->dataMapper = $dataMapper;
         $this->queryBuilder = $queryBuilder;
-        return $this;
     }
 
     /**
@@ -101,18 +87,16 @@ class Crud implements CrudInterface
                 'table' => $this->getSchema(),
                 'type' => 'select',
                 'selectors' => $selectors,
-                'where' => array_merge($conditions, isset($options['where']) ? $options['where'] : []),
+                'conditions' => $conditions,
                 'params' => $params,
                 'extras' => $options,
-                'table_join' => isset($options['table_join']) ? $options['table_join'] : [],
             ];
             // $params = ModelHelper::get_params_args($params);
             $query = $this->queryBuilder->buildQuery($arg)->select();
-            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($arg['where'], $params));
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($arg['conditions'], $params));
             if ($this->dataMapper->numrow() > 0) {
                 return $this->dataMapper->results($options);
             }
-
             return $this->dataMapper;
         } catch (\Throwable $th) {
             throw $th;

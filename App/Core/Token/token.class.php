@@ -3,9 +3,6 @@
 declare(strict_types=1);
 class Token extends RandomStringGenerator
 {
-    //=======================================================================
-    //Generate Token
-    //=======================================================================
     public function generate_token(int $length = 8, string $frm = '', string $alphabet = '')
     {
         $identifiant = '';
@@ -21,25 +18,16 @@ class Token extends RandomStringGenerator
         return $this->urlSafeEncode($hash . $separator . $identifiant . $separator . $time);
     }
 
-    //=======================================================================
-    //Url Safe encode
-    //=======================================================================
     public function urlSafeEncode($str)
     {
         return rtrim(strtr(base64_encode($str), '+/', '-_'), '=');
     }
 
-    //=======================================================================
-    //Url Safe décode
-    //=======================================================================
     public function urlSafeDecode($str)
     {
         return base64_decode(strtr($str, '-_', '+/'));
     }
 
-    //=======================================================================
-    //Validate token
-    //=======================================================================
     public function validateToken($token = '', $frm = '')
     {
         $separator = !empty($frm) ? $frm : '|';
@@ -77,5 +65,10 @@ class Token extends RandomStringGenerator
 
         return hash_equals($serverToken, $token);
         //(Session::exists($token_name) && $token === Session::get($token_name));
+    }
+
+    public function getHash() : string
+    {
+        return hash_hmac('sha256', $this->token, YamlFile::get('app')['settings']['secret_key']);
     }
 }

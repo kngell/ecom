@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class DatabaseConnexion implements DatabaseConnexionInterface
+final class DatabaseConnexion implements DatabaseConnexionInterface
 {
     /**
      * @var array
@@ -13,17 +13,7 @@ class DatabaseConnexion implements DatabaseConnexionInterface
      */
     private PDO $con;
 
-    public function __construct()
-    {
-    }
-
-    /**
-     * SetCredentials
-     * =========================================================.
-     * @param array $credentials
-     * @return void
-     */
-    public function setCredentials(array $credentials) : void
+    public function __construct(array $credentials)
     {
         $this->credentials = $credentials;
     }
@@ -38,10 +28,12 @@ class DatabaseConnexion implements DatabaseConnexionInterface
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci',
             PDO::MYSQL_ATTR_INIT_COMMAND => 'SET CHARACTER SET UTF8mb4',
             PDO::ATTR_PERSISTENT => true,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_EMULATE_PREPARES => true,
             PDO::MYSQL_ATTR_FOUND_ROWS => true,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_CASE => PDO::CASE_NATURAL,
+            PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING,
         ];
         if (!isset($this->con)) {
             try {

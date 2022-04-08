@@ -22,23 +22,11 @@ abstract class AbstractLoggerHandler implements LoggerHandlerInterface
         LogLevel::WARNING,
     ];
 
-    public function __construct()
-    {
-    }
-
-    /**
-     * AbstractLoggerHandler constructor.
-     * @param string $file
-     * @param string $minLevel
-     * @param array $options
-     * @return void
-     */
-    public function setParams(string $file, string $minLevel, array $options = []) : self
+    public function __construct(string $file, string $minLevel, array $options)
     {
         $this->options = $options;
         $this->minLevel = $minLevel;
         $this->file = $file;
-        return $this;
     }
 
     /**

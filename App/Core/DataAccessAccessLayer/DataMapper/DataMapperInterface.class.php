@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 interface DataMapperInterface
 {
-    public function setCredentials(array $credentials) : self;
+    // public function setCredentials(array $credentials) : self;
 
     /**
      * --------------------------------------------------------------------------------------------------

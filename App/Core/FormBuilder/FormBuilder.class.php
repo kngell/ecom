@@ -22,7 +22,7 @@ class FormBuilder extends AbstractFormBuilder
      *
      * @return void
      */
-    public function __construct(protected CoreError $error, protected RequestHandler $request, protected Token $token)
+    public function __construct(protected CoreError $error, protected RequestHandler $request, protected Token $token, protected GlobalVariablesInterface $globals)
     {
         $this->container = Container::getInstance();
         $path = FILES . 'Template' . DS . 'Users' . DS . 'Auth' . DS . $this::class . 'Template.php';
@@ -82,7 +82,7 @@ class FormBuilder extends AbstractFormBuilder
         }
     }
 
-    public function addField(array $args = [], $options = null, array $settings = []) : self
+    public function input(array $args = [], $options = null, array $settings = []) : self
     {
         $this->inputObject = [];
         return $this->add($args, $options, $settings)->htmlAttr(array_merge(self::FIELD_ARGS, $this->fieldWrapperClass));
@@ -202,11 +202,11 @@ class FormBuilder extends AbstractFormBuilder
      */
     public function canHandleRequest() : array
     {
-        $method = ($_SERVER['REQUEST_METHOD'] ?? '');
+        $method = ($this->globals->getServer('REQUEST_METHOD') ?? '');
         if ($method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
-            if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE') {
+            if ($this->globals->getServer('HTTP_X_HTTP_METHOD') == 'DELETE') {
                 $method == 'DELETE';
-            } elseif ($_SERVER['HTTP_X_HTTP_METHOD'] == 'PUT') {
+            } elseif ($this->globals->getServer('HTTP_X_HTTP_METHOD') == 'PUT') {
                 $method == 'PUT';
             } else {
                 throw new FormBuilderUnexpectedValueException('Unexpected Header');
@@ -215,7 +215,7 @@ class FormBuilder extends AbstractFormBuilder
         try {
             return [
                 $method,
-                (class_exists(RequestHandler::class)) ? $this->request->handler()->request->all() : $_POST,
+                (class_exists(RequestHandler::class)) ? $this->request->handler()->request->all() : $_REQUEST,
                 $this->getStream(),
             ];
         } catch (Throwable $th) {
@@ -279,7 +279,8 @@ class FormBuilder extends AbstractFormBuilder
      */
     public function isSubmittable(string $name = 'submit') : bool
     {
-        return isset($_POST[$name]);
+        $sb = $this->globals->getPost($name);
+        return isset($sb);
     }
 
     /**
@@ -296,9 +297,10 @@ class FormBuilder extends AbstractFormBuilder
 
     protected function getStream()
     {
-        $contentType = isset($_SERVER['CONTENT_TYPE']) && $_SERVER['REQUEST_METHOD'] == 'POST' ? trim($_SERVER['CONTENT_TYPE']) : '';
+        $ct = $this->globals->getServer('CONTENT_TYPE');
+        $contentType = isset($ct) && $this->globals->getServer('REQUEST_METHOD') == 'POST' ? trim($this->globals->getServer('CONTENT_TYPE')) : '';
         if ($contentType === 'application/json') {
-            $content = trim(file_get_contents('php://input', false, stream_context_get_default(), 0, $_SERVER['CONTENT_LENGTH']));
+            $content = trim(file_get_contents('php://input', false, stream_context_get_default(), 0, $this->globals->getServer('CONTENT_LENGTH')));
             $decode = json_decode($content, true);
             if (is_array($decode)) {
                 echo $decode;
@@ -327,15 +329,14 @@ class FormBuilder extends AbstractFormBuilder
         if (isset($template) && $template == true) {
             $html .= (isset($field_wrapper) && $field_wrapper == true) ? $this->buildTemplate($objectType, $this->htmlAttr, $label_up) : '';
             $html = $this->buildLabel($objectType, $html, $this->htmlAttr, $label, $show_label);
-            $html = sprintf($html, $objectType->view());
-            return $html;
+            return sprintf($html, $objectType->view($label));
         } else {
             if ($container) {
                 //[before, after, element, element_id, element_class, element_style]
                 // extract($this->htmlAttr);
                 $html .= (isset($field_wrapper) && $field_wrapper == true) ? $this->buildTemplate($objectType, $this->htmlAttr, $label_up) : ''; //"\n{$before}" : '';
                 $html = $this->buildLabel($objectType, $html, $this->htmlAttr, $label, $show_label);
-                return sprintf($html, $objectType->view());
+                return sprintf($html, $objectType->view($label));
             // if (!empty($element)) {
                 //     /* Main wrapper element html tag are set with in the $before variable */
                 //     /* Form label wrapping element */

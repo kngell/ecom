@@ -94,7 +94,7 @@ cache:
 #=============================================================================
 #=============================================================================
 system:
-  use_resolvable_action: false
+  use_resolvable_method: false
   use_session: true
   use_cookie: true
   logger:

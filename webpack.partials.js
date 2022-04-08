@@ -7,8 +7,7 @@ const frontendEntries = require("./src/entries/assets/frontend/frontendEntries")
 const adminEntries = require("./src/entries/assets/backend/admin/adminEntries");
 const { viewRules, assetsRuless } = require("./webpack.modules");
 const ASSET_PATH =
-  process.env.ASSET_PATH ||
-  `${path.sep}ecom${path.sep}public${path.sep}assets${path.sep}`;
+  process.env.ASSET_PATH || `${path.sep}public${path.sep}assets${path.sep}`;
 
 /**
  * Alias
@@ -35,6 +34,9 @@ exports.alias = {
  */
 const serverOpt = {
   static: ["./"],
+  client: {
+    webSocketURL: "auto://myapp.test:80/ws",
+  },
   // open: {
   //   app: {
   //     name: "Chrome",
@@ -53,10 +55,13 @@ const serverOpt = {
   proxy: {
     context: () => true,
     "/**": {
-      target: "https://localhost/ecom",
+      target: "https://localhost",
       secure: false,
       changeOrigin: true,
       pathRewrite: { "^/ecom": "" },
+      // headers: {
+      //   cookie: 'COOKIE_AUTH_KEY=COOKIE_AUTH_VALUE;',
+      // },
     },
   },
   devMiddleware: {
@@ -67,7 +72,11 @@ const serverOpt = {
   client: {
     logging: "none",
   },
-  // firewall: false,
+  // headers: {
+  //   "Access-Control-Allow-Origin": "*",
+  //   "Access-Control-Allow-Headers": "*",
+  //   "Access-Control-Allow-Methods": "*",
+  // },
 };
 
 const assetParams = {

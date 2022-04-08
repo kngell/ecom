@@ -7,22 +7,21 @@ class AuthManager extends Model
     protected $_colID = 'userID';
     protected $_table = 'users';
     protected $_count;
-    protected SessionInterface $session;
     private $_sessionName;
     private $_cookieName;
     private $_isLoggedIn = false;
     private $_confirm;
 
-    //=======================================================================
-    //construct
-    //=======================================================================
-
     public function __construct()
     {
         parent::__construct($this->_table, $this->_colID);
-        $this->session = GlobalsManager::get('global_session');
         $this->_sessionName = CURRENT_USER_SESSION_NAME;
         $this->_cookieName = REMEMBER_ME_COOKIE_NAME;
+    }
+
+    public function gardedId(): array
+    {
+        return [];
     }
 
     public function initUser(string $user = '')
@@ -53,7 +52,7 @@ class AuthManager extends Model
             'group_by' => ['userID' => ['tbl' => 'users']],
             'return_mode' => 'class',
         ];
-        $user = $this->getAllItem($data, $tables);
+        $user = $this->getAllItems($data, $tables);
         if ($user->count() > 0) {
             $u = current($user->get_results());
             $u->_count = $user->count();
@@ -66,29 +65,22 @@ class AuthManager extends Model
         return false;
     }
 
-    //=======================================================================
-    //Get Users login attempts
-    //=======================================================================
-    public function getUserLoginattemps($email)
+    public function loginAttemps(string $email) : array
     {
-        $tables = ['users' => ['*'], 'login_attempts' => 'COUNT|laID'];
-        $data = [
-            'join' => 'LEFT JOIN',
-            'rel' => [['userID', 'userID'], 'params' => ['timestamp| >=' . time() - 60 * 60 . '|login_attempts']],
-            'where' => ['email' => ['value' => $email, 'tbl' => 'users']],
-            'group_by' => ['userID' => ['tbl' => 'users']],
-            'return_mode' => 'class',
-        ];
-        $user = $this->getAllItem($data, $tables);
+        $query_params = $this->table()
+            ->leftJoin('login_attempts', ['laID|COUNT|number'])->on(['userID', 'users' => 'userID'], ['timestamp|>=|' => [time() - 60 * 60, 'login_attempts']])
+            ->where(['email' => [$email, 'users']])
+            ->groupBy(['users' => 'userID'])
+            ->return('class')
+            ->build();
+        $user = $this->getAllItems($query_params);
         if ($user->count() > 0) {
             $u = current($user->get_results());
             $u->_count = $user->count();
             $u->name = $u->firstName . ' ' . $u->lastName;
             $user = null;
-
-            return [$u, (int) $u->Number];
+            return [$u, (int) $u->number];
         }
-
         return false;
     }
 
@@ -381,13 +373,13 @@ class AuthManager extends Model
             'return_mode' => 'class',
             'return_type' => 'single',
         ];
-        $row = $this->getAllItem($conditions);
+        $row = $this->getAllItems($conditions);
 
         return $row;
     }
 
     //Before update
-    public function beforeSaveUpadate($fields = [])
+    public function beforeSaveUpadate(Entity $entity) : Entity
     {
         return parent::beforeSaveUpadate($fields);
     }

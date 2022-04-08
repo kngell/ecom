@@ -29,16 +29,16 @@ class SessionConfig
             'default_driver' => self::DEFAULT_DRIVER,
             'drivers' => [
                 'native_storage' => [
-                    'class' => '\MagmaCore\Session\Storage\NativeSessionStorage',
+                    'class' => 'NativeSessionStorage',
                     'default' => true,
                 ],
                 'array_storage' => [
-                    'class' => '\MagmaCore\Session\Storage\ArraySessionStorage',
+                    'class' => 'ArraySessionStorage',
                     'default' => false,
 
                 ],
                 'pdo_storage' => [
-                    'class' => '\MagmaCore\Session\Storage\PdoSessionStorage',
+                    'class' => 'PdoSessionStorage',
                     'default' => false,
 
                 ],

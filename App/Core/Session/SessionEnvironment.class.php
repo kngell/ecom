@@ -16,17 +16,12 @@ class SessionEnvironment
      * @param array $sessionConfig
      * @return void
      */
-    public function __construct()
-    {
-    }
-
-    public function setParams(array $sessionConfig) : self
+    public function __construct(array $sessionConfig)
     {
         if (count($sessionConfig) < 0 || !is_array($sessionConfig)) {
             throw new \LogicException('Session environment has failed to load. Ensure your are passing the correct yaml configuration file to the session facade class object');
         }
         $this->sessionConfig = $sessionConfig;
-        return $this;
     }
 
     /**

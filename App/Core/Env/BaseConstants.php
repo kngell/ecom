@@ -14,7 +14,7 @@ final class BaseConstants
      *
      * @return void
      */
-    public static function load($app): void
+    public static function load(): void
     {
         defined('PUBLIC_PATH') or define('PUBLIC_PATH', 'public');
         defined('ASSET_PATH') or define('ASSET_PATH', '/' . PUBLIC_PATH . '/assets');

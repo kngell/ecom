@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 abstract class AbstractCookieStore implements CookieStoreInterface
 {
-    /** @var object */
-    protected Object $cookieEnvironment;
+    /** @var CookieEnvironment */
+    protected CookieEnvironment $cookieEnvironment;
 
     /**
      * Main class constructor.
      *
-     * @param object $cookieEnvironment
+     * @param CookieEnvironment $cookieEnvironment
      */
-    public function __construct(Object $cookieEnvironment)
+    public function __construct(CookieEnvironment $cookieEnvironment)
     {
         $this->cookieEnvironment = $cookieEnvironment;
     }

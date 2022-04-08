@@ -12,7 +12,7 @@
         <div class="font-rale font-size-14 left-side">
             <?=$this->search_box?>
             <div class="connect">
-                <?php if (!isset(AuthManager::$currentLoggedInUser)) : ?>
+                <?php if (AuthManager::$currentLoggedInUser == null) : ?>
                 <button type="button" class="px-3 border-right border-left text-dark connexion text-decoration-none"
                     data-bs-toggle="modal" data-bs-target="#login-box" id="login_btn">
                     <span class="icon login"></span>&nbsp;&nbsp;Login</button>

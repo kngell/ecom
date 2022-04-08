@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 class EntityManager implements EntityManagerInterface
 {
+    private CrudInterface $crud;
+
     /**
      * Main constructor
      * =====================================================================.
      * @param CrudInterface $crud
      * @return void
      */
-    public function __construct(private CrudInterface $crud)
+    public function __construct(CrudInterface $crud)
     {
+        $this->crud = $crud;
     }
 
     /**
-     * Get Items
+     * Get Crud Operations
      * =====================================================================.
      *@inheritDoc
      */

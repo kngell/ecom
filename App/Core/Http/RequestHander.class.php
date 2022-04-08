@@ -37,7 +37,7 @@ class RequestHandler extends GlobalVariables
     {
         $path = $this->getGet('url');
         if (empty($path)) {
-            return '/';
+            return '';
         }
         $position = strpos($path, '?');
         if ($position === false) {
@@ -94,9 +94,9 @@ class RequestHandler extends GlobalVariables
      * ==================================================================================.
      * @param array $source
      * @param array $item
-     * @return void
+     * @return array
      */
-    public function transform_keys(array $source = [], array | null $item = [])
+    public function transform_keys(array $source = [], array | null $item = []) : array
     {
         $S = $source;
         if (isset($item)) {

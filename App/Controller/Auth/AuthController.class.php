@@ -9,29 +9,29 @@ class AuthController extends Controller
      * Main Controller
      * ===========================================================================================.
      */
-    public function __construct(private AuthMiddleWare $authmiddleware, private UploadHelper $uploadHelper)
-    {
-        $authmiddleware->init(['profile']);
-        $this->registerMiddleware($authmiddleware);
-    }
+    // public function __construct(private AuthMiddleWare $authmiddleware, private UploadHelper $uploadHelper)
+    // {
+    //     $authmiddleware->init(['profile']);
+    //     $this->registerMiddleware($authmiddleware);
+    // }
 
     public function ajaxLogin()
     {
-        if ($this->request->exists('post')) {
+        if ($this->request->exists('post') && $this->loginFrm->canHandleRequest()) {
             $data = $this->request->get();
             if ($data['csrftoken'] && $this->token->validateToken($data['csrftoken'], $data['frm_name'])) {
                 $model = $this->container->make(AuthManager::class)->assign($data);
                 method_exists('Form_rules', 'login') ? $model->validator($data, Form_rules::login()) : '';
                 if ($model->validationPasses()) {
-                    $user = $model->getUserLoginattemps($data['email']);
-                    if ($user && (int) $user[0]->count() === 1) {
-                        if ($user[0]->verified) {
-                            if ($user[1] <= MAX_LOGIN_ATTEMPTS_PER_HOUR) {
+                    list($user, $number) = $model->loginAttemps($data['email']);
+                    if ($user) {
+                        if ($user->verified) {
+                            if ($number <= MAX_LOGIN_ATTEMPTS_PER_HOUR) {
                                 $loginAtempt = $this->container->make(LoginAttemptsManager::class);
-                                if (password_verify($data['password'], $user[0]->password)) {
-                                    $remember = (isset($data['rem']) && $data['rem'] === 'on') ? true : false;
-                                    if ($user[0]->login($remember)) {
-                                        $loginAtempt->delete(['userID' => $user[0]->userID]);
+                                if (password_verify($data['password'], $user->password)) {
+                                    $remember = (isset($data['remember_me']) && $data['remember_me'] === 'on') ? true : false;
+                                    if ($user->login($remember)) {
+                                        $loginAtempt->delete(['userID' => $user->userID]);
                                         if (isset($data['checkout'])) {
                                             $this->jsonResponse(['result' => 'success', 'msg' => $data['checkout']]);
                                         }
@@ -40,7 +40,7 @@ class AuthController extends Controller
                                         $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Failed to login')]);
                                     }
                                 } else {
-                                    $loginAtempt->userID = $user[0]->userID;
+                                    $loginAtempt->userID = $user->userID;
                                     $loginAtempt->timestamp = time();
                                     $loginAtempt->ip = $_SERVER['REMOTE_ADDR'];
                                     if ($loginAtempt->save()) {

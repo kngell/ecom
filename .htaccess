@@ -1,6 +1,8 @@
+
+# the following 2 lines to eliminate the overhead.
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /ecom
+  # RewriteBase /
   RewriteRule ^$ public/ [L]
   RewriteRule ^(.*) public/$1 [L,NC]
 </IfModule>
@@ -10,5 +12,7 @@
     Header always set Access-Control-Allow-Origin "*"
   </FilesMatch>
 </IfModule>
+
+
 
 

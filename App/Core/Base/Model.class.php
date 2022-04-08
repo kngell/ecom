@@ -1,21 +1,31 @@
 <?php
 
 declare(strict_types=1);
-class Model extends ModelCruds
+class Model extends AbstractModel implements ModelInterface
 {
+    use ModelTrait;
+
     protected RepositoryInterface $repository;
     protected ContainerInterface $container;
     protected MoneyManager $money;
     protected Entity $entity;
-    protected $validates = true;
-    protected $_results;
-    protected $_count;
-    protected $_modelName;
-    protected $_softDelete = false;
-    protected $_deleted_item = false;
-    protected $_current_ctrl_method = 'update';
-    protected $validationErr = [];
-    protected $_lasID;
+    protected ModelHelper $helper;
+    protected SessionInterface $session;
+    protected CookieInterface $cookie;
+    protected Token $token;
+    protected RequestHandler $request;
+    protected ResponseHandler $response;
+    protected bool $validates = true;
+    protected array $validationErr = [];
+    protected string $tableSchema;
+    protected string $tableSchemaID;
+    private $_results;
+    private int $_count;
+    private string $_modelName;
+    private bool $_softDelete = false;
+    private bool $_deleted_item = false;
+    private string $_current_ctrl_method = 'update';
+    private int $_lasID;
 
     /**
      * Main Constructor
@@ -27,8 +37,86 @@ class Model extends ModelCruds
     {
         $this->container = Container::getInstance();
         $this->throwException($tableSchema, $tableSchemaID);
-        $this->createRepository($tableSchema, $tableSchemaID);
-        $this->entity = $this->container->make(str_replace(' ', '', ucwords(str_replace('_', ' ', $tableSchema))) . 'Entity');
+        $this->tableSchema = $tableSchema;
+        $this->tableSchemaID = $tableSchemaID;
+        $this->properties();
+        $this->entity();
+        $this->repository();
+    }
+
+    public function guardedID(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get Detail
+     * ===========================================================.
+     * @param mixed $id
+     * @param string $colID
+     * @return self|null
+     */
+    public function getDetails(mixed $id, string $colID = '') : ?self
+    {
+        $data_query = $this->table()
+            ->where([$colID != '' ? $colID : $this->get_colID() => $id])
+            ->return('class')
+            ->build();
+        return $this->findFirst($data_query);
+    }
+
+    public function getAll() : ?self
+    {
+        return $this->find();
+    }
+
+    public function getUniqueId(string $colid_name = '', string $prefix = '', string $suffix = '', int $token_length = 24)
+    {
+        $output = $prefix . $this->token->generate($token_length) . $suffix;
+        while ($this->getDetails($output, $colid_name)->count() > 0) :
+            $output = $prefix . $this->token->generate($token_length) . $suffix;
+        endwhile;
+        return $output;
+    }
+
+    /**
+     * Save Data insert or update
+     * ============================================================.
+     * @param array $params
+     * @return void
+     */
+    public function save(?Entity $entity = null) : ?Object
+    {
+        $en = is_null($entity) ? $this->entity : $entity;
+        if ($this->beforeSave($entity)) {
+            if (( new ReflectionProperty($en, $en->getColId()))->isInitialized($en)) {
+                $en = $this->beforeSaveUpadate($en);
+                $save = $this->update($en);
+            } else {
+                $en = $this->beforeSaveInsert($en);
+                $save = $this->insert();
+            }
+            if ($save->count() > 0) {
+                $params['saveID'] = $save ?? '';
+                return $this->afterSave($params);
+            }
+        }
+        return null;
+    }
+
+    public function count() : int
+    {
+        return $this->_count;
+    }
+
+    public function setCount(int $count) : void
+    {
+        $this->_count = $count;
+    }
+
+    public function setResults(mixed $results) : void
+    {
+        $this->_results = $results;
     }
 
     /**
@@ -66,18 +154,6 @@ class Model extends ModelCruds
     }
 
     /**
-     * Create the model repositories
-     * =============================================================.
-     * @param string $tableSchema
-     * @param string $tableSchemaID
-     * @return void
-     */
-    public function createRepository(string $tableSchema, string $tableSchemaID): void
-    {
-        $this->repository = $this->container->make(RepositoryFactory::class)->initParams('crudIdentifier', $tableSchema, $tableSchemaID)->create();
-    }
-
-    /**
      * Throw an exception
      * ================================================================.
      * @return void
@@ -87,6 +163,12 @@ class Model extends ModelCruds
         if (empty($tableSchema) || empty($tableSchemaID)) {
             throw new BaseInvalidArgumentException('Your repository is missing the required constants. Please add the TABLESCHEMA and TABLESCHEMAID constants to your repository.');
         }
+    }
+
+    public function assign(array $data) : self
+    {
+        $this->entity->assign($data);
+        return $this;
     }
 
     /**
@@ -119,19 +201,6 @@ class Model extends ModelCruds
     }
 
     /**
-     * Get Detail
-     * ===========================================================.
-     * @param mixed $id
-     * @param string $colID
-     * @return self|null
-     */
-    public function getDetails(mixed $id, string $colID = '') : ?self
-    {
-        $data_query = ['where' => [$colID != '' ? $colID : $this->get_colID() => $id], 'return_mode' => 'class'];
-        return $this->findFirst($data_query);
-    }
-
-    /**
      * Get Col ID or TablschemaID.
      *
      * @return string
@@ -139,5 +208,27 @@ class Model extends ModelCruds
     public function get_colID() : string
     {
         return isset($this->_colID) ? $this->_colID : '';
+    }
+
+    public function validationPasses() : bool
+    {
+        return $this->validates;
+    }
+
+    /**
+     * Create the model repositories
+     * =============================================================.
+     * @param string $tableSchema
+     * @param string $tableSchemaID
+     * @return void
+     */
+    private function repository(): void
+    {
+        $this->repository = $this->container->make(RepositoryFactory::class, [
+            'crudIdentifier' => 'crudIdentifier',
+            'tableSchema' => $this->tableSchema,
+            'tableSchemaID' => $this->tableSchemaID,
+            'entity' => $this->entity,
+        ])->create();
     }
 }

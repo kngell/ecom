@@ -10,15 +10,24 @@ class Rooter implements RooterInterface
     private array $controllerAry = [];
     private mixed $params;
     private string $controllerSuffix = 'Controller';
-    private string $controllerString = DEFAULT_CONTROLLER;
-    private string $controllerMethod = DEFAULT_METHOD;
+    private string $methodSuffix = 'Page';
     private ContainerInterface $container;
-    private RequestHandler $request;
-    private ResponseHandler $response;
 
-    public function __construct(private RooterHelper $helper)
+    public function __construct(private RooterHelper $helper, private ResponseHandler $response, private RequestHandler $request)
     {
-        $this->container = Container::getInstance();
+    }
+
+    /** @inheritDoc */
+    public function setProperties(array $params = []) : self
+    {
+        if (!empty($params)) {
+            foreach ($params as $key => $value) {
+                if ($key != '' && property_exists($this, $key)) {
+                    $this->{$key} = $value;
+                }
+            }
+        }
+        return $this;
     }
 
     /** @inheritDoc */
@@ -31,22 +40,12 @@ class Rooter implements RooterInterface
         $this->routes[$method][$route] = $params;
     }
 
-    public function get(string $path, mixed $callback)
-    {
-        $this->routes['get'][$path] = $callback;
-    }
-
-    public function post(string $path, mixed $callback)
-    {
-        $this->routes['post'][$path] = $callback;
-    }
-
     /**
      * Parse URL
      * =========================================================.
-     * @return string
+     * @return string|ResponseHandler
      */
-    public function parseUrl(?string $urlroute = null) : string
+    public function parseUrl(?string $urlroute = null) : string|ResponseHandler
     {
         if ($urlroute != null) {
             if ($urlroute == '') {
@@ -66,27 +65,21 @@ class Rooter implements RooterInterface
     }
 
     /** @inheritDoc */
-    public function resolve(): self
+    public function resolve(string $url): self
     {
-        $url = $this->parseUrl($this->helper->formatQueryString(strtolower($this->request->getPath())));
-        list($this->params, $match) = $this->getMatchRoute($url, $this->routes[$this->request->getMethod()]);
-        if (!$match) {
-            throw new RouterNoRoutesFound('Page not found');
-        }
-        if (is_string($this->params)) {
-            $this->view->render('', []);
-        }
-        $controllerString = $this->helper->transformCtrlToCmCase($this->params['controller']) . $this->controllerSuffix;
-        if (class_exists($controllerString)) {
-            $method = $this->helper->transformCmCase($this->params['method']);
-            $controllerObject = $this->controllerObject($controllerString, $method);
-            if (\is_callable([$controllerObject, $method], true, $callableName)) {
-                $controllerObject->$method($this->arguments);
+        list($controllerString) = $this->resolveWithException($this->helper->formatQueryString(strtolower($url)));
+        $method = $this->createMethod();
+        $controllerObject = $this->controllerObject($controllerString, $method);
+        if (preg_match('/method$/i', $method) == 0) {
+            if (YamlFile::get('app')['system']['use_resolvable_method'] === true) {
+                $this->resolveControllerMethodDependencies($controllerObject, $method);
+            } elseif (\is_callable([$controllerObject, $method], true, $callableName)) {
+                $controllerObject->$method($this->arguments); //$callableName($this->arguments);
             } else {
-                throw new NoActionFoundException('No method existe or not callable', 1);
+                throw new NoActionFoundException("Method $method in controller $controllerString cannot be called");
             }
         } else {
-            throw new RouterNoControllerFoundException('No controller exists', 1);
+            throw new NoActionFoundException("Method $method in controller $controllerString cannot be called directly - remove the Action suffix to call this method");
         }
         return $this;
     }
@@ -98,9 +91,9 @@ class Rooter implements RooterInterface
      *
      * @param string $url
      * @param array $routes
-     * @return array
+     * @return bool
      */
-    public function getMatchRoute(string $url, array $routes) : array
+    public function getMatchRoute(string $url, array $routes) : bool
     {
         foreach ($routes as $route => $params) {
             if (preg_match($route, $this->helper->dynamicNamespace($route, $this->route, $this->controllerAry) . $url, $matches)) {
@@ -109,59 +102,26 @@ class Rooter implements RooterInterface
                         $params[$key] = $param;
                     }
                 }
-                return [$params, true];
+                $this->params = $params;
+                return true;
             }
         }
-        return [[], false];
+        return false;
     }
 
     public function controllerObject(string $controllerString, string $method) : Controller
     {
-        $controllerObject = $this->container->make($controllerString)->iniParams($controllerString, $method, $this->params, $this->getNamespace($controllerString));
-        $this->container->bind($controllerString, fn () => $controllerObject);
-        $this->container->bind($method, fn () => $method);
-        return $controllerObject;
+        return $this->container->make(ControllerFactory::class, [
+            'controllerString' => $controllerString,
+            'method' => $method,
+            'params' => $this->params,
+            'path' => $this->getNamespace($controllerString),
+        ])->create();
     }
 
     public function getRoutes() : array
     {
         return $this->routes;
-    }
-
-    public function setRequest(RequestHandler $request) : self
-    {
-        $this->request = $request;
-        return $this;
-    }
-
-    public function setResponse(ResponseHandler $response) : self
-    {
-        $this->response = $response;
-        return $this;
-    }
-
-    public function setContainer(ContainerInterface $container) : self
-    {
-        $this->container = $container;
-        return $this;
-    }
-
-    public function setControllerAry(array $ctrlAry) : self
-    {
-        $this->controllerAry = $ctrlAry;
-        return $this;
-    }
-
-    public function setNewRouter(string $newRouter) : self
-    {
-        $this->newRouter = $newRouter;
-        return $this;
-    }
-
-    public function setRouteHandler(string $routeHandler) : self
-    {
-        $this->routeHandler = $routeHandler;
-        return $this;
     }
 
     /**
@@ -178,5 +138,52 @@ class Rooter implements RooterInterface
             $namespace .= $this->params['namespace'] . DS;
         }
         return $namespace;
+    }
+
+    private function resolveControllerMethodDependencies(object $controllerObject, string $newAction): mixed
+    {
+        $newAction = $newAction . $this->methodSuffix;
+        $reflectionMethod = new ReflectionMethod($controllerObject, $newAction);
+        $reflectionMethod->setAccessible(true);
+        if ($reflectionMethod) {
+            $dependencies = [];
+            foreach ($reflectionMethod->getParameters() as $param) {
+                $newAction = Application::diGet(YamlFile::get('providers')[$param->getName()]);
+                if (isset($newAction)) {
+                    $dependencies[] = $newAction;
+                } elseif ($param->isDefaultValueAvailable()) {
+                    $dependencies[] = $param->getDefaultValue();
+                }
+            }
+            $reflectionMethod->setAccessible(false);
+            return $reflectionMethod->invokeArgs($controllerObject, $dependencies);
+        }
+    }
+
+    private function createController(): string
+    {
+        $controllerName = $this->params['controller'] . $this->controllerSuffix;
+        $controllerName = Stringify::studlyCaps($controllerName);
+        return $controllerName;
+    }
+
+    private function createMethod(): string
+    {
+        $method = $this->params['method'];
+        return Stringify::camelCase($method);
+    }
+
+    private function resolveWithException(string $url): array
+    {
+        $url = $this->parseUrl($url);
+        //$this->getMatchRoute($url, $this->routes[$this->request->getMethod()])
+        if (!$this->getMatchRoute($url, $this->routes[$this->request->getMethod()])) {
+            http_response_code(404);
+            throw new RouterNoRoutesFound('Route ' . $url . ' does not match any valid route.', 404);
+        }
+        if (!class_exists($controller = $this->createController())) {
+            throw new RouterBadFunctionCallException('Class ' . $controller . ' does not exists.');
+        }
+        return [$controller];
     }
 }

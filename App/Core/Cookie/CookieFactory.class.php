@@ -18,13 +18,11 @@ class CookieFactory
      * @param CookieEnvironment $cookieEnvironment
      * @return CookieInterface
      */
-    public function create(?string $cookieStore, CookieEnvironment $cookieEnvironment): CookieInterface
+    public function create(CookieStoreInterface $cookieStoreObject): CookieInterface
     {
-        $cookieStoreObject = new $cookieStore($cookieEnvironment);
         if (!$cookieStoreObject instanceof CookieStoreInterface) {
-            throw new CookieUnexpectedValueException($cookieStore . 'is not a valid cookie store object.');
+            throw new CookieUnexpectedValueException($cookieStoreObject::class . 'is not a valid cookie store object.');
         }
-
-        return new Cookie($cookieStoreObject);
+        return Container::getInstance()->make(CookieInterface::class, ['cookieStore' => $cookieStoreObject]);
     }
 }

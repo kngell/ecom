@@ -27,8 +27,6 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
     protected string $logMinLevel;
     protected array $themeBuilderOptions = [];
     protected array $controllerArray = [];
-    private RequestHandler $request;
-    private ResponseHandler $response;
     private RooterInterface $rooter;
     private static string $appRoot;
 
@@ -39,27 +37,32 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     public function __construct()
     {
-        parent::__construct($this);
+        // parent::__construct($this);
         $this->registerBaseBindings();
         $this->registerBaseAppSingleton();
-        // $this->environment();
-        // $this->errorHandler();
         $this->request = $this->make(RequestHandler::class);
         $this->response = $this->make(ResponseHandler::class);
     }
 
-    public function run(): void
+    public function run(?string $url = null)
     {
+        $urlroute = $url == null ? $this->request->getPath() : $url;
+        if (!empty($urlroute) && $urlroute[-1] === '/') {
+            return $this->response->setStatusCode(301)->redirect(substr($urlroute, 0, -1));
+        }
         BaseConstants::load($this->app());
         $this->phpVersion();
+        $this->handleCors();
         $this->loadErrorHandlers();
         $this->loadSession();
         $this->loadCache();
+        $this->loadCookies();
         $this->loadLogger();
         $this->loadEnvironment();
         $this->registerDataAccessLayerClass();
         //$this->loadThemeBuilder();
-        $this->loadRoutes()->resolve();
+        $this->loadRoutes()->resolve($urlroute);
+        // $this->instance('session_name', $this->getSessions()['session_name']);
     }
 
     /**
@@ -508,6 +511,12 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
         return $this->controllerArray;
     }
 
+    public function handleCors()
+    {
+        $this->make(Cors::class)->handle();
+        return $this;
+    }
+
     /**
      * Register the basic bindings into the container.
      *
@@ -515,7 +524,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     protected function registerDataAccessLayerClass()
     {
-        $objs = AppHelper::dataAccessLayerClass($this->app());
+        $objs = AppHelper::dataAccessLayerClass();
         if (is_array($objs)) {
             foreach ($objs as $obj => $value) {
                 $this->singleton($obj, $value);
@@ -530,7 +539,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     protected function registerBaseAppSingleton()
     {
-        $objs = AppHelper::singleton($this->app());
+        $objs = AppHelper::singleton();
         if (is_array($objs)) {
             foreach ($objs as $obj => $value) {
                 $this->singleton($obj, $value);

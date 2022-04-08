@@ -5,6 +5,13 @@ declare(strict_types=1);
 class EntityManagerFactory
 {
     private ContainerInterface $container;
+    private DataMapperInterface $dataMapper;
+    private QueryBuilderInterface $queryBuilder;
+    private DataMapperEnvironmentConfig $dataMapperEnvConfig;
+    private string $tableSchema;
+    private string $tableSchemaID;
+    private array $options;
+    private Entity $entity;
 
     /**
      * Main constructor
@@ -13,9 +20,13 @@ class EntityManagerFactory
      * @param DataMapperInterface $datamapper
      * @param QueryBuilderInterface $querybuilder
      */
-    public function __construct(private DataMapperInterface $dataMapper, private QueryBuilderInterface $queryBuilder)
+    public function __construct(DataMapperEnvironmentConfig $dataMapperEnvConfig, string $tableSchema, string $tableSchamaID, ?array $options, Entity $entity)
     {
-        $this->container = Container::getInstance();
+        $this->tableSchema = $tableSchema;
+        $this->tableSchemaID = $tableSchamaID;
+        $this->options = $options;
+        $this->entity = $entity;
+        $this->dataMapperEnvConfig = $dataMapperEnvConfig;
     }
 
     /**
@@ -27,10 +38,20 @@ class EntityManagerFactory
      * @param array $options
      * @return EntityManagerInterface
      */
-    public function create(string $tableSchema, string $tableSchmaID, array $options) : EntityManagerInterface
+    public function create() : EntityManagerInterface
     {
-        $em = $this->container->make(EntityManagerInterface::class);
-        $em->getCrud()->setParams($this->dataMapper, $this->queryBuilder, $tableSchema, $tableSchmaID, $options);
+        $em = $this->container->make(EntityManagerInterface::class, [
+            'crud' => $this->container->make(CrudInterface::class, [
+                'dataMapper' => $this->container->make(DataMapperFactory::class, [
+                    'dataMapperEnvConfig' => $this->dataMapperEnvConfig,
+                    'entity' => $this->entity,
+                ])->create(),
+                'queryBuilder' => $this->container->make(QueryBuilderInterface::class),
+                'tableSchema' => $this->tableSchema,
+                'tableSchemaID' => $this->tableSchemaID,
+                'options' => $this->options,
+            ]),
+        ]);
         if (!$em instanceof EntityManagerInterface) {
             throw new EntityManagerExceptions(get_class($em) . ' is not a valid entityManager object!');
         }

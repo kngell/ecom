@@ -5,15 +5,13 @@ declare(strict_types=1);
 class SessionFactory
 {
     private ContainerInterface $container;
-    private SessionStorageInterface $sessionStorage;
 
     /**
      * Main constructor
      *  =====================================================================.
      */
-    public function __construct(SessionStorageInterface $sessionStorage)
+    public function __construct(private SessionStorageInterface $sessionStorage)
     {
-        $this->sessionStorage = $sessionStorage;
     }
 
     /**
@@ -24,12 +22,14 @@ class SessionFactory
      * @param array $options
      * @return SessionInterface
      */
-    public function create(string $sessionName, array $options = []) : SessionInterface
+    public function create(string $sessionName) : SessionInterface
     {
-        $this->sessionStorage->initOptions($options);
         if (!$this->sessionStorage instanceof SessionStorageInterface) {
             throw new SessionStorageInvalidArgument(get_class($this->sessionStorage) . ' is not a valid session storage object!');
         }
-        return Container::getInstance()->make(SessionInterface::class)->setParams($sessionName);
+        return $this->container->make(SessionInterface::class, [
+            'storage' => $this->sessionStorage,
+            'sessionIdentifier' => $sessionName,
+        ]);
     }
 }

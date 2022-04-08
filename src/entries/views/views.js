@@ -16,3 +16,6 @@ import "views/client/home/index.php";
 
 //Home Users Account
 import "views/client/users/account/login.php";
+
+//Learn
+import "views/client/learn/learn.php";

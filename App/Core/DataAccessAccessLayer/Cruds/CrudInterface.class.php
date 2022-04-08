@@ -31,7 +31,7 @@ interface CrudInterface
      * @param array $fields
      * @return int
      */
-    public function create(array $fields) : int;
+    public function create(array $fields = []) : int;
 
     /**
      * --------------------------------------------------------------------------------------------------

@@ -12,8 +12,9 @@ abstract class AbstractSessionStorage implements SessionStorageInterface
      * =====================================================================.
      * @param array $options
      */
-    public function initOptions(array $options = []) :self
+    public function __construct(array $options, GlobalVariablesInterface $gv)
     {
+        $this->gv = $gv;
         $this->options = $options;
         $this->iniSet();
         if ($this->isSessionStarted()) {

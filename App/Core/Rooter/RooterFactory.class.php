@@ -13,16 +13,12 @@ class RooterFactory
     {
     }
 
-    public function create(RequestHandler $request, ResponseHandler $response, ContainerInterface $container, array $routes, ?string $newRouter = null, ?string $routeHandler = null, array $ctrlAry = []) : self
+    public function create(array $routes, array $ctrlAry, ) : self
     {
         $this->routes = $routes;
-        $this->rooter
-            ->setRequest($request)
-            ->setResponse($response)
-            ->setNewRouter($newRouter)
-            ->setRouteHandler($routeHandler)
-            ->setContainer($container)
-            ->setControllerAry($ctrlAry);
+        $this->rooter->setProperties([
+            'controllerAry' => $ctrlAry,
+        ]);
         if (empty($routes)) {
             throw new BaseNoValueException("There are one or more empty arguments. In order to continue, please ensure your <code>routes.yaml</code> has your defined routes and you are passing the correct variable ie 'QUERY_STRING'");
         }

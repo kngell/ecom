@@ -5,6 +5,8 @@
 .npmrc
 .browserslistrc
 .php-cs-fixer.php
+composer.lock
+package-lock.json
 /temp
 /public
 /session_dir

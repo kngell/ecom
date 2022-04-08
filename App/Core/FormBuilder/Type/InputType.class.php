@@ -87,6 +87,7 @@ class InputType implements FormBuilderTypeInterface
             'autofocus' => false,
             'autocomplete' => 'nope',
             'custom_attr' => '',
+            'title' => '',
         ];
     }
 
@@ -163,7 +164,7 @@ class InputType implements FormBuilderTypeInterface
      *
      * @return string
      */
-    public function view() : string
+    public function view(?string $label = null) : string
     {
         switch ($this->getType()) :
             case 'radio':
@@ -183,7 +184,7 @@ class InputType implements FormBuilderTypeInterface
                 }
         break;
         case 'submit':
-                return sprintf("\n<button %s>\n", $this->filtering());
+                return sprintf('<button type="%s" title="%s" class="%s" id="%s" %s>%s</button>', $this->attr['type'] ?? '', $this->attr['title'] ?? '', implode(' ', $this->attr['class']) ?? '', $this->attr['id'] ?? '', $this->attr['custom_attr'] ?? '', $label);
         break;
         default:
                 return sprintf("\n<input %s>\n", $this->filtering());

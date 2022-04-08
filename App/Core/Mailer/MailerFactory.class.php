@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+class MailerFactory
+{
+    /** @var array|null */
+    protected ?array $settings = null;
+    private ContainerInterface $container;
+
+    /**
+     * Construct.
+     * @param array|null $settings
+     */
+    public function __construct(?array $settings = null)
+    {
+        $this->settings = $settings;
+    }
+
+    /**
+     * Create method which creates the Mailer object and inject the relevant arguments.
+     *
+     * @param string $transportString
+     * @return MailerInterface
+     * @throws MailerInvalidArgumentException
+     */
+    public function create(string $transportString) : MailerInterface
+    {
+        $transporterObject = new $transportString(true);
+        if (!$transporterObject) {
+            throw new MailerInvalidArgumentException($transportString . ' is not a valid mailer object');
+        }
+        return Container::getInstance()->make(MailerInterface::class, [
+            'transporterObject' => $transporterObject,
+            'settings' => $this->settings,
+            'dotEnvString' => Symfony\Component\Dotenv\Dotenv::class,
+        ]);
+    }
+}

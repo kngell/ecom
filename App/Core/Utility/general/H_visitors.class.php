@@ -21,7 +21,7 @@ class H_visitors
     }
 
     //Get ip data
-    public static function getVisitorData($ip = '')
+    public static function getIpData($ip = '')
     {
         $query = @unserialize(file_get_contents('http://ip-api.com/php/' . $ip));
 
@@ -39,7 +39,7 @@ class H_visitors
     }
 
     //Key format for IpAPI
-    public static function new_IpAPI_keys()
+    public static function new_IpAPI_keys() : array
     {
         return ['query' => 'ipAddress', 'status' => 'statusCode', 'city' => 'cityName', 'region' => 'regionCode', 'country' => 'countryName',  'lat' => 'latitude', 'lon' => 'longitude',    'timezone' => 'timeZone', 'zip' => 'zipCode'];
     }

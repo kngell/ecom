@@ -7,23 +7,12 @@ class CookieEnvironment
     /** @var array */
     protected array $cookieConfig;
 
-    public function __construct()
-    {
-    }
-
-    /**
-     * Set Options.
-     *
-     * @param array $cookieConfig
-     * @return void
-     */
-    public function setConfig(array $cookieConfig) : self
+    public function __construct(array $cookieConfig)
     {
         if (count($cookieConfig) < 0 || !is_array($cookieConfig)) {
             throw new LogicException('Session environment has failed to load. Ensure your are passing the correct yaml configuration file to the session facade class object');
         }
         $this->cookieConfig = $cookieConfig;
-        return $this;
     }
 
     /**
@@ -68,7 +57,7 @@ class CookieEnvironment
      */
     public function getPath(): string
     {
-        return isset($this->getConfig()['path']) ? filter_var($this->getConfig()['path'], FILTER_SANITIZE_STRING) : '/';
+        return isset($this->getConfig()['path']) ? filter_var($this->getConfig()['path'], FILTER_UNSAFE_RAW) : '/';
     }
 
     /**

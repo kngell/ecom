@@ -4,16 +4,9 @@ declare(strict_types=1);
 
 class NativeSessionStorage extends AbstractSessionStorage
 {
-    public function __construct(Globalvariables $gv)
+    public function __construct(GlobalVariablesInterface $gv, array $options)
     {
-        $this->gv = $gv;
-    }
-
-    public function initOptions(array $options = []) : self
-    {
-        parent::initOptions($options);
-
-        return $this;
+        parent::__construct($options, $gv);
     }
 
     /**

@@ -12,17 +12,12 @@ class Session extends AbstractSession implements SessionInterface
      * @param SessionStorageInterface|null $storage
      * @param string $sessionIdentifier
      */
-    public function __construct(private ?SessionStorageInterface $storage)
-    {
-    }
-
-    public function setParams(string $sessionIdentifier) : self
+    public function __construct(private ?SessionStorageInterface $storage, string $sessionIdentifier)
     {
         if ($this->isSessionKeyValid($sessionIdentifier) === false) {
             throw new SessionStorageInvalidArgument($sessionIdentifier . ' is not a valid session name');
         }
         $this->sessionIdentifier = $sessionIdentifier;
-        return $this;
     }
 
     /**

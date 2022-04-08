@@ -5,14 +5,6 @@ declare(strict_types=1);
 interface SessionStorageInterface
 {
     /**
-     * Init Options
-     * --------------------------------------------------------------------------------------------------.
-     * @param array $options
-     * @return self
-     */
-    public function initOptions(array $options = []) : self;
-
-    /**
      * Set Session
      * --------------------------------------------------------------------------------------------------.
      * @param string $key

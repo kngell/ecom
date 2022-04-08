@@ -40,15 +40,16 @@
     "symfony/var-dumper": "^6.0",
     "brick/money": "^0.5.2",
     "stripe/stripe-php": "^7.97",
-    "symfony/http-foundation": "^6.0",
     "phpmailer/phpmailer": "^6.5",
     "sendgrid/sendgrid": "^7.9",
-    "paragonie/anti-csrf": "^2.3"
+    "paragonie/anti-csrf": "^2.3",
+    "symfony/http-foundation": "^6.0"
   },
   "require-dev": {
     "symfony/var-dumper": "^6.0",
     "phpunit/phpunit": "^9.5",
-    "friendsofphp/php-cs-fixer": "^3.4"
+    "friendsofphp/php-cs-fixer": "^3.4",
+    "symfony/dotenv": "^6.0"
   },
   "autoload": {
     "classmap": [

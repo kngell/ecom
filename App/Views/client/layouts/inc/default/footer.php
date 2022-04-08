@@ -4,7 +4,7 @@
           <div class="row mx-auto mt-5">
               <div class="footer-item col-lg-3 col-md-6 col-12">
                   <h5 class="pb-2">About Us</h5>
-                  <img src="/ecom/public/assets/img/logo2.png" alt="" class="pb-3">
+                  <img src="/public/assets/img/logo2.png" alt="" class="pb-3">
                   <p>Lorem ipsum dolor sit, amet consectetur adipisicing
                       elit.
                       Quaerat ipsum quisquam libero?
@@ -56,7 +56,7 @@
           <div class="container">
               <div class="row mx-auto">
                   <div class="col-lg-3 col-md-6 col-12 mb-4">
-                      <img src="/ecom/public/assets/img/payment.png" alt="">
+                      <img src="/public/assets/img/payment.png" alt="">
                   </div>
                   <div class="c-copy col-lg-4 col-md-6 col-12 text-nowrap mb-2">
                       <p class="font-rale font-size-14">&copy; Copyrights 2021 Design by <a href="#"

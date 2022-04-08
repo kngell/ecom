@@ -1,24 +1,23 @@
-const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const devMode = process.env.NODE_ENV !== "production";
+const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const devMode = process.env.NODE_ENV !== 'production';
 const ASSET_PATH =
-  process.env.ASSET_PATH ||
-  `${path.sep}ecom${path.sep}public${path.sep}assets${path.sep}`;
+  process.env.ASSET_PATH || `${path.sep}public${path.sep}assets${path.sep}`;
 
 exports.viewRules = {
-  mode: "development",
+  mode: 'development',
   module: {
     rules: [
       {
         test: /\.php$/,
-        type: "asset/resource",
+        type: 'asset/resource',
       },
       {
         test: /\.php$/i,
         use: [
-          "extract-loader",
+          'extract-loader',
           {
-            loader: "html-loader",
+            loader: 'html-loader',
             options: {
               esModule: false,
             },
@@ -31,15 +30,15 @@ exports.viewRules = {
           /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
           /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css/,
         ],
-        type: "javascript/auto",
+        type: 'javascript/auto',
         use: [
           {
-            loader: "file-loader",
+            loader: 'file-loader',
             options: {
-              name: "[name].[ext]",
-              outputPath: "../../public/assets/img",
+              name: '[name].[ext]',
+              outputPath: '../public/assets/img',
               publicPath: (url) => {
-                return ASSET_PATH + "img/" + url;
+                return ASSET_PATH + 'img/' + url;
               },
             },
           },
@@ -52,8 +51,8 @@ exports.viewRules = {
 exports.assetsRuless = {
   module: {
     generator: {
-      "asset/resource": {
-        publicPath: "https://localhost/ecom/public/assets/",
+      'asset/resource': {
+        publicPath: 'https://localhost/public/assets/',
       },
     },
     rules: [
@@ -61,7 +60,7 @@ exports.assetsRuless = {
         test: /\.js$/,
         exclude: /node_modules/,
         use: {
-          loader: "babel-loader",
+          loader: 'babel-loader',
         },
       },
       {
@@ -70,14 +69,14 @@ exports.assetsRuless = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: "/",
+              publicPath: '/',
             },
           },
           {
-            loader: "css-loader",
+            loader: 'css-loader',
           },
           {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
           },
         ],
       },
@@ -87,17 +86,17 @@ exports.assetsRuless = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              publicPath: "./",
+              publicPath: './',
             },
           },
           {
-            loader: "css-loader",
+            loader: 'css-loader',
           },
           {
-            loader: "postcss-loader",
+            loader: 'postcss-loader',
           },
           {
-            loader: "sass-loader",
+            loader: 'sass-loader',
           },
         ],
       },
@@ -108,32 +107,32 @@ exports.assetsRuless = {
           /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
           /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css/,
         ],
-        type: "asset/resource",
+        type: 'asset/resource',
         generator: {
           filename: devMode
-            ? "img/[name][ext][query]"
-            : "img/[name][hash][ext][query]",
+            ? 'img/[name][ext][query]'
+            : 'img/[name][hash][ext][query]',
         },
       },
       {
         test: /.(ttf|otf|eot|woff(2)?)(\?[a-z0-9]+)?$/i,
-        type: "asset/resource",
+        type: 'asset/resource',
         generator: {
           filename: devMode
-            ? "fonts/[name][ext][query]"
-            : "fonts/[name][hash][ext][query]",
+            ? 'fonts/[name][ext][query]'
+            : 'fonts/[name][hash][ext][query]',
         },
       },
       {
         test: /\.svg$/,
-        type: "javascript/auto",
+        type: 'javascript/auto',
         include: [
           /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
           /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css/,
         ],
         use: [
           {
-            loader: "raw-loader",
+            loader: 'raw-loader',
             options: {},
           },
         ],

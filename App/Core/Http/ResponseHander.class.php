@@ -6,6 +6,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ResponseHandler extends GlobalVariables
 {
+    private string $content;
+
     public function handler() : Response
     {
         if (!isset($response)) {
@@ -17,14 +19,26 @@ class ResponseHandler extends GlobalVariables
         return false;
     }
 
-    public function setStatusCode(int $code)
+    public function content(string $content) : void
     {
-        http_response_code($code);
+        $this->content = $content;
     }
 
-    public function redirect(string $url)
+    public function getContent() : string
+    {
+        return $this->content;
+    }
+
+    public function setStatusCode(int $code) : self
+    {
+        http_response_code($code);
+        return $this;
+    }
+
+    public function redirect(string $url) : self
     {
         header('Location: ' . $url);
+        return $this;
     }
 
     public function is_image(string $file)
@@ -38,7 +52,7 @@ class ResponseHandler extends GlobalVariables
 
     public function cacheRefresh()
     {
-        $session = GlobalsManager::get('global_session');
+        $session = GlobalManager::get('global_session');
         if ($session->exists(BRAND_NUM)) {
             switch ($session->get(BRAND_NUM)) {
                 case 2:

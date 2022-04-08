@@ -8,15 +8,16 @@ abstract class AbstractBaseBootLoader extends Container
 
     /** @var Application */
     protected Application $application;
+    protected RequestHandler $request;
+    protected ResponseHandler $response;
 
     /**
      * Main class constructor.
      *
      * @param Application $application
      */
-    public function __construct(Application $application)
+    public function __construct()
     {
-        $this->application = $application;
     }
 
     /**
@@ -26,7 +27,7 @@ abstract class AbstractBaseBootLoader extends Container
      */
     public function app(): Application
     {
-        return $this->application;
+        return self::getInstance();
     }
 
     /**
@@ -48,19 +49,20 @@ abstract class AbstractBaseBootLoader extends Container
      * @param string $dependencies
      * @return mixed
      */
-    public static function diGet(string $dependencies): mixed
+    public static function diGet(string $class): mixed
     {
-        $container = (new ContainerFactory())->create();
-        if ($container) {
-            return $container->make($dependencies);
-        }
+        return self::getInstance()->make($class);
+        // $container = (new ContainerFactory())->create();
+        // if ($container) {
+        //     return $container->make($dependencies);
+        // }
     }
 
-    public function loadCache()
+    public function loadCache(): CacheInterface
     {
-        $cache = $this->make(CacheFacade::class)->create($this->application->getCacheIdentifier());
-        if ($this->application->isCacheGlobal() === true) {
-            GLobalManager::set($this->application->getGlobalCacheKey(), $cache);
+        $cache = $this->make(CacheFacade::class)->create($this->app()->getCacheIdentifier());
+        if ($this->app()->isCacheGlobal() === true) {
+            GLobalManager::set($this->app()->getGlobalCacheKey(), $cache);
         }
         return $cache;
     }
@@ -147,9 +149,13 @@ abstract class AbstractBaseBootLoader extends Container
      */
     protected function loadSession(): Object
     {
-        $session = $this->make(SessionFacade::class)->setOptions($this->app()->getSessions(), $this->app()->getSessions()['session_name'], $this->app()->getSessionDriver())->setSession();
-        if ($this->application->isSessionGlobal() === true) {
-            GlobalManager::set($this->application->getGlobalSessionKey(), $session);
+        $session = $this->make(SessionFacade::class, [
+            'sessionEnvironment' => $this->app()->getSessions(),
+            'sessionIdentifier' => $this->app()->getSessions()['session_name'],
+            'storage' => $this->app()->getSessionDriver(),
+        ])->setSession();
+        if ($this->app()->isSessionGlobal() === true) {
+            GlobalManager::set($this->app()->getGlobalSessionKey(), $session);
         }
         return $session;
     }
@@ -157,11 +163,20 @@ abstract class AbstractBaseBootLoader extends Container
     protected function loadRoutes()
     {
         $routes = $this->app()->getRoutes();
-        $factory = $this->make(RooterFactory::class)
-            ->create($this->app()->getRequest(), $this->app()->getResponse(), $this, $routes, $this->app()->getRouter(), $this->app()->getRouteHandler(), $this->app()->getControllerArray());
+        $factory = $this->make(RooterFactory::class, [
+            'rooter' => $this->app()->make(RooterInterface::class),
+        ])->create($routes, $this->app()->getControllerArray());
         if (count($routes) > 0) {
-            return $factory->buildRoutes($this->app()->getRoutes());
+            return $factory->buildRoutes($routes);
         }
+    }
+
+    protected function loadCookies()
+    {
+        return $this->make(CookieFacade::class, [
+            'cookieEnvironmentArray' => [],
+            'cookieConfig' => $this->make(CookieConfig::class),
+        ])->initialize();
     }
 
     protected function loadErrorHandlers(): void
@@ -189,8 +204,8 @@ abstract class AbstractBaseBootLoader extends Container
     protected function loadThemeBuilder(): ThemeBuilder
     {
         $themeFactory = new ThemeBuilderFactory();
-        $themeOptions = $this->application->getThemeBuilderOptions();
-        $themeDefault = $this->application->getDefaultThemeBuilder();
+        $themeOptions = $this->app()->getThemeBuilderOptions();
+        $themeDefault = $this->app()->getDefaultThemeBuilder();
         $themeBuilder = $themeFactory->create($themeDefault, $themeOptions);
         if ($themeBuilder) {
             return $themeBuilder;

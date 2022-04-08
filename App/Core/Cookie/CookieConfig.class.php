@@ -18,8 +18,8 @@ class CookieConfig
     {
         return [
 
-            'name' => '__magmacore_cookie__',
-            'expires' => 3600,
+            'name' => VISITOR_COOKIE_NAME, //'__kngell_cookie__',
+            'expires' => time() + COOKIE_EXPIRY,
             'path' => '/',
             'domain' => 'localhost',
             'secure' => false,

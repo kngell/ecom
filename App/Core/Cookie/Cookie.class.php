@@ -29,7 +29,7 @@ class Cookie implements CookieInterface
 
     public function get(string $name) : mixed
     {
-        $this->CookieStore->getCookie($name);
+        return $this->cookieStore->getCookie($name);
     }
 
     /**

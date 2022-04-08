@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 class CacheFacade
 {
-    public function __construct(private CacheFactory $cacheFactory)
+    private ContainerInterface $container;
+
+    public function __construct()
     {
     }
 
@@ -19,7 +21,13 @@ class CacheFacade
     public function create(?string $cacheIdentifier = null, array $options = []): CacheInterface
     {
         try {
-            return $this->cacheFactory->create($cacheIdentifier, $options);
+            return $this->container->make(CacheFactory::class, [
+                'cacheConfig' => $this->container->make(CacheEnvironmentConfigurations::class, [
+                    'cacheIdentifier' => $cacheIdentifier,
+                    'fileCacheBasePath' => CACHE_PATH,
+                    'maximumPathLength' => PHP_MAXPATHLEN,
+                ]),
+            ])->create($cacheIdentifier, $options);
         } catch (CacheException $e) {
             throw $e->getMessage();
         }

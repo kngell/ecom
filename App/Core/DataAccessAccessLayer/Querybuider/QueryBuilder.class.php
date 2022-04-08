@@ -46,21 +46,8 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
     public function select():string
     {
         if ($this->isValidquerytype('select')) {
-            if (!$this->sql = $this->join($this->key['table_join'], $this->key['extras'])) {
-                if (!array_key_exists('sql', $this->key['extras'])) {
-                    if (strpos($this->key['table'], 'SELECT') !== false) {
-                        $this->sql = $this->key['table'];
-                    } else {
-                        $selectors = (!empty($this->key['selectors'])) ? implode(', ', $this->key['selectors']) : '*';
-                        if (isset($this->key['aggregate']) && $this->key['aggregate']) {
-                            $this->sql = "SELECT {$this->key['aggregate']}({$this->key['aggregate_field']}) FROM {$this->key['table']}";
-                        } else {
-                            $this->sql = "SELECT {$selectors} FROM {$this->key['table']}";
-                        }
-                    }
-                } else {
-                    $this->sql = $this->key['extras']['sql'];
-                }
+            if (!$this->sql = $this->join($this->key['selectors'], $this->key['extras'])) {
+                $this->sql = $this->mainQuery();
             }
             $this->sql .= $this->where();
             $this->sql .= $this->groupBy();
@@ -125,7 +112,7 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
     {
         if ($this->isValidquerytype('delete')) {
             if (is_array($this->key['conditions']) && count($this->key['conditions']) > 0) {
-                $this->sql = $this->key['conditions'][0] != 'all' ? 'DELETE FROM ' . $this->key['table'] . $this->where() : 'DELETE FROM ' . $this->key['table'];
+                $this->sql = (isset($this->key['conditions'][0]) && $this->key['conditions'][0] != 'all') ? 'DELETE FROM ' . $this->key['table'] : 'DELETE FROM ' . $this->key['table'] . $this->where();
                 return $this->sql . (isset($this->key['where']['bind_array']) ? '&' . serialize($this->key['where']['bind_array']) : '');
             }
         }

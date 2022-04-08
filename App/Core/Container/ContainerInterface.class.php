@@ -40,7 +40,7 @@ interface ContainerInterface
      * @param string $abstract
      * @return mixed
      */
-    public function make(string $abstract): mixed;
+    public function make(string $abstract, array $args = []): mixed;
 
     /**
      * Returns true if the container can return an entry for the given identifier.

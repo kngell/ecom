@@ -23,39 +23,65 @@ abstract class Entity
         }
     }
 
-    public function getEntityFields() : array
+    public function getAllAttributes() : array
     {
-        $this->getReflect();
-        return array_column($this->reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PRIVATE), 'name');
+        return array_column($this->reflectionInstance()->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PRIVATE), 'name');
     }
 
-    public function display(string $field) : string
+    public function getInitializedAttributes() : array
     {
-        $this->getReflect();
-        $docs = $this->reflect->getProperty($field)->getDocComment();
-        if (!$docs == false) {
-            $docs = explode('@', $docs);
-            $docs = rtrim($docs[1], ' /**');
-            return $docs;
+        $properties = [];
+        foreach ($this->getAllAttributes() as $field) {
+            $rp = $this->reflectionInstance()->getProperty($field);
+            if ($rp->isInitialized($this)) {
+                if ($rp->getType()->getName() === 'DateTimeInterface') {
+                    $properties[$field] = $rp->getValue($this)->format('Y-m-d H:i:s');
+                } else {
+                    $properties[$field] = $rp->getValue($this);
+                }
+            }
+        }
+        return $properties;
+    }
+
+    public function getFields(string $field) : string
+    {
+        return $this->reflectionInstance()->getProperty($field)->getName();
+    }
+
+    public function getColId() :  string
+    {
+        $props = $this->getAllAttributes();
+        foreach ($props as $field) {
+            $docs = $this->getPropertyComment($field);
+            if ($docs == 'id') {
+                return $field;
+                exit;
+            }
         }
         return '';
     }
 
-    public function populateEntity(array $params) : self
+    public function getPropertyComment(string $field) : string
     {
-        $this->getReflect();
-        $props = $this->getEntityFields();
+        $propertyComment = $this->reflectionInstance()->getProperty($field)->getDocComment();
+        return $this->filterPropertyComment($propertyComment);
+    }
+
+    public function assign(array $params) : self
+    {
+        $props = $this->getAllAttributes();
         foreach ($props as $field) {
             if (in_array($field, array_keys($params))) {
                 if (method_exists($this, 'set' . ucwords($field))) {
                     $method = 'set' . ucwords($field);
                     if (isset($params[$field])) {
-                        $rp = new ReflectionProperty($this, $field);
+                        $rp = $this->reflectionInstance()->getProperty($field); // new ReflectionProperty($this, $field);
                         $type = $rp->getType()->getName();
                         if ($type === 'DateTimeInterface') {
                             $this->$method(new DateTimeImmutable($params[$field]));
-                        } elseif ($type === 'string' && is_array($params[$field])) {
-                            $this->$method($params[$field][0]);
+                        } elseif ($type === 'string') {
+                            is_array($params[$field]) ? $this->$method((string) $params[$field][0]) : $this->$method((string) $params[$field]);
                         } else {
                             $this->$method($params[$field]);
                         }
@@ -83,10 +109,20 @@ abstract class Entity
         return substr(strip_tags($this->htmlDecode($content)), 0, 200) . '...';
     }
 
-    private function getReflect()
+    private function filterPropertyComment(false|string $comment) : string
+    {
+        if (is_string($comment)) {
+            preg_match('/@(?<content>.+)/i', $comment, $content);
+            $content = isset($content['content']) ? $content['content'] : '';
+            return trim(str_replace('*/', '', $content));
+        }
+        return '';
+    }
+
+    private function reflectionInstance()
     {
         if (!isset($this->reflect)) {
-            return $this->reflect = new ReflectionClass($this);
+            return $this->reflect = new ReflectionClass($this::class);
         }
         return $this->reflect;
     }

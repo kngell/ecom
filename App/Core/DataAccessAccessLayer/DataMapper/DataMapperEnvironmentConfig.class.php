@@ -10,15 +10,16 @@ class DataMapperEnvironmentConfig
      */
     private array $credentials = [];
 
-    public function __construct()
-    {
-    }
-
-    public function setCredentials(array $credentials) : self
+    public function __construct(array $credentials)
     {
         $this->credentials = $credentials;
-        return $this;
     }
+
+    // public function setCredentials(array $credentials) : self
+    // {
+    //     $this->credentials = $credentials;
+    //     return $this;
+    // }
 
     /**
      * --------------------------------------------------------------------------------------------------

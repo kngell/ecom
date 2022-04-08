@@ -10,9 +10,9 @@ class HomePlugin {
     this.element = element;
   }
 
-  _init = () => {
+  _init = (e) => {
     this._setupVariables();
-    this._setupEvents();
+    this._setupEvents(e);
   };
 
   _setupVariables = () => {
@@ -21,7 +21,7 @@ class HomePlugin {
     this.navigation = this.element.find(".navigation");
     this.wrapper = this.element.find(".tab-content");
   };
-  _setupEvents = () => {
+  _setupEvents = (event) => {
     var phpPlugin = this;
 
     //=======================================================================
@@ -40,17 +40,18 @@ class HomePlugin {
       }
     );
 
-    //=======================================================================
-    //Get visitors IP Adresss
-    //=======================================================================
-    let visitor = get_visitors_data().then((visitors_data) => {
+    /**
+     * Get Visitors data
+     */
+    let visitor = get_visitors_data(event).then((visitors_data) => {
       var data = {
         url: "visitors",
         table: "visitors",
         ip: visitors_data.ip,
       };
-      send_visitors_data(data, manageR);
-      function manageR(response) {}
+      send_visitors_data(data, (response) => {
+        console.log(response);
+      });
     });
     //=======================================================================
     //Ajax Select2
@@ -72,6 +73,6 @@ class HomePlugin {
     // };
   };
 }
-document.addEventListener("DOMContentLoaded", function () {
-  new HomePlugin($("#body"))._init();
+document.addEventListener("DOMContentLoaded", function (e) {
+  new HomePlugin($("#body"))._init(e);
 });

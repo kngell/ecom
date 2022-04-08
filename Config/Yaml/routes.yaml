@@ -3,6 +3,14 @@ get: # Http Get ===========================================
     controller: home
     method: index
     namespace: Client
+  "home":
+    controller: home
+    method: index
+    namespace: Client
+  "learn":
+    controller: learning
+    method: index
+    namespace: Client
   login:
     controller: security
     method: login
@@ -19,21 +27,17 @@ get: # Http Get ===========================================
     namespace: Client
   client/{controller}/{method}/{id:[\da-f]+}:
     namespace: Client
-  ajax/{controller}/{method}:
-    namespace: Ajax
-  ajax/{controller}/{method}/{id:[\da-f]+}:
-    namespace: Ajax
   test: errors
 post: # Http Post method =========================================================
   visitors:
     controller: visitors
     method: track
-    namespace: Ajax
+    namespace: Client
+  ajaxLogin:
+    controller: auth
+    method: ajaxlogin
+    namespace: Client
   client/{controller}/{method}:
     namespace: Client
   client/{controller}/{method}/{id:[\da-f]+}:
     namespace: Client
-  ajax/{controller}/{method}:
-    namespace: Ajax
-  ajx/{controller}/{method}/{id:[\da-f]+}:
-    namespace: Ajax

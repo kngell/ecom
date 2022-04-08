@@ -20,4 +20,6 @@ interface CookieStoreInterface
      * @return void
      */
     public function deleteCookie(string|null $cookieName = null): void;
+
+    public function getCookie(string $name) : mixed;
 }

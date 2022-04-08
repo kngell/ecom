@@ -8,8 +8,17 @@ class NativeLoggerHandler extends AbstractLoggerHandler
 
     private string $file;
 
-    public function __construct()
+    public function __construct(string $file, string $minLevel, array $options)
     {
+        parent::__construct($file, $minLevel, $options);
+        if (!file_exists($this->getLogFile())) {
+            if (!touch($this->getLogFile())) {
+                throw new LoggerHandlerInvalidArgumentException('Log file ' . $this->getLogFile() . ' can not be created.');
+            }
+        }
+        if (!is_writable($this->getLogFile())) {
+            throw new LoggerHandlerInvalidArgumentException('Log file ' . $this->getLogFile() . ' is not writable.');
+        }
     }
 
     /**
@@ -19,17 +28,8 @@ class NativeLoggerHandler extends AbstractLoggerHandler
      * @param array $options
      * @return void
      */
-    public function setParams(string $file, string $minLevel, array $options = []) : self
+    public function setParams() : self
     {
-        parent::setParams($file, $minLevel, $options);
-        if (!file_exists($this->getLogFile())) {
-            if (!touch($this->getLogFile())) {
-                throw new LoggerHandlerInvalidArgumentException('Log file ' . $this->getLogFile() . ' can not be created.');
-            }
-        }
-        if (!is_writable($this->getLogFile())) {
-            throw new LoggerHandlerInvalidArgumentException('Log file ' . $this->getLogFile() . ' is not writable.');
-        }
         return $this;
     }
 

@@ -6,9 +6,7 @@ use function get_class;
 
 class LoggerFactory
 {
-    public function __construct(private LoggerInterface $logger)
-    {
-    }
+    private ContainerInterface $container;
 
     /**
      * @param string $handler
@@ -17,10 +15,16 @@ class LoggerFactory
      */
     public function create(?string $file, ?string $defaultLogLevel, array $options = []): LoggerInterface
     {
-        $newHandler = $this->logger->getLoggerHandler()->setParams($file, $defaultLogLevel, $options);
-        if (!$newHandler instanceof LoggerHandlerInterface) {
-            throw new LoggerHandlerInvalidArgumentException(get_class($newHandler) . ' is invald as it does not implement the correct interface.');
+        $logger = $this->container->make(LoggerInterface::class, [
+            'loggerHandler' => $this->container->make(LoggerHandlerInterface::class, [
+                'file' => $file,
+                'minLevel' => $defaultLogLevel,
+                'options' => $options,
+            ]),
+        ]);
+        if (!$logger instanceof LoggerInterface) {
+            throw new LoggerHandlerInvalidArgumentException(get_class($logger) . ' is invald as it does not implement the correct interface.');
         }
-        return $this->logger; //Container::getInstance()->make(LoggerInterface::class)->setParams($newHandler);
+        return $logger; //Container::getInstance()->make(LoggerInterface::class)->setParams($newHandler);
     }
 }

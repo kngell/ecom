@@ -5,15 +5,18 @@ declare(strict_types=1);
 class DataMapperFactory
 {
     private ContainerInterface $container;
+    private DataMapperEnvironmentConfig $dataMapperEnvConfig;
+    private Entity $entity;
 
     /**
      * Main constructor
      * ================================================================.
      *@return void
      */
-    public function __construct()
+    public function __construct(DataMapperEnvironmentConfig $dataMapperEnvConfig, Entity $entity)
     {
-        $this->container = Container::getInstance();
+        $this->dataMapperEnvConfig = $dataMapperEnvConfig;
+        $this->entity = $entity;
     }
 
     /**
@@ -23,12 +26,17 @@ class DataMapperFactory
      * @param string $dataMapperEnvConfigObject
      *@return DataMapperInterface
      */
-    public function create(string $databaseConnexionString) : DataMapperInterface
+    public function create() : DataMapperInterface
     {
-        $databaseConnexionObject = $this->container->make($databaseConnexionString);
-        if (!$databaseConnexionObject instanceof DatabaseConnexionInterface) {
-            throw new DataMapperExceptions($databaseConnexionString . ' is not a valid database connexion Object!');
+        $dataMapperObject = $this->container->make(DataMapperInterface::class, [
+            '_con' => $this->container->make(DatabaseConnexionInterface::class, [
+                'credentials' => $this->dataMapperEnvConfig->getCredentials('mysql'),
+            ]),
+            'entity' => $this->entity,
+        ]);
+        if (!$dataMapperObject instanceof DataMapperInterface) {
+            throw new DataMapperExceptions(DataMapperInterface::class . ' is not a valid database connexion Object!');
         }
-        return $this->container->make(DataMapper::class)->setDatabaseConnexion($databaseConnexionObject);
+        return $dataMapperObject;
     }
 }

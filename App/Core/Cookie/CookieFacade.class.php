@@ -5,23 +5,28 @@ declare(strict_types=1);
 class CookieFacade
 {
     /** @var string - the namespace reference to the cookie store type */
-    protected string $store;
-    /** @var object - the cookie environment object */
-    protected Object $cookieEnvironment;
+    protected CookieStoreInterface $store;
+    protected ContainerInterface $container;
+    /** @var CookieEnvironment - the cookie environment object */
+    private CookieEnvironment $cookieEnvironment;
 
     /**
      * Main cookie facade class which pipes the properties to the method arguments.
      * Which also defines the default cookie store.
      *
-     * @param null|array $cookieEnvironmentArray - expecting a cookie.yaml configuration file
-     * @param null|string $store - optional defaults to nativeCookieStore
+     * @param array $cookieEnvironmentArray - expecting a cookie.yaml configuration file
+     * @param string $store - optional defaults to nativeCookieStore
      * @return void
      */
-    public function __construct(?array $cookieEnvironmentArray = null, ?string $store = null)
+    public function __construct(array $cookieEnvironmentArray, CookieConfig $cookieConfig)
     {
-        $cookieArray = array_merge((new CookieConfig())->baseConfig(), $cookieEnvironmentArray);
-        $this->cookieEnvironment = new CookieEnvironment($cookieArray);
-        $this->store = ($store != null) ? $store : NativeCookieStore::class;
+        $this->container = Container::getInstance();
+        $cookieArray = array_merge($cookieConfig->baseConfig(), $cookieEnvironmentArray);
+        $this->store = $this->container->make(CookieStoreInterface::class, [
+            'cookieEnvironment' => $this->container->make(CookieEnvironment::class, [
+                'cookieConfig' => $cookieArray,
+            ]),
+        ]);
     }
 
     /**
@@ -29,10 +34,10 @@ class CookieFacade
      * dependencies ie. the cookie store object and the cookie environment
      * configuration.
      *
-     * @return object
+     * @return CookieInterface
      */
-    public function initialize(): Object
+    public function initialize(): CookieInterface
     {
-        return (new CookieFactory())->create($this->store, $this->cookieEnvironment);
+        return $this->container->make(CookieFactory::class)->create($this->store);
     }
 }

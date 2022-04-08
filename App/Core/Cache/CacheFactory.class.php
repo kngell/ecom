@@ -6,8 +6,10 @@ class CacheFactory
 {
     /** @var object */
     protected Object $envConfigurations;
+    private ContainerInterface $container;
+    private NativeCacheStorage $storage;
 
-    public function __construct(private CacheEnvironmentConfigurations $cacheConfig, private NativeCacheStorage $storage)
+    public function __construct(private CacheEnvironmentConfigurations $cacheConfig)
     {
     }
 
@@ -24,11 +26,17 @@ class CacheFactory
      */
     public function create(?string $cacheIdentifier = null, array $options = []): CacheInterface
     {
-        $this->envConfigurations = $this->cacheConfig->setParams($cacheIdentifier, CACHE_PATH);
-        $storageObject = $this->storage->setParams($this->envConfigurations, $options);
+        $storageObject = $this->container->make(CacheStorageInterface::class, [
+            'envConfigurations' => $this->cacheConfig,
+            'options' => $options,
+        ]);
         if (!$storageObject instanceof CacheStorageInterface) {
             throw new cacheInvalidArgumentException('"' . $this->storage::class . '" is not a valid cache storage object.', 0);
         }
-        return Container::getInstance()->make(CacheInterface::class)->setParams($cacheIdentifier, $storageObject, $options);
+        return $this->container->make(CacheInterface::class, [
+            'cacheIdentifier' => $cacheIdentifier,
+            'storage' => $storageObject,
+            'options' => $options,
+        ]);
     }
 }

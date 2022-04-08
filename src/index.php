@@ -7,8 +7,6 @@ $autoload = ROOT_DIR . '/vendor/autoload.php';
 if (is_file($autoload)) {
     require_once $autoload;
 }
-// $app = (new Application())->setAppRoot(ROOT_DIR);
-// $app->setConst()->setSession()->handleCors()->run();
 
 try {
     /* Attempting to run a single instance of the application */
@@ -27,5 +25,5 @@ try {
         ->setThemeBuilder(YamlFile::get('app')['theme_builder'], true)
         ->run();
 } catch (Exception $e) {
-    throw new Exception($e->getMessage());
+    throw new BaseResourceNotFoundException($e->getMessage());
 }

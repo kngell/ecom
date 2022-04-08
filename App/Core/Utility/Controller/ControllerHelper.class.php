@@ -6,10 +6,8 @@ final class ControllerHelper
 {
     protected Container $container;
 
-    public function __construct()
+    public function __construct(private Token $token)
     {
-        $this->container = Container::getInstance();
-        $this->token = $this->container->make(Token::class);
     }
 
     public function getSliders()
@@ -140,6 +138,6 @@ final class ControllerHelper
                 'fieldclass' => 'input-box__input',
                 'labelClass' => 'input-box__label',
             ],
-    ];
+        ];
     }
 }

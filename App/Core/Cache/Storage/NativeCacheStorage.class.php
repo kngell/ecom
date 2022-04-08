@@ -9,14 +9,9 @@ class NativeCacheStorage extends AbstractCacheStorage
     /**
      * Undocumented function.
      */
-    public function __construct()
+    public function __construct(CacheEnvironmentConfigurations $envConfigurations, array $options)
     {
-    }
-
-    public function setParams(CacheEnvironmentConfigurations $envConfigurations, array $options = []) : self
-    {
-        parent::setParams($envConfigurations, $options);
-        return $this;
+        parent::__construct($envConfigurations, $options);
     }
 
     /**
@@ -54,7 +49,6 @@ class NativeCacheStorage extends AbstractCacheStorage
         if (!file_exists($cacheEntryPathAndFilename)) {
             return false;
         }
-
         return $this->readCacheFile($cacheEntryPathAndFilename);
     }
 

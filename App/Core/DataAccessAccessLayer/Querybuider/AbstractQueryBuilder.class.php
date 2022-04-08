@@ -43,6 +43,26 @@ abstract class AbstractQueryBuilder
         return false;
     }
 
+    protected function mainQuery() : string
+    {
+        $sql = '';
+        if (!array_key_exists('sql', $this->key['extras'])) {
+            if (strpos($this->key['table'], 'SELECT') !== false) {
+                $sql = $this->key['table'];
+            } else {
+                $selectors = (!empty($this->key['selectors'])) ? implode(', ', $this->key['selectors']) : '*';
+                if (isset($this->key['aggregate']) && $this->key['aggregate']) {
+                    $sql = "SELECT {$this->key['aggregate']}({$this->key['aggregate_field']}) FROM {$this->key['table']}";
+                } else {
+                    $sql = "SELECT {$selectors} FROM {$this->key['table']}";
+                }
+            }
+        } else {
+            $sql = $this->key['extras']['sql'];
+        }
+        return $sql;
+    }
+
     /**
      * Join Table when selecting data
      * =====================================================================.
@@ -50,52 +70,30 @@ abstract class AbstractQueryBuilder
      * @param array $data
      * @return void
      */
-    protected function join($tables, array $data = []) :string
+    protected function join($selectors, array $options = []) :string
     {
         $sql = '';
-        if (is_array($tables) && !empty($tables)) {
-            $sql = 'SELECT ';
-            $all_tables = array_keys($tables);
-            foreach ($all_tables  as $table) {
-                if ($tables[$table]) {
-                    switch (true) {
-                        case !is_array($tables[$table]):
-                            $count = explode('|', $tables[$table]);
-                            $sql .= $count[0] . '(' . $table . '.' . $count[1] . ') AS Number ';
-                            break;
-                        default:
-                            foreach ($tables[$table] as $value) {
-                                $separator = $table == end($all_tables) && $value == end($tables[$table]) ? ' ' : ', ';
-                                if (strpos($value, 'AS') !== false) {
-                                    $v = explode('AS', $value);
-                                    $sql .= $table . '.' . trim($v[0]) . ' AS ' . trim($v[1]) . $separator;
-                                } else {
-                                    $sql .= $table . '.' . $value . $separator;
-                                }
-                            }
-                            break;
-                    }
+        if (array_key_exists('join_rules', $options)) {
+            if (array_key_exists('table', $options)) {
+                if (!(count($options['join_rules']) === count($options['table']) - 1)) {
+                    throw new QueryBuilderInvalidArgExceptions('Cannot join tables');
                 }
+                $columns = (!empty($selectors)) ? implode(', ', $selectors) : '*';
+                $sql .= "SELECT {$columns} FROM {$options['table'][0]}";
             }
-            $sql .= 'FROM ' . $all_tables[0] . ' ';
-            $i = 0;
-            $op = isset($data['op']) ? $data['op'] : ' AND ';
-            if (array_key_exists('join', $data)) {
-                foreach ($data['rel'] as $index => $value) {
-                    $add = ($i > 0) ? ' ' . $op . ' ' : '';
-                    if (is_numeric($index)) {
-                        $sql .= $data['join'] . ' ' . $all_tables[$index + 1] . ' ON ';
-                        $part1 = is_array($value[0]) ? $value[0]['tbl'] . '.' . $value[0]['value'] : $all_tables[$index] . '.' . $value[0];
-                        $part2 = is_array($value[1]) ? $value[1]['tbl'] . '.' . $value[1]['value'] : $all_tables[$index + 1] . '.' . $value[1];
-                        $sql .= $part1 . ' = ' . $part2 . ' ';
-                    }
-                    if ($index == 'params') {
-                        foreach ($data['rel']['params'] as $key => $value) {
-                            $params = explode('|', $value);
-                            $sql .= $add . $params[2] . '.' . $params[0] . ' ' . $params[1] . ' ';
-                        }
-                    }
-                    $i++;
+            $all_tables = $options['table'];
+            foreach ($options['join_rules'] as $index => $join_rule) {
+                $withParams = array_key_exists('params', $options['join_on'][$all_tables[$index + 1]]) ? true : false;
+                $braceOpen = $withParams ? ' (' : '';
+                $braceClose = $withParams ? ') ' : '';
+                if (is_numeric($index)) {
+                    $sql .= ' ' . $join_rule . ' ' . $all_tables[$index + 1];
+                    $sql .= ' ON' . $braceOpen . '(' . $options['join_on'][$all_tables[$index + 1]][1] . ' = ' . $options['join_on'][$all_tables[$index + 1]][0] . ')';
+                }
+                if ($withParams) {
+                    $params = $options['join_on'][$all_tables[$index + 1]]['params'];
+                    $args = $params[0];
+                    $sql .= ' ' . $params['separator'] . ' (' . $args[0] . ' ' . $params['operator'] . ' ' . $args[1] . ')' . $braceClose;
                 }
             }
         }
@@ -115,32 +113,27 @@ abstract class AbstractQueryBuilder
         if (isset($whereCond) && !empty($whereCond)) {
             $where .= ' WHERE ';
             $i = 0;
-            $op = isset($this->key['extras']['op']) ? $this->key['extras']['op'] : ' AND ';
-            foreach ($whereCond as $key => $value) {
-                $add = ($i > 0) ? ' ' . $op . ' ' : '';
-                if (is_array($value)) {
-                    $tbl = isset($value['tbl']) ? $value['tbl'] . '.' : '';
-                    switch (true) {
-                        case isset($value['operator']) && in_array($value['operator'], ['NOT IN', 'IN']):
-                            $arr = [];
-                            $where .= "$add" . $tbl . $key . ' ' . $value['operator'] . ' (' . $this->arrayPrefixer($key, $value['value'], $arr) . ')'; //":$key"
-                            $this->key['where']['bind_array'] = $arr;
-                        break;
-                        case isset($value['operator']) && in_array($value['operator'], ['!=', '>', '<', '>=', '<=']):
-                            $where .= "$add" . $tbl . $key . $value['operator'] . ":$key";
-                        break;
-
-                        default:
-                            $where .= "$add" . $tbl . $key . '=' . ":$key";
-                        break;
-                      }
-                } else {
-                    $where .= $value == 'IS NULL' ? "$add" . $key . ' ' . 'IS NULL' : "$add" . $key . '=' . ":$key";
+            $where .= '(';
+            foreach ($whereCond as $field => $aryCond) {
+                if ($field != 'or' && $field != 'and') {
+                    if (is_array($aryCond) && !empty($aryCond)) {
+                        $where .= $this->whereConditions($aryCond, $field);
+                        $i++;
+                        unset($whereCond[$field]);
+                    }
                 }
-                $i++;
             }
-            if (isset($whereCond['op']) || isset($whereCond['comparator'])) {
-                unset($whereCond['op'],$whereCond['comparator']);
+            $where .= ')';
+            if (count($whereCond) > 0) {
+                foreach ($whereCond as $separator => $aryConds) {
+                    $where .= ' ' . strtoupper($separator) . ' (';
+                    $i = 0;
+                    foreach ($aryConds as $field => $AryCond) {
+                        $where .= $this->whereConditions($AryCond, $field);
+                        $i++;
+                    }
+                    $where .= ')';
+                }
             }
         }
         return $where;
@@ -155,36 +148,15 @@ abstract class AbstractQueryBuilder
     {
         $groupBy = '';
         if (isset($this->key['extras']) && array_key_exists('group_by', $this->key['extras'])) {
-            $groupBy .= ' GROUP BY ';
-            $i = 0;
-            $op = isset($this->key['extras']['op']) ? $this->key['extras']['op'] : ' AND ';
-            if (is_array($this->key['extras']['group_by'])) {
-                foreach ($this->key['extras']['group_by'] as $key => $value) {
-                    $add = ($i > 0) ? ' ' . $op . ' ' : '';
-                    if (is_array($value)) {
-                        $tbl = isset($value['tbl']) ? $value['tbl'] . '.' : '';
-                        $groupBy .= "$add" . $tbl . $key;
-                    } else {
-                        $groupBy .= "$add" . $this->key['extras']['group_by'][$key];
-                    }
-                    $i++;
-                }
-            } else {
-                $groupBy .= $this->key['extras']['group_by'];
-            }
-            unset($this->key['extras']['group_by']);
+            $groupBy .= ' GROUP BY ' . implode(', ', $this->key['extras']['group_by']);
         }
-        return $groupBy;
+        return $groupBy . '';
     }
 
     protected function orderBy()
     {
-        // Append the orderby statement if set
         if (isset($this->key['extras']['orderby']) && $this->key['extras']['orderby'] != '') {
-            $this->key['orderby'] = implode(' ,', $this->key['orderby']) . ' ' . $this->key['extras']['orderby'];
-        }
-        if (isset($this->key['orderby']) && !empty($this->key['orderby'])) {
-            $this->sql .= ' ORDER BY ' . $this->key['orderby'] . ' ';
+            $this->sql .= is_array($this->key['extras']['orderby']) ? ' ORDER BY ' . implode(', ', $this->key['extras']['orderby']) . ' ' : ' ORDER BY ' . $this->key['extras']['orderby'];
         }
     }
 
@@ -216,6 +188,32 @@ abstract class AbstractQueryBuilder
     protected function has(string $key): bool
     {
         return isset($this->key[$key]);
+    }
+
+    private function whereConditions(array $aryCond, string $field) : string
+    {
+        $separator = isset($aryCond['separator']) ? ' ' . $aryCond['separator'] . ' ' : '';
+        $operator = isset($aryCond['operator']) ? ' ' . $aryCond['operator'] . ' ' : '';
+        $braceOpen = isset($aryCond['braceOpen']) ? ' ' . $aryCond['braceOpen'] . ' ' : '';
+        $braceEnd = isset($aryCond['braceEnd']) ? ' ' . $aryCond['braceEnd'] . ' ' : '';
+        switch ($operator) {
+        case in_array(trim($operator), ['NOT IN', 'IN']):
+            $arr = [];
+            $prefixer = $this->arrayPrefixer($field, $aryCond['value'], $arr);
+            $this->key['where']['bind_array'] = $arr;
+            return $braceOpen . $aryCond['tbl'] . '.' . $field . $operator . ' (' . $prefixer . ')' . $braceEnd . $separator;
+            // return "$add" . $tbl . $key . ' ' . $value['operator'] . ' (' . $prefixer . ')';
+
+        break;
+
+        default:
+            return $braceOpen . $aryCond['tbl'] . '.' . $field . $operator . ":$field" . $braceEnd . $separator;
+        break;
+    }
+
+        // case isset($value['operator']) && in_array($value['operator'], ['NOT IN', 'IN']):
+
+        //     break;
     }
 
     /**

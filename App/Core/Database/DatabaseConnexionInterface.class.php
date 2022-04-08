@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 interface DatabaseConnexionInterface
 {
-    public function setCredentials(array $credentials) : void;
-
     /**
      * DataBase open
      * --------------------------------------------------------------------------------------------------.

@@ -62,12 +62,15 @@ class ErrorHandling
             $code = 500;
         }
         http_response_code($code);
-
         if (self::isMode()['mode'] == 'dev' && self::isMode()['mode'] != 'prod') {
             list($srcCode, $snippet) = self::srcCode($exception->getFile(), $exception->getLine(), 'highlight');
             $stacktrace = self::$trace;
-            Container::getInstance()->make(ErrorsController::class)->iniParams(ErrorsController::class, 'index', [], 'Client/')
-                ->index(['exception' => $exception, 'snippet' => $snippet, 'srcCode' => $srcCode, 'stacktrace' => $stacktrace]);
+            Container::getInstance()->make(ControllerFactory::class, [
+                'controllerString' => ErrorsController::class,
+                'method' => 'index',
+                'params' => [],
+                'path' => 'Client/',
+            ])->create()->index(['exception' => $exception, 'snippet' => $snippet, 'srcCode' => $srcCode, 'stacktrace' => $stacktrace]);
         } else {
             $logFile = LOG_DIR . '/error-' . date('Y-m-d') . '-.log';
             ini_set('log_errors', 'On');
@@ -159,38 +162,4 @@ class ErrorHandling
     {
         return array_slice(file($filename, $flags), $offset, $length, true);
     }
-
-    /*
-     * Exception Handler
-     * ===========================================================.
-     * @param [type] $exception
-     * @return void
-     */
-    // public static function exceptionHandler($exception)
-    // {
-    //     $code = $exception->getCode();
-    //     if ($code != 404) {
-    //         $code = 500;
-    //     }
-    //     http_response_code($code);
-    //     $error = true;
-    //     if ($error) {
-    //         echo '<div style="font-size: 18px;">';
-    //         echo '<h1>Fatal Error</h1>';
-    //         echo '<p>Uncaught exception: ' . get_class($exception) . '</p>';
-    //         echo '<p style="color:red;font-weight:700;">Message: ' . $exception->getMessage() . '</p>';
-    //         echo '<p>Stack trace: ' . $exception->getTraceAsString() . '</p>';
-    //         echo '<p>Thrown in ' . $exception->getFile() . ' on line ' . $exception->getLine() . '</p>';
-    //         echo '</div>';
-    //     } else {
-    //         $errolog = LOG_DIR . '/' . date('Y-m-d H:is') . 'txt';
-    //         ini_set('erro_log', $errolog);
-    //         $message = 'Uncaught Exception: ' . get_class($exception);
-    //         $message .= 'with massage : ' . $exception->getMessage();
-    //         $message .= '\nStack trace : ' . $exception->getTraceAsString();
-    //         $message .= '\nThrown in : ' . $exception->getFile() . ' on line ' . $exception->getLine();
-    //         error_log($message);
-    //         echo Container::getInstance()->make(View::class)->render('errors' . DS . '_errors', ['erro_message' => $message]);
-    //     }
-    // }
 }

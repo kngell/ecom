@@ -12,7 +12,7 @@
         <div class="font-rale font-size-14 left-side">
             <?=$this->search_box?>
             <div class="connect">
-                <?php if (!isset(AuthManager::$currentLoggedInUser)) : ?>
+                <?php if (AuthManager::$currentLoggedInUser == null) : ?>
                 <button type="button" class="px-3 border-right border-left text-dark connexion text-decoration-none"
                     data-bs-toggle="modal" data-bs-target="#login-box" id="login_btn">
                     <span class="icon login"></span>&nbsp;&nbsp;Login</button>
@@ -58,7 +58,7 @@
     <!-- Primary navigation -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="<?= PROOT ?>"><img src="/ecom/public/assets/img/logo1.png" alt="Logo"></a>
+            <a class="navbar-brand" href="<?= PROOT ?>"><img src="/public/assets/img/logo1.png" alt="Logo"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-menu"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="bar"><i class="far fa-bars"></i></span>

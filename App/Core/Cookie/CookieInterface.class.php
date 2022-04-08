@@ -12,6 +12,8 @@ interface CookieInterface
      */
     public function set(mixed $value) : void;
 
+    public function get(string $name) : mixed;
+
     /**
      * Checks to see whether the cookie was set or not return true or false.
      * @param string $name

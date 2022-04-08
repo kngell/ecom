@@ -19,17 +19,7 @@ interface RooterInterface
      * ======================================================.
      * @return self
      */
-    public function resolve() : self;
+    public function resolve(string $url) : self;
 
-    public function setRequest(RequestHandler $request) : self;
-
-    public function setResponse(ResponseHandler $response) : self;
-
-    public function setNewRouter(string $newRouter) : self;
-
-    public function setRouteHandler(string $routeHandler) : self;
-
-    public function setContainer(ContainerInterface $container) : self;
-
-    public function setControllerAry(array $ctrlAry) : self;
+    public function setProperties(array $params = []) : self;
 }

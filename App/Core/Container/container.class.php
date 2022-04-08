@@ -12,6 +12,7 @@ class Container implements ContainerInterface
 
     /** @var array[] */
     protected array $bindings = [];
+
     /**
      * All of the registered rebound callbacks.
      *
@@ -19,11 +20,17 @@ class Container implements ContainerInterface
      */
     protected $reboundCallbacks = [];
 
-    public function __construct()
+    private ReflectionClass $reflector;
+
+    private function __construct()
     {
     }
 
-    public static function setInstance(?ContainerInterface $container = null)
+    private function __clone()
+    {
+    }
+
+    public static function setInstance(?Application $container = null)
     {
         return static::$instance = $container;
     }
@@ -102,21 +109,20 @@ class Container implements ContainerInterface
      * @param string $abstract
      * @return mixed
      */
-    public function make(string $abstract): mixed
+    public function make(string $abstract, array $args = []): mixed
     {
         if ($this->has($abstract)) {
             return $this->instances[$abstract];
         }
         $concrete = $this->bindings[$abstract]['concrete'] ?? $abstract;
         if ($concrete instanceof Closure || $concrete === $abstract) {
-            $object = $this->build($concrete);
+            $object = $this->build($concrete, $args);
         } else {
-            $object = $this->make($concrete);
+            $object = $this->make($concrete, $args);
         }
         if (isset($this->bindings[$abstract]) && $this->bindings[$abstract]['shared']) {
             $this->instances[$abstract] = $object;
         }
-
         return $object;
     }
 
@@ -126,35 +132,28 @@ class Container implements ContainerInterface
      * @param Closure|string $concrete
      * @return mixed
      */
-    public function build(Closure | string $concrete): mixed
+    public function build(Closure | string $concrete, array $args = []): mixed
     {
         if ($concrete instanceof Closure) {
             return $concrete($this);
         }
-
         try {
-            $reflector = new ReflectionClass($concrete);
+            $this->reflector = new ReflectionClass($concrete);
         } catch (ReflectionException $e) {
             throw new BindingResolutionException("Target class [$concrete] does not exist.", 0, $e);
         }
-
-        if (!$reflector->isInstantiable()) {
+        if (!$this->reflector->isInstantiable()) {
             throw new BindingResolutionException("Target [$concrete] is not instantiable.");
         }
-
-        $constructor = $reflector->getConstructor();
-
+        $constructor = $this->reflector->getConstructor();
         if ($constructor === null) {
-            $obj = $reflector->newInstance();
-
-            return $this->objectWithContainer($reflector, $obj);
+            $obj = $this->reflector->newInstance();
+            return $this->objectWithContainer($obj);
         }
-
         $dependencies = $constructor->getParameters();
-        $instances = $this->resolveDependencies($dependencies);
-        $obj = $reflector->newInstanceArgs($instances);
-
-        return $this->objectWithContainer($reflector, $obj);
+        $instances = $this->resolveDependencies($dependencies, $args);
+        $obj = $this->reflector->newInstanceArgs($instances);
+        return $this->objectWithContainer($obj);
     }
 
     public function flush(): void
@@ -166,6 +165,46 @@ class Container implements ContainerInterface
     public function getRooter()
     {
         return $this->rooter;
+    }
+
+    /**
+     * Resolve Dependencies
+     * =========================================================================================.
+     * @param array $dependencies
+     * @return array
+     */
+    protected function resolveDependencies(array $dependencies, array $args = []): array
+    {
+        $results = [];
+        foreach ($dependencies as $dependency) {
+            // This is a much simpler version of what Laravel does
+            $type = $dependency->getType(); // ReflectionType|null
+            if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
+                if ($dependency->isDefaultValueAvailable() || !empty($args)) {
+                    if ($dependency->isDefaultValueAvailable() && !array_key_exists($dependency->name, $args)) {
+                        $results[] = $dependency->getDefaultValue();
+                    }
+                    if (!empty($args)) {
+                        $results[] = $args[$dependency->name];
+                    }
+                } else {
+                    throw new DependencyHasNoDefaultValueException('Sorry cannot resolve class dependency ' . $dependency->name);
+                }
+            } elseif (!$this->reflector->isUserDefined()) {
+                $results[] = $this->make($dependency->name);
+            } else {
+                if (!empty($args)) {
+                    $results[] = $args[$dependency->name];
+                } else {
+                    $results[] = $this->make($type->getName());
+                }
+            }
+
+            // else {
+            //     throw new BindingResolutionException("Unresolvable dependency resolving [$dependency] in class {$dependency->getDeclaringClass()->getName()}");
+            // }
+        }
+        return $results;
     }
 
     /**
@@ -201,41 +240,15 @@ class Container implements ContainerInterface
      * @param object $obj
      * @return void
      */
-    protected function objectWithContainer(ReflectionClass $reflector, Object $obj)
+    protected function objectWithContainer(Object $obj)
     {
-        if ($reflector->hasProperty('container')) {
-            $reflectionContainer = $reflector->getProperty('container');
+        if ($this->reflector->hasProperty('container')) {
+            $reflectionContainer = $this->reflector->getProperty('container');
             $reflectionContainer->setAccessible(true);
             if (!$reflectionContainer->isInitialized($obj)) {
                 $reflectionContainer->setValue($obj, $this);
             }
         }
-
         return $obj;
-    }
-
-    /**
-     * Resolve Dependencies
-     * =========================================================================================.
-     * @param array $dependencies
-     * @return array
-     */
-    protected function resolveDependencies(array $dependencies): array
-    {
-        $results = [];
-
-        foreach ($dependencies as $dependency) {
-            // This is a much simpler version of what Laravel does
-
-            $type = $dependency->getType(); // ReflectionType|null
-
-            if (!$type instanceof ReflectionNamedType || $type->isBuiltin()) {
-                throw new BindingResolutionException("Unresolvable dependency resolving [$dependency] in class {$dependency->getDeclaringClass()->getName()}");
-            }
-
-            $results[] = $this->make($type->getName());
-        }
-
-        return $results;
     }
 }

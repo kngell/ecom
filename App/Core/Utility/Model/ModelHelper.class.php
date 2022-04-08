@@ -1,39 +1,25 @@
 <?php
 
 declare(strict_types=1);
-abstract class ModelHelper
+class ModelHelper
 {
-    /**
-     * After Find
-     * =============================================================.
-     * @param object $m
-     * @return DataMapper
-     */
-    public function afterFind(?DataMapper $m = null) : DataMapper
+    public function getRepoArgs(array $data = [], array $tables = []) : array
     {
-        if ($m->count() === 1) {
-            $model = current($m->get_results());
-            $array = false;
-            if (is_array($model)) {
-                $array = true;
-                $model = (object) $model;
-            }
-            $media_key = $this->get_media();
-            if ($media_key != '') {
-                $model->$media_key = $model->$media_key != null ? unserialize($model->$media_key) : ['products' . US . 'product-80x80.jpg'];
-                if (is_array($model->$media_key)) {
-                    foreach ($model->$media_key as $key => $url) {
-                        $model->$media_key[$key] = IMG . $url; //
+        $results = [];
+        if (!empty($data)) {
+            foreach ($data as $key => $value) {
+                if (!is_array($value)) {
+                    throw new BaseInvalidArgumentException($value . ' must be an array');
+                }
+                if (in_array($key, array_keys($data))) {
+                    if ($key == 'table_join') {
+                        $results[$key] = array_merge($value, $tables);
+                    } else {
+                        $results[$key] = $value;
                     }
                 }
             }
-            $m->set_results($array ? (array) $model : $model);
         }
-        return $m;
-    }
-
-    public function get_media() : string
-    {
-        return isset($this->_media_img) ? $this->_media_img : '';
+        return [$results['selectors'] ?? [], $results['conditions'] ?? [], $results['parameters'] ?? [], $results['options'] ?? ''];
     }
 }

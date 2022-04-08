@@ -1,10 +1,10 @@
-import { Call_controller } from "corejs/form_crud";
-import owlCarousel from "owl.carousel";
-import "select2";
-import OP from "corejs/operator";
-import favicon from "img/favicon.ico";
-import user_cart from "corejs/user_cart";
-import { BASE_URL, HOST } from "corejs/config";
+import { Call_controller } from 'corejs/form_crud';
+import owlCarousel from 'owl.carousel';
+import 'select2';
+import OP from 'corejs/operator';
+import favicon from 'img/favicon.ico';
+import user_cart from 'corejs/user_cart';
+import { BASE_URL, HOST } from 'corejs/config';
 
 class Main {
   constructor(element) {
@@ -15,13 +15,13 @@ class Main {
     this._setupEvents();
   };
   _setupVariables = () => {
-    this.header = this.element.find("#header");
-    this.wrapper = this.element.find("#main-site");
+    this.header = this.element.find('#header');
+    this.wrapper = this.element.find('#main-site');
   };
   _setupEvents = () => {
     var phpPlugin = this;
 
-    document.querySelector("link[type='image/ico']").href = HOST + favicon;
+    document.querySelector("link[type='image/ico']").href = favicon;
     /**
      * Currency Management
      * =======================================================================
@@ -29,46 +29,46 @@ class Main {
     const operation = new OP();
     operation._format_money({
       wrapper: phpPlugin.wrapper,
-      fields: [".price .product_regular_price"],
+      fields: ['.price .product_regular_price'],
     });
     /**
      * Add to Cart
      * ========================================================================
      */
-    phpPlugin.wrapper.on("submit", ".add_to_cart_frm", function (e) {
+    phpPlugin.wrapper.on('submit', '.add_to_cart_frm', function (e) {
       e.preventDefault();
       var data = {
-        url: "AddFromGuestCart",
+        url: 'AddFromGuestCart',
         frm: $(this),
-        frm_name: "add_to_cart_frm" + $(this).find("input[name=item_id]").val(),
-        table: "cart",
-        params: $(this).find("button[type=submit]"),
+        frm_name: 'add_to_cart_frm' + $(this).find('input[name=item_id]').val(),
+        table: 'cart',
+        params: $(this).find('button[type=submit]'),
       };
       Call_controller(data, ManageR);
       function ManageR(response, button) {
-        if (response.result == "success") {
-          if (document.location.pathname != BASE_URL + "cart") {
-            phpPlugin.header.find(".cart_nb_elt").html(function () {
+        if (response.result == 'success') {
+          if (document.location.pathname != BASE_URL + 'cart') {
+            phpPlugin.header.find('.cart_nb_elt').html(function () {
               return (
                 response.msg[0] +
-                parseInt(phpPlugin.header.find(".cart_nb_elt").html())
+                parseInt(phpPlugin.header.find('.cart_nb_elt').html())
               );
             });
           }
           if (response.msg[0] == 1) {
             button
-              .removeClass("btn-warning")
-              .addClass("btn-success")
-              .html("In the cart");
+              .removeClass('btn-warning')
+              .addClass('btn-success')
+              .html('In the cart');
           } else {
             button
-              .removeClass("btn-warning")
-              .addClass("btn-success")
-              .html("In the cart");
+              .removeClass('btn-warning')
+              .addClass('btn-success')
+              .html('In the cart');
           }
           console.log(BASE_URL);
-          if (document.location.pathname == BASE_URL + "cart") {
-            console.log("add");
+          if (document.location.pathname == BASE_URL + 'cart') {
+            console.log('add');
             new user_cart(phpPlugin.wrapper, phpPlugin.header)._display_cart();
           }
         }
@@ -76,6 +76,6 @@ class Main {
     });
   };
 }
-document.addEventListener("DOMContentLoaded", function () {
-  new Main($("#body"))._init();
+document.addEventListener('DOMContentLoaded', function () {
+  new Main($('#body'))._init();
 });

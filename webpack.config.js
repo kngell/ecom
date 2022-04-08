@@ -15,8 +15,7 @@ const {
   viewsConfig,
 } = require("./webpack.partials");
 const ASSET_PATH =
-  process.env.ASSET_PATH ||
-  `${path.sep}ecom${path.sep}public${path.sep}assets${path.sep}`;
+  process.env.ASSET_PATH || `${path.sep}public${path.sep}assets${path.sep}`;
 
 const commonConfig = merge(plugins, {
   devtool: false,
@@ -44,18 +43,19 @@ const developmentConfig = {
             },
             recursive: true,
           },
-          {
-            folder: "public/assets/js",
-            method: (absoluteItemPath) => {
-              return new RegExp(/\.hot-update.js$/, "m").test(absoluteItemPath);
-            },
-            recursive: true,
-          },
+          // {
+          //   folder: 'public/assets/js',
+          //   method: (absoluteItemPath) => {
+          //     return new RegExp(/\.hot-update.js$/, 'm').test(absoluteItemPath);
+          //   },
+          //   recursive: true,
+          // },
         ],
       },
     }),
     new RemoveEmptyScriptsPlugin({
       verbose: true,
+      // enabled: devMod === false,
     }),
     new webpack.SourceMapDevToolPlugin({}),
   ],

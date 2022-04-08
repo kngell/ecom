@@ -1,6 +1,7 @@
 //Get visitors Data
 
-export const get_visitors_data = () => {
+export const get_visitors_data = (e) => {
+  e.preventDefault();
   return new Promise((resolve, reject) => {
     let data = {
       ip: $("#ip_address").val(),
@@ -17,6 +18,7 @@ export const send_visitors_data = (data, manageR) => {
   $.ajax({
     url: data.url,
     method: "post",
+    dataType: "json",
     data: {
       table: data.table,
       ip: data.ip ? data.ip : "",
