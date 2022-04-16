@@ -8,9 +8,10 @@ interface CookieInterface
      * Set a cookie within the domain.
      *
      * @param mixed $value
+     * @param null|string $cookieName
      * @return void
      */
-    public function set(mixed $value) : void;
+    public function set(mixed $value, ?string $cookieName = null): void;
 
     public function get(string $name) : mixed;
 

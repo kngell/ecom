@@ -5,18 +5,18 @@ class UniqueValidator extends CustomValidator
 {
     public function runValidation()
     {
-        $fields = (is_array($this->field)) ? $this->field[0] : $this->field;
-        $value = $this->_model->{$fields};
+        $field = (is_array($this->getField())) ? $this->getField()[0] : $this->getField();
+        $value = $this->getModel()->{$field};
 
-        if (is_array($this->rule)) {
-            $table = $this->rule[0];
-            $table_id = $this->rule[1];
+        if (is_array($this->getRule())) {
+            $table = $this->getRule()[0];
+            $table_id = $this->getRule()[1];
         } else {
-            $table = $this->_model->rule;
+            $table = $this->getModel()->rule;
         }
-        $where = [$fields => $value];
-        $query_params = ['where' => $where, 'return_mode' => 'class'];
-        $other = $this->_model->getAllItem($query_params);
+        $where = [$field => $value];
+        $query_params = $this->getModel()->table()->where($where)->return('class');
+        $other = $this->getModel()->getAll($query_params);
         if ($other->count() <= 0) {
             return true;
         }
@@ -27,22 +27,6 @@ class UniqueValidator extends CustomValidator
                 }
             }
         }
-
-        // if(!empty($this->_model->id)){
-        //     $conditions[] = " id != ?";
-        //     $bind = $this->_model->id;
-        // }
-
-        //if (is_array($this->field)) {
-        //array_unshift($this->field);
-        //foreach ($this->field as $adds) {
-        //    $conditions[] = "{}$adds = ?";
-        //     $bind[] = $this->_model->{$adds};
-        //  }
-        //}
-        //$queryparams = ['conditions'=>$conditions,'bind'=>$bind];
-        //$other = $this->findfirst($queryparams);
-        //retunr !$other;
         return !$other;
     }
 }

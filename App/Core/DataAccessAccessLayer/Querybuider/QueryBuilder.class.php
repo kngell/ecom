@@ -17,7 +17,6 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
         }
         $arg = array_merge(self::SQL_DEFAULT, $args);
         $this->key = $arg;
-
         return $this;
     }
 

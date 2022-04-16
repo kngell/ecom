@@ -3,15 +3,13 @@
 declare(strict_types=1);
 class VisitorsManager extends Model
 {
-    protected $_table = 'visitors';
-    protected $_colID = 'vID';
-    protected $_colIndex = 'cookies';
-    protected $_modelName;
+    protected string $_table = 'visitors';
+    protected string $_colID = 'vID';
+    protected string $_colIndex = 'cookies';
 
     public function __construct()
     {
         parent::__construct($this->_table, $this->_colID);
-        $this->_modelName = str_replace(' ', '', ucwords(str_replace('_', ' ', $this->_table))) . 'Manager';
     }
 
     public function manageVisitors(array $params = [])
@@ -24,8 +22,8 @@ class VisitorsManager extends Model
                 1 => $this->updateVisitorInfos($visitorInfos, $ipData),
                 default => $this->cleanVisitorsInfos($visitorInfos, $ipData)
             };
-        }else{
-            $return_value= $this->add_new_visitor($ipData);
+        } else {
+            $return_value = $this->add_new_visitor($ipData);
         }
         return $return_value ?? false;
     }
@@ -53,7 +51,7 @@ class VisitorsManager extends Model
         $query_data = $this->table()
             ->where([
                 'cookies' => $this->cookie->get(VISITOR_COOKIE_NAME),
-                'ipAddress' => $ip,
+                'ipAddress|in' => [[$ip, '2', '3'], 'visitors'],
             ])
             ->return('class')
             ->build();

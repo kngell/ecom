@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 abstract class AbstractDispatcher implements DispatcherInterface
 {
-    protected function listnerCanBeInstantiated(string $class) : void
+    protected function listnerCanBeInstantiated(string $class) : ReflectionClass
     {
         $reflector = new ReflectionClass($class);
         if (!$reflector->isInstantiable()) {
             throw new BaseInvalidArgumentException("Listener can not be instantiate [$class]!");
         }
+        return $reflector;
     }
 
     protected function checkEvent(string $name) : void

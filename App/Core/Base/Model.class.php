@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-class Model extends AbstractModel implements ModelInterface
+class Model extends AbstractModel
 {
     use ModelTrait;
 
@@ -21,11 +21,11 @@ class Model extends AbstractModel implements ModelInterface
     protected string $tableSchemaID;
     private $_results;
     private int $_count;
-    private string $_modelName;
     private bool $_softDelete = false;
     private bool $_deleted_item = false;
     private string $_current_ctrl_method = 'update';
     private int $_lasID;
+    private string $_matchingTestColumn;
 
     /**
      * Main Constructor
@@ -33,15 +33,14 @@ class Model extends AbstractModel implements ModelInterface
      * @param string $tableSchema
      * @param string $tableSchemaID
      */
-    public function __construct(string $tableSchema, string $tableSchemaID)
+    public function __construct(string $tableSchema, string $tableSchemaID, $matchingTestCol = '')
     {
-        $this->container = Container::getInstance();
         $this->throwException($tableSchema, $tableSchemaID);
         $this->tableSchema = $tableSchema;
         $this->tableSchemaID = $tableSchemaID;
+        $this->_matchingTestColumn = $matchingTestCol;
         $this->properties();
-        $this->entity();
-        $this->repository();
+        $this->_modelName = $this::class;
     }
 
     public function guardedID(): array
@@ -70,7 +69,7 @@ class Model extends AbstractModel implements ModelInterface
         return $this->find();
     }
 
-    public function getUniqueId(string $colid_name = '', string $prefix = '', string $suffix = '', int $token_length = 24)
+    public function getUniqueId(string $colid_name = '', string $prefix = '', string $suffix = '', int $token_length = 24) : mixed
     {
         $output = $prefix . $this->token->generate($token_length) . $suffix;
         while ($this->getDetails($output, $colid_name)->count() > 0) :
@@ -83,7 +82,7 @@ class Model extends AbstractModel implements ModelInterface
      * Save Data insert or update
      * ============================================================.
      * @param array $params
-     * @return void
+     * @return ?object
      */
     public function save(?Entity $entity = null) : ?Object
     {
@@ -104,6 +103,16 @@ class Model extends AbstractModel implements ModelInterface
         return null;
     }
 
+    public function getMatchingTestColumn() : string
+    {
+        return $this->_matchingTestColumn;
+    }
+
+    public function validator(array $items = []) : void
+    {
+        FH::validate_forms($items, $this);
+    }
+
     public function count() : int
     {
         return $this->_count;
@@ -117,6 +126,11 @@ class Model extends AbstractModel implements ModelInterface
     public function setResults(mixed $results) : void
     {
         $this->_results = $results;
+    }
+
+    public function getErrorMessages() : array
+    {
+        return $this->validationErr;
     }
 
     /**
@@ -215,20 +229,27 @@ class Model extends AbstractModel implements ModelInterface
         return $this->validates;
     }
 
-    /**
-     * Create the model repositories
-     * =============================================================.
-     * @param string $tableSchema
-     * @param string $tableSchemaID
-     * @return void
-     */
-    private function repository(): void
+    private function properties() : void
     {
-        $this->repository = $this->container->make(RepositoryFactory::class, [
-            'crudIdentifier' => 'crudIdentifier',
-            'tableSchema' => $this->tableSchema,
-            'tableSchemaID' => $this->tableSchemaID,
-            'entity' => $this->entity,
-        ])->create();
+        $this->container = property_exists($this, 'container') ? Container::getInstance() : '';
+        $props = array_merge(['entity' => str_replace(' ', '', ucwords(str_replace('_', ' ', $this->tableSchema))) . 'Entity'], YamlFile::get('model_properties'));
+        foreach ($props as $prop => $class) {
+            if (property_exists($this, $prop)) {
+                if ($prop === 'queryParams') {
+                    $this->{$prop} = $this->container->make($class, [
+                        'tableSchema' => $this->tableSchema,
+                    ]);
+                } elseif ($prop === 'repository') {
+                    $this->{$prop} = $this->container->make($class, [
+                        'crudIdentifier' => 'crudIdentifier',
+                        'tableSchema' => $this->tableSchema,
+                        'tableSchemaID' => $this->tableSchemaID,
+                        'entity' => $this->entity,
+                    ])->create();
+                } else {
+                    $this->{$prop} = $this->container->make($class);
+                }
+            }
+        }
     }
 }

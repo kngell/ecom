@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 abstract class AbstractModel implements ModelInterface
 {
+    protected string $_modelName;
     protected QueryParams $queryParams;
 
     /*
@@ -102,16 +103,13 @@ abstract class AbstractModel implements ModelInterface
         return isset($this->_colID) ? $this->_colID : '';
     }
 
-    public function runValidation($validator)
+    public function runValidation(CustomValidator $validator) : void
     {
-        $validator->run();
-        $key = $validator->field;
-        //dd($validator);
-        if (!$validator->success) {
+        $status = $validator->run();
+        if (!$status) {
             $this->validates = false;
-            $this->validationErr[$key] = $validator->msg;
+            $this->validationErr[$validator->getField()] = $validator->getMsg();
         }
-        //dd($validator);
     }
 
     /**
@@ -122,5 +120,10 @@ abstract class AbstractModel implements ModelInterface
     public function get_container() : ContainerInterface
     {
         return $this->container;
+    }
+
+    public function getModelName() : string
+    {
+        return $this->_modelName;
     }
 }

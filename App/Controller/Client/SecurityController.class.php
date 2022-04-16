@@ -10,6 +10,7 @@ class SecurityController extends Controller
 
     public function loginPage()
     {
+        $this->dispatcher->dispatch(new NewVisitoregisteredEvent);
         echo 'login';
     }
 

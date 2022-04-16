@@ -56,7 +56,7 @@ abstract class AbstractQueryParams implements QueryParamsInterface
         $where = [];
         $this->key('conditions');
         if (is_string($params['field'])) {
-            $where[$params['field']] = ['value' => $params['value'], 'tbl' => $this->current_table];
+            $where[$params['field']] = !is_array($params['value']) ? ['value' => $params['value'], 'tbl' => $this->tableSchema] : ['value' => $params['value'][0], 'tbl' => $params['value'][1]];
         }
         if ($params['operator'] != '') {
             $where[$params['field']]['operator'] = $params['operator'];
@@ -100,12 +100,15 @@ abstract class AbstractQueryParams implements QueryParamsInterface
         return '';
     }
 
-    protected function braceEnd(string $separator, mixed $key) : string
+    protected function braceClose(string $separator, mixed $key) : string
     {
-        if (!empty($this->braceOpen) && ((is_numeric($key) || in_array($separator, self::SEPARATOR)) || !empty($this->conditionBreak))) {
+        if (!empty($this->braceOpen)) {
             $this->braceOpen = '';
             return ')';
         }
+        // if (!empty($this->braceOpen) && ((is_numeric($key) || in_array($separator, self::SEPARATOR)) || !empty($this->conditionBreak))) {
+
+        // }
         return '';
     }
 
@@ -116,7 +119,7 @@ abstract class AbstractQueryParams implements QueryParamsInterface
         $firstKey = key($conditions);
         $whereParams['separator'] = ($key != $lastKey) ? $this->separator(next($conditions), key($conditions)) : '';
         $whereParams['braceOpen'] = ($key == $firstKey) || (is_numeric($key) && in_array($value, ['or', 'and']) || !empty($this->conditionBreak)) ? $this->braceOpen($conditions) : '';
-        $whereParams['braceEnd'] = $this->braceEnd($whereParams['separator'], $key);
+        $whereParams['braceEnd'] = $this->braceClose($whereParams['separator'], $key);
         $whereParams['value'] = $value;
         return $whereParams;
     }

@@ -72,27 +72,16 @@ class Login_And_Register {
         },
       });
     });
-    //remove invalid input on focus register
-    phpLR.regfrm.on("focus", "input", function () {
-      $(this).removeClass("is-invalid");
-      $(this).parent().children("div.invalid-feedback").html("");
-    });
-    //remove invalid input on focus login
-    phpLR.loginfrm.on("focus", "input", function () {
-      $(this).removeClass("is-invalid");
-      $(this).parent().children("div.invalid-feedback").html("");
-    });
+    //remove invalid input on focus
+    input.removeInvalidInput(phpLR.loginfrm);
+    input.removeInvalidInput(phpLR.regfrm);
+    input.removeInvalidInput(phpLR.forgotfrm);
     //reset forgot password frm
     phpLR.bs_forgot_box.addEventListener("hide.bs.modal", function () {
       phpLR.forgotfrm.get(0).reset();
       if (phpLR.forgotfrm.find(".is-invalid").length != 0) {
         input.reset_invalid_input(phpLR.forgotfrm);
       }
-    });
-    //remove forgot password frm
-    phpLR.forgotfrm.on("focus", "input", function () {
-      $(this).removeClass("is-invalid");
-      $(this).parent().children("div.invalid-feedback").html("");
     });
     //Register form
     phpLR.regfrm.on("submit", function (e) {
@@ -145,8 +134,7 @@ class Login_And_Register {
         frm: phpLR.loginfrm,
         frm_name: "login-frm",
       };
-      Call_controller(data, ManageLoginResponse);
-      function ManageLoginResponse(response) {
+      Call_controller(data, (response) => {
         phpLR.loginfrm.find("#login-btn").val("Login");
         if (response.result == "success") {
           if (response.msg == "checkout") {
@@ -159,12 +147,13 @@ class Login_And_Register {
           }
         } else {
           if (response.result == "error-field") {
+            console.log(response);
             input.error(phpLR.loginfrm, response.msg);
           } else {
-            phpLR.loginfrm.find("#loginAlert").html(response.msg);
+            phpLR.loginfrm.find("#alertErr").html(response.msg);
           }
         }
-      }
+      });
     });
     //Forgot password request
     phpLR.forgotfrm.on("submit", function (e) {

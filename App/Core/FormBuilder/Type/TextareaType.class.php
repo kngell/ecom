@@ -26,7 +26,7 @@ class TextareaType implements FormBuilderTypeInterface
      * @param mixed|null $options
      * @param array $settings
      */
-    public function setParams(array $fields, mixed $options = null, array $settings = [])
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         $this->fields = $fields;
         $this->options = ($options != null) ? $options : null;
@@ -34,7 +34,6 @@ class TextareaType implements FormBuilderTypeInterface
         if (is_array($this->baseOptions)) {
             $this->baseOptions = $this->getBaseOptions();
         }
-        return $this;
     }
 
     /**

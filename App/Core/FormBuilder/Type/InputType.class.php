@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-class InputType implements FormBuilderTypeInterface
+class InputType extends AbstractInputType implements FormBuilderTypeInterface
 {
     use FormBuilderTrait;
 
@@ -23,8 +23,14 @@ class InputType implements FormBuilderTypeInterface
     /** @var string - this is the standard Label Template */
     protected string $labelTemplate = '';
 
-    public function __construct()
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
+        $this->fields = $this->filterArray($fields);
+        $this->options = ($options != null) ? $options : null;
+        $this->settings = $settings;
+        if (is_array($this->baseOptions)) {
+            $this->baseOptions = $this->getBaseOptions();
+        }
         list($this->template, $this->labelTemplate) = $this->template();
     }
 
@@ -36,23 +42,6 @@ class InputType implements FormBuilderTypeInterface
     public function getLabelTemplate() : string
     {
         return $this->labelTemplate;
-    }
-
-    /**
-     * Set Params.
-     *
-     * @param array $fields
-     * @param mixed|null $options
-     * @param array $settings
-     */
-    public function setParams(array $fields, mixed $options = null, array $settings = [])
-    {
-        $this->fields = $this->filterArray($fields);
-        $this->options = ($options != null) ? $options : null;
-        $this->settings = $settings;
-        if (is_array($this->baseOptions)) {
-            $this->baseOptions = $this->getBaseOptions();
-        }
     }
 
     public function settings(array $args) : self
@@ -80,7 +69,7 @@ class InputType implements FormBuilderTypeInterface
             'type' => $this->type,
             'name' => '',
             'id' => isset($this->attr['id']) ? $this->attr['id'] : ($this->fields['name'] ?? ''),
-            'class' => ['form-control', 'input-box__input', isset($this->attr['id']) ? $this->attr['id'] : ($this->fields['name'] ?? '')],
+            'class' => ['form-control', isset($this->attr['id']) ? $this->attr['id'] : ($this->fields['name'] ?? '')],
             'checked' => false,
             'required' => false,
             'disabled' => false,
@@ -110,7 +99,7 @@ class InputType implements FormBuilderTypeInterface
                 /* Phew!! */
                 /* Lets merge the options from the our extension with the fields options */
                 /* assigned complete merge to $this->attr class property */
-                $this->attr = array_merge($defaultWithExtensionOptions, $this->fields, !empty($this->attr) ? $this->attr : []);
+                $this->attr = $this->mergeArys($defaultWithExtensionOptions, $this->fields, !empty($this->attr) ? $this->attr : []);
             }
         }
     }

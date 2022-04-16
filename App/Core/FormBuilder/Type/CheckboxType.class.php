@@ -15,23 +15,9 @@ class CheckboxType extends InputType implements FormExtensionTypeInterface
     /** @var array - returns the defaults for the input type */
     protected array $defaults = [];
 
-    public function __construct()
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
-        parent::__construct();
-    }
-
-    /**
-     * Set Params.
-     *
-     * @param array $fields
-     * @param mixed|null $options
-     * @param array $settings
-     */
-    public function setParams(array $fields, mixed $options = null, array $settings = [])
-    {
-        /* Assigned arguments to parent InputType constructor */
-        parent::setParams($fields, $options, $settings);
-        return $this;
+        parent::__construct($fields, $options, $settings);
     }
 
     public function template(array $args = []) : array
@@ -54,7 +40,7 @@ class CheckboxType extends InputType implements FormExtensionTypeInterface
     public function configureOptions(array $extensionOptions = []): void
     {
         $this->defaults = [
-            'class' => ['uk-checkbox'],
+            'class' => ['checkbox__input'],
             'value' => '',
         ];
         parent::configureOptions($this->defaults);

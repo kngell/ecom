@@ -52,7 +52,7 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
     const HTML_ELEMENT_PARTS = [
         'wrapperClass' => ['input-box', 'mb-3'],
         'wrapperId' => '',
-        'feedbackTag' => '<div class="invalid-feedback"></div>',
+        'feedbackTag' => '<div class="invalid-feedback form-text"></div>',
         'labelTag' => '%s {{label}}',
         'helpBlock' => '',
         'labelClass' => ['field_label'],
@@ -112,6 +112,12 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
 
         $this->inputs[$key] = $value;
         return true;
+    }
+
+    protected function noLabel() : self
+    {
+        $this->inputObject[0]->settings(['show_label' => false]);
+        return $this;
     }
 
     protected function class(string $str)

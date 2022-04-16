@@ -5,8 +5,8 @@ class Minvalidator extends CustomValidator
 {
     public function runValidation()
     {
-        $value = $this->_model->getEntity()->{'get' . ucwords($this->field)}();
-        $pass = (strlen($value) >= $this->rule);
+        $value = $this->getModel()->getEntity()->{'get' . ucwords($this->getField())}();
+        $pass = (strlen($value) >= $this->getRule());
         return $pass;
     }
 }

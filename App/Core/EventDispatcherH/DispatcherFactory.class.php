@@ -8,7 +8,7 @@ class DispatcherFactory
     public function create() : DispatcherInterface
     {
         $dispatcher = $this->container->make(DispatcherInterface::class, [
-            'listeners' => [NullEvent::class => [NullListener::class]],
+            'listeners' => YamlFile::get('eventListener'),
             'log' => [],
         ]);
         if (!$dispatcher instanceof DispatcherInterface) {

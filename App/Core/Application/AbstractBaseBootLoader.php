@@ -176,6 +176,7 @@ abstract class AbstractBaseBootLoader extends Container
         return $this->make(CookieFacade::class, [
             'cookieEnvironmentArray' => [],
             'cookieConfig' => $this->make(CookieConfig::class),
+            'gv' => $this->make(GlobalVariablesInterface::class),
         ])->initialize();
     }
 

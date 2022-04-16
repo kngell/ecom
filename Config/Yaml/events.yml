@@ -1,0 +1,153 @@
+services:
+  subscribers:
+    user.subscriber:
+      class: UserActionSubscriber
+      register_route_feedback:
+        UserController::newAction:
+          msg: New user added!
+        UserController::editAction:
+          msg: Changes saved!
+        UserController::deleteAction:
+          msg: User deleted successfully!
+          redirect: user.index
+        UserController::bulkAction:
+          msg: Bulk action successful!
+          redirect: user.index
+        UserController::trashAction:
+          msg: Account is in located within the trash!
+          redirect: user.index
+        UserController::trashRestoreAction:
+          msg: Account restored from trash!
+          redirect: user.index
+        UserController::lockAction:
+          msg: User account is now locked
+          redirect: user.index
+        UserController::unlockAction:
+          msg: User account is is now unlocked
+          redirect: user.index
+        UserController::activeAction:
+          msg: User account is now active
+          redirect: user.index
+        UserController::bulkDeleteAction:
+          msg: Multiple items deleted successfully.
+          redirect: user.index
+        UserController::bulkCloneAction:
+          msg: Multiple items cloned successfully.
+          redirect: user.index
+        UserController::cloneAction:
+          msg: Item cloned successfully.
+          redirect: user.index
+        RegistrationController::registerAction:
+          msg: Your account was created!
+
+    role.subscriber:
+      class: RoleActionSubscriber
+      register_route_feedback:
+        RoleController::newAction:
+          msg: New Role Added!
+        RoleController::editAction:
+          msg: Role updated!
+        RoleController::deleteAction:
+          msg: Role Deleted!
+          redirect: role.index
+        RoleController::assignedAction:
+          msg: New permission successfully assigned to role.
+
+    role_permission_assigned.subscriber:
+      class: RolePermissionAssignedActionSubscriber
+      register_route_feedback:
+        RoleController::assignedAction:
+          msg: Changes Saved
+
+    permission.subscriber:
+      class: EventSubscriber\PermissionActionSubscriber
+      register_route_feedback:
+        PermissionController::newAction:
+          msg: New permission added!
+        PermissionController::editAction:
+          msg: Permission updated!
+        PermissionController::deleteAction:
+          msg: Permission deleted!
+          redirect: permission.index
+
+    userRole.subscriber:
+      class: UserRoleActionSubscriber
+
+    security.subscriber:
+      class: LoginActionSubscriber
+      register_route_feedback:
+        SecurityController::indexAction:
+          msg: Welcome back!
+
+    logout.subscriber:
+      class: LogoutActionSubscriber
+      register_route_feedback:
+        LogoutController::logoutAction:
+          msg: You've successfully logged out!
+
+    password.subscriber:
+      class: PasswordActionSubscriber
+      register_route_feedback:
+        PasswordController::forgotAction:
+          msg: Your request was successful. Please check your email address for reset link!
+        PasswordController::resetAction:
+          msg: Password reset successfully.
+
+    activation.subscriber:
+      class: ActivationActionSubscriber
+      register_route_feedback:
+        ActivationController::activateAction:
+          msg: You're now activated
+
+    registration.subscriber:
+      class: RegistrationActionSubscriber
+      register_route_feedback:
+        RegistrationController::registerAction:
+          msg: You're now registered
+
+    setting.subscriber:
+      class: SettingActionSubscriber
+      register_route_feedback:
+        SettingController::indexAction:
+          msg: Changes Saved
+
+    account.subscriber:
+      class: UserProfileActionSubscriber
+      register_route_feedback:
+        AccountController::nameAction:
+          msg: Your name was changed successfully!
+        AccountController::emailAction:
+          msg: Your email was changed successfully!
+        AccountController::passwordAction:
+          msg: Your password was changed successfully!
+
+    menu.subscriber:
+      class: MenuActionSubscriber
+      register_route_feedback:
+        MenuController::editAction:
+          msg: Changes Saved
+
+    ########################## CORE SYSTEM EVENTS ##########################
+    base_controller_action.subscriber:
+      class: BeforeControllerActionSubscriber
+    base_render_action.subscriber:
+      class: BeforeRenderActionSubscriber
+    system_action_event:
+      class: SystemActionSubscriber
+    controllerSettings.subscriber:
+      class: ControllerSettingActionSubscriber
+
+    # base_bulk_action.subscriber:
+    #   class: \MagmaCore\Base\EventSubscriber\BulkActionSubscriber
+    #   register_route_feedback:
+    #     UserController::bulkDeleteAction:
+    #       msg: Multiple items deleted successfully.
+    #       redirect: user.index
+    #     UserController::bulkCloneAction:
+    #       msg: Multiple items cloned successfully.
+    #       redirect: user.index
+#  listeners:
+#    inertia.listener:
+#      class: \MagmaCore\Inertia\InertiaListener
+#      props:
+#        - { name: "app.event.listener.send_registration_email_listener", event: '' }

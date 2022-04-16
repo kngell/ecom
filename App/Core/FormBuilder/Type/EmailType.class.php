@@ -9,11 +9,6 @@ class EmailType extends InputType implements FormExtensionTypeInterface
     /** @var array - returns the defaults for the input type */
     protected array $defaults = [];
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Set Params.
      *
@@ -21,11 +16,10 @@ class EmailType extends InputType implements FormExtensionTypeInterface
      * @param mixed|null $options
      * @param array $settings
      */
-    public function setParams(array $fields, mixed $options = null, array $settings = []) : self
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         /* Assigned arguments to parent InputType constructor */
-        parent::setParams($fields, $options, $settings);
-        return $this;
+        parent::__construct($fields, $options, $settings);
     }
 
     /**

@@ -9,18 +9,10 @@ class DatetimeLocalType extends InputType implements FormExtensionTypeInterface
     /** @var array - returns the defaults for the input type */
     protected array $defaults = [];
 
-    /**
-     * set Params.
-     *
-     * @param array $fields
-     * @param mixed|null $options
-     * @param array $settings
-     */
-    public function setParams(array $fields, mixed $options = null, array $settings = [])
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         /* Assigned arguments to parent InputType constructor */
-        parent::setParams($fields, $options, $settings);
-        return $this;
+        parent::__construct($fields, $options, $settings);
     }
 
     /**

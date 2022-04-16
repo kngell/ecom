@@ -9,18 +9,10 @@ class ColorType extends InputType implements FormExtensionTypeInterface
     /** @var array - returns the defaults for the input type */
     protected array $defaults = [];
 
-    /**
-     * Set Params.
-     *
-     * @param array $fields
-     * @param mixed $options
-     * @param array $settings
-     */
-    public function setParams(array $fields, $options = null, array $settings = [])
+    public function __construct(array $fields, $options = null, array $settings = [])
     {
         /* Assigned arguments to parent InputType constructor */
-        parent::setParams($fields, $options, $settings);
-        return $this;
+        parent::__construct($fields, $options, $settings);
     }
 
     /**

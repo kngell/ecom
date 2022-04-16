@@ -37,8 +37,9 @@ class ResponseHandler extends GlobalVariables
 
     public function redirect(string $url) : self
     {
-        header('Location: ' . $url);
-        return $this;
+        header("Location: $url");
+        header('HTTP/1.1 301 Moved Permanently');
+        exit;
     }
 
     public function is_image(string $file)
@@ -50,68 +51,19 @@ class ResponseHandler extends GlobalVariables
         }
     }
 
-    public function cacheRefresh()
-    {
-        $session = GlobalManager::get('global_session');
-        if ($session->exists(BRAND_NUM)) {
-            switch ($session->get(BRAND_NUM)) {
-                case 2:
-                    Cache::getcache()->init()->delete('phone_products_and_cart.txt');
-                    break;
+    // public function cacheRefresh()
+    // {
+    //     $session = GlobalManager::get('global_session');
+    //     if ($session->exists(BRAND_NUM)) {
+    //         switch ($session->get(BRAND_NUM)) {
+    //             case 2:
+    //                 Cache::getcache()->init()->delete('phone_products_and_cart.txt');
+    //                 break;
 
-                default:
-                    Cache::getcache()->init()->delete('clothes_products_and_cart.txt');
-                    break;
-            }
-        }
-    }
-
-    public function posts_frm_params()
-    {
-        return [
-            'action' => '#',
-            'method' => 'post',
-            'formClass' => 'posts-frm needs-validation',
-            'formCustomAttr' => 'novalidate',
-            'formID' => 'posts-frm',
-            'fieldWrapperClass' => 'input-box',
-            'token' => Container::getInstance()->make(Token::class),
-            'enctype' => 'multipart/form-data',
-            'autocomplete' => 'nope',
-            'alertErr' => true,
-            'inputHidden' => [
-                'postID' => ['id' => 'postID'],
-                'postCommentCount' => ['id' => 'postCommentCount'],
-                'userID' => ['id' => 'userID'],
-                'updateAt' => ['id' => 'updateAt'],
-                'deleted' => ['id' => 'deleted'],
-                'operation' => ['id' => 'operation'],
-            ],
-            'fieldCommonclass' => [
-                'fieldclass' => 'input-box__input',
-                'labelClass' => 'input-box__label',
-            ],
-        ];
-    }
-
-    public function frm_params(string $frm_name, array $inpuHidden)
-    {
-        return [
-            'action' => '#',
-            'method' => 'post',
-            'formClass' => $frm_name . ' needs-validation',
-            'formCustomAttr' => 'novalidate',
-            'formID' => $frm_name,
-            'fieldWrapperClass' => 'input-box',
-            'token' => Container::getInstance()->make(Token::class),
-            'enctype' => 'multipart/form-data',
-            'autocomplete' => 'nope',
-            'alertErr' => true,
-            'inputHidden' => $inpuHidden,
-            'fieldCommonclass' => [
-                'fieldclass' => 'input-box__input',
-                'labelClass' => 'input-box__label',
-            ],
-        ];
-    }
+    //             default:
+    //                 Cache::getcache()->init()->delete('clothes_products_and_cart.txt');
+    //                 break;
+    //         }
+    //     }
+    // }
 }

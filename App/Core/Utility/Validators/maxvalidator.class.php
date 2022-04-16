@@ -5,7 +5,7 @@ class Maxvalidator extends CustomValidator
 {
     public function runValidation()
     {
-        $value = $this->_model->{$this->field};
+        $value = $this->getModel()->{$this->getField()};
         $pass = (strlen($value) <= $this->rule);
 
         return $pass;

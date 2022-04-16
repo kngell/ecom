@@ -1,0 +1,4 @@
+NewVisitoregisteredEvent:
+  - WelcomeVisitorLst
+  - RegisterVisitorToNewsLetterLst
+  - NotifyAdminLst

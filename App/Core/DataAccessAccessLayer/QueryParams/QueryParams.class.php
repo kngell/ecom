@@ -34,6 +34,7 @@ class QueryParams extends AbstractQueryParams
 
     public function join(?string $tbl = null, mixed $columns = null, string $joinType = 'INNER JOIN') : self
     {
+        $this->key('table_join');
         if (!array_key_exists($tbl, $this->query_params['table_join'])) {
             $this->query_params['table_join'] += [$tbl != null ? $tbl : $this->tableSchema => $columns != null ? $columns : ['*']];
             $this->key('options');

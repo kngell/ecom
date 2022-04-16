@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-abstract class AbstractView
+abstract class AbstractView implements ViewInterface
 {
     protected string  $page_title;
     protected string $_siteTitle = SITE_TITLE;

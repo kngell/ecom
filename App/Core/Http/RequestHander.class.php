@@ -123,7 +123,6 @@ class RequestHandler extends GlobalVariables
             foreach ($_REQUEST[$input] as $val) {
                 $r[] = $this->sanitizer->clean($val);
             }
-
             return $r;
         }
         if (!$input) {
@@ -134,8 +133,7 @@ class RequestHandler extends GlobalVariables
 
             return $data;
         }
-
-        return isset($_REQUEST[$input]) ? $this->sanitizer->clean($_REQUEST[$input]) : '';
+        return isset($_REQUEST[$input]) ? $this->sanitizer->clean($_REQUEST[$input]) : false;
     }
 
     /**

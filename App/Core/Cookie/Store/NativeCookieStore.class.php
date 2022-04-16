@@ -9,15 +9,15 @@ class NativeCookieStore extends AbstractCookieStore
      *
      * @param CookieEnvironment $cookieEnvironment
      */
-    public function __construct(CookieEnvironment $cookieEnvironment)
+    public function __construct(CookieEnvironment $cookieEnvironment, GlobalVariablesInterface $gv)
     {
-        parent::__construct($cookieEnvironment);
+        parent::__construct($cookieEnvironment, $gv);
     }
 
     public function getCookie(string $name) : mixed
     {
         if ($this->exists($name)) {
-            return $_COOKIE[$name];
+            return $this->gv->getCookie($name);
         }
     }
 
@@ -30,8 +30,8 @@ class NativeCookieStore extends AbstractCookieStore
      */
     public function exists(string $name = ''): bool
     {
-        $CookieName = $name != '' ? $this->cookieEnvironment->getCookieName() : $name;
-        return isset($_COOKIE[$CookieName]);
+        $CookieName = $name == '' ? $this->cookieEnvironment->getCookieName() : $name;
+        return array_key_exists($CookieName, $this->gv->getCookie());
     }
 
     /**
@@ -39,9 +39,9 @@ class NativeCookieStore extends AbstractCookieStore
      * @param mixed $value
      * @return self
      */
-    public function setCookie(mixed $value): void
+    public function setCookie(mixed $value, ?string $cookieName = null): void
     {
-        setcookie($this->cookieEnvironment->getCookieName(), $value, $this->cookieEnvironment->getExpiration(), $this->cookieEnvironment->getPath(), $this->cookieEnvironment->getDomain(), $this->cookieEnvironment->isSecure(), $this->cookieEnvironment->isHttpOnly());
+        setcookie($cookieName === null ? $this->cookieEnvironment->getCookieName() : $cookieName, $value, $this->cookieEnvironment->getExpiration(), $this->cookieEnvironment->getPath(), $this->cookieEnvironment->getDomain(), $this->cookieEnvironment->isSecure(), $this->cookieEnvironment->isHttpOnly());
     }
 
     /**

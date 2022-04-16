@@ -59,43 +59,72 @@ class FH
         return $a_errors;
     }
 
-    public static function validate_forms($source, $items, $obj)
+    public static function validate_forms(array $items, ModelInterface $obj)
     {
-        if (!isset($source['terms'])) {
-            $source['terms'] = '';
-        }
-        // if (isset($source['select2']) && empty(json_decode($source['select2'], true))) {
-        //     $colTitle = $obj->get_colTitle();
-        //     $source[$colTitle] = $obj->$colTitle;
-        // }
+        $container = Container::getInstance();
         foreach ($items as $item => $rules) {
             $display = $rules['display'];
-            if (isset($source[$item])) {
+            $value = $obj->getEntity()->{'get' . ucwords($item)}();
+            if (isset($value)) {
                 foreach ($rules as $rule => $rule_value) {
-                    $value = $source[$item];
                     if ($rule === 'required' && (empty($value) || $value == '[]')) {
                         $requireMsg = ($item == 'terms') ? 'Please accept terms & conditions' : "{$display} is require";
-                        property_exists($obj, $item) ? $obj->runValidation($obj->get_container()->make(Requirevalidator::class)->setParams($obj, $item, $rule_value, $requireMsg)) : '';
+                        $obj->runValidation($container->make(Requirevalidator::class, [
+                            'model' => $obj,
+                            'field' => $item,
+                            'rule' => $rule_value,
+                            'msg' => $requireMsg,
+                        ]));
                     } elseif (!empty($value)) {
                         switch ($rule) {
                         case 'min':
-                            $obj->runValidation($obj->get_container()->make(Minvalidator::class)->setParams($obj, $item, $rule_value, "{$display} must be a minimum of {$rule_value} characters"));
+                            $obj->runValidation($container->make(Minvalidator::class, [
+                                'model' => $obj,
+                                'field' => $item,
+                                'rule' => $rule_value,
+                                'msg' => "{$display} must be a minimum of {$rule_value} characters",
+                            ]));
                             break;
                         case 'max':
-                            $obj->runValidation($obj->get_container()->make(Maxvalidator::class)->setParams($obj, $item, $rule_value, "{$display} must be a maximum of {$rule_value} caracters"));
+                            $obj->runValidation($container->make(Maxvalidator::class, [
+                                'model' => $obj,
+                                'field' => $item,
+                                'rule' => $rule_value,
+                                'msg' => "{$display} must be a maximum of {$rule_value} caracters",
+                            ]));
                             break;
                         case 'valid_email':
-                            $obj->runValidation($obj->get_container()->make(ValidEmailvalidator::class)->setParams($obj, $item, $rule_value, "{$display} is not valid"));
+                            $obj->runValidation($container->make(ValidEmailvalidator::class, [
+                                'model' => $obj,
+                                'field' => $item,
+                                'rule' => $rule_value,
+                                'msg' => "{$display} is not valid Email",
+                            ]));
                             break;
                         case 'is_numeric':
-                            $obj->runValidation($obj->get_container()->make(Numericvalidator::class)->setParams($obj, $item, $rule_value, "{$display} has to be a number. Please use a numeric value"));
+                            $obj->runValidation($container->make(Numericvalidator::class, [
+                                'model' => $obj,
+                                'field' => $item,
+                                'rule' => $rule_value,
+                                'msg' => "{$display} has to be a number. Please use a numeric value",
+                            ]));
                             break;
                         case 'matches':
                             $mathdisplay = $items[$rule_value]['display'];
-                            $obj->runValidation($obj->get_container()->make(MatchesValidator::class)->setParams($obj, $item, $obj->getConfirm(), "{$display} does not math {$mathdisplay}"));
+                            $obj->runValidation($container->make(MatchesValidator::class, [
+                                'model' => $obj,
+                                'field' => $item,
+                                'rule' => $obj->getEntity()->{'get' . ucwords($obj->getMatchingTestColumn())}(),
+                                'msg' => "{$display} does not math {$mathdisplay}",
+                            ]));
                             break;
                         case 'unique':
-                            $obj->runValidation($obj->get_container()->make(UniqueValidator::class)->setParams($obj, $item, [$rule_value, $obj->get_colID()], "This {$display} already exist."));
+                            $obj->runValidation($container->make(UniqueValidator::class, [
+                                'model' => $obj,
+                                'field' => $item,
+                                'rule' => [$rule_value, $obj->getEntity()->getColID()],
+                                'msg' => "This {$display} already exist.",
+                            ]));
                             break;
                         }
                     }

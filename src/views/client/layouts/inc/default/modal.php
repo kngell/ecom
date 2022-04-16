@@ -42,7 +42,6 @@
                 </div>
             </div>
         </div>
-
         <!--Forgot password-->
         <div class="modal fade" id="forgot-box" tabindex="-1" aria-labelledby="forgot-boxLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
@@ -50,29 +49,7 @@
                     <div class="modal-body">
                         <button type="button" class="close float-end" data-bs-dismiss="modal">
                             <span>&times;</span></button>
-                        <div class="form-wrapper rounded bg-light" id="">
-                            <form action="" method="post" role="form" class="p-2" id="forgot-frm" autocomplete="off">
-                                <?=FH::csrfInput('csrftoken', $this->token->generate_token(8, 'forgot-frm')); ?>
-                                <div id="forgotAlert"></div>
-                                <div class="input-group mb-3"> <small class="text-muted text-center">To reset your
-                                        password,
-                                        enter your
-                                        email</small> </div>
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control form-control-lg" name="email"
-                                        id="forgot_email" placeholder="E-Mail" autocomplete="false">
-                                    <div class="invalid-feedback"></div>
-                                </div>
-                                <div class="input-group mb-3">
-                                    <input type="submit" name="forgot" class="btn btn-primary btn-block" id="forgot-btn"
-                                        value="Reset password">
-                                </div>
-                                <div class="input-group form-footer d-flex justify-content-center mb-3"> <a href="#"
-                                        id="back-btn" class="close" data-bs-dismiss="modal" data-bs-toggle="modal"
-                                        data-bs-target="#login-box">Back</a>
-                                </div>
-                            </form>
-                        </div>
+                        <?= $this->forgotFrm?>
                     </div>
                 </div>
             </div>

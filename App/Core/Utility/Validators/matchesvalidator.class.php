@@ -5,7 +5,7 @@ class MatchesValidator extends CustomValidator
 {
     public function runValidation()
     {
-        $value = $this->_model->{$this->field};
+        $value = $this->getModel()->{$this->getField()};
 
         return $value == $this->rule;
     }

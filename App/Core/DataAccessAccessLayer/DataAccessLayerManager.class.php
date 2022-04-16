@@ -38,7 +38,6 @@ class DataAccessLayerManager
             'tableSchema' => $this->tableSchema,
             'tableSchamaID' => $this->tableSchemaID,
             'options' => $this->options,
-            'entity' => $this->entity,
             'dataMapperEnvConfig' => $this->dataMapperEnvConfig,
 
         ])->create();

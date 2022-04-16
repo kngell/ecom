@@ -20,7 +20,7 @@ final class AppHelper
             'ResponseHandler' => fn () => new ResponseHandler(),
             'RequestHandler' => RequestHandler::class,
             'View' => View::class,
-            'Token' => fn () => new Token(),
+            'Token' => Token::class,
             'MoneyManager' => fn () => new MoneyManager(),
             'ControllerHelper' => ControllerHelper::class,
             'UsersManager' => UsersManager::class,
@@ -42,7 +42,6 @@ final class AppHelper
             'CoreError' => fn () => new CoreError(),
             'LoginForm' => LoginForm::class,
             'RegisterForm' => RegisterForm::class,
-            'QueryParamsInterface' => QueryParams::class,
             'DispatcherInterface' => Dispatcher::class,
             'ViewInterface' => View::class,
             'MailerInterface' => Mailer::class,
@@ -64,6 +63,13 @@ final class AppHelper
             'RepositoryFactory' => RepositoryFactory::class,
             'DataAccessLayerManager' => DataAccessLayerManager::class,
             'CrudInterface' => Crud::class,
+        ];
+    }
+
+    public static function bindedClass()
+    {
+        return [
+            'QueryParamsInterface' => QueryParams::class,
         ];
     }
 }

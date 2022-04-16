@@ -11,11 +11,11 @@
     </div>
     <hr class="mb-3">
     {{form_begin}}
-    <div class="row g-3">
-        <div class="col-md-6">
+    <div class="row">
+        <div class="col">
             {{last_name}}
         </div>
-        <div class="col-md-6">
+        <div class="col">
             {{first_name}}
         </div>
     </div>

@@ -13,7 +13,7 @@ interface CookieStoreInterface
      * @param mixed $value
      * @return void
      */
-    public function setCookie(mixed $value): void;
+    public function setCookie(mixed $value, ?string $coolieName = null): void;
 
     /**
      * @param null|string $cookieName

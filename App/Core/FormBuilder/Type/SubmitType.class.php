@@ -16,11 +16,10 @@ class SubmitType extends InputType implements FormExtensionTypeInterface
      * @param mixed|null $options
      * @param array $settings
      */
-    public function setParams(array $fields, mixed $options = null, array $settings = [])
+    public function __construct(array $fields, mixed $options = null, array $settings = [])
     {
         /* Assigned arguments to parent InputType constructor */
-        parent::setParams($fields, $options, $settings);
-        return $this;
+        parent::__construct($fields, $options, $settings);
     }
 
     /**

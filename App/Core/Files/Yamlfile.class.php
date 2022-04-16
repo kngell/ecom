@@ -7,7 +7,7 @@ class YamlFile
 {
     public static function get(string $YamFile) : array
     {
-        foreach (glob(CONFIG_PATH . DS . '*.yaml') as $file) {
+        foreach (glob(CONFIG_PATH . DS . '*.{yaml,yml}', GLOB_BRACE) as $file) {
             if (!file_exists($file)) {
                 throw new BaseException($file . ' does not exist');
             }

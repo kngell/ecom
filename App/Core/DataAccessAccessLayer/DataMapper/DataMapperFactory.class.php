@@ -6,17 +6,15 @@ class DataMapperFactory
 {
     private ContainerInterface $container;
     private DataMapperEnvironmentConfig $dataMapperEnvConfig;
-    private Entity $entity;
 
     /**
      * Main constructor
      * ================================================================.
      *@return void
      */
-    public function __construct(DataMapperEnvironmentConfig $dataMapperEnvConfig, Entity $entity)
+    public function __construct(DataMapperEnvironmentConfig $dataMapperEnvConfig)
     {
         $this->dataMapperEnvConfig = $dataMapperEnvConfig;
-        $this->entity = $entity;
     }
 
     /**
@@ -32,7 +30,6 @@ class DataMapperFactory
             '_con' => $this->container->make(DatabaseConnexionInterface::class, [
                 'credentials' => $this->dataMapperEnvConfig->getCredentials('mysql'),
             ]),
-            'entity' => $this->entity,
         ]);
         if (!$dataMapperObject instanceof DataMapperInterface) {
             throw new DataMapperExceptions(DataMapperInterface::class . ' is not a valid database connexion Object!');

@@ -5,10 +5,7 @@ class Requirevalidator extends CustomValidator
 {
     public function runValidation()
     {
-        $pass = true;
-        $value = $this->_model->{$this->field};
-        $pass = $value == '0' ? true : (!(empty($value) || $value == '[]'));
-
-        return $pass;
+        $value = $this->getModel()->getEntity()->{'get' . $this->getField()}();
+        return !(empty($value) || $value == '[]');
     }
 }

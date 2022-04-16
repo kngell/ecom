@@ -12,11 +12,12 @@ class Dispatcher extends AbstractDispatcher
     {
         $this->checkEvent(name: $event::class);
         foreach ($this->getListenersForEvent(name: $event::class) as $listener) {
-            $this->listnerCanBeInstantiated(class: $listener);
+            /** @var ReflectionClass */
+            $reflector = $this->listnerCanBeInstantiated(class: $listener);
             /**
              * @var mixed
              */
-            $result = Container::getInstance()->make($listener)->handle(event: $event);
+            $result = $reflector->newInstance()->handle(event: $event);
             if ($debug) {
                 $this->log[$event::class][] = $result;
             }

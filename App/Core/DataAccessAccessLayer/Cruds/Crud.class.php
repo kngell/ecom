@@ -91,7 +91,6 @@ class Crud extends AbstractCrud implements CrudInterface
                 'params' => $params,
                 'extras' => $options,
             ];
-            // $params = ModelHelper::get_params_args($params);
             $query = $this->queryBuilder->buildQuery($arg)->select();
             $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($arg['conditions'], $params));
             if ($this->dataMapper->numrow() > 0) {

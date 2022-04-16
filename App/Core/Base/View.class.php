@@ -1,7 +1,7 @@
 <?php
 
 declare(strict_types=1);
-class View extends AbstractView implements ViewInterface
+class View extends AbstractView
 {
     private StdClass $ressources;
     private string $_head;
@@ -12,6 +12,7 @@ class View extends AbstractView implements ViewInterface
     private string $view_file;
     private string $loginFrm;
     private string $registerFrm;
+    private string $forgotFrm;
     private string $search_box;
     private Token $token;
     private ResponseHandler $response;

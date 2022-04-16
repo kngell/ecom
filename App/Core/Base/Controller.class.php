@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-class Controller extends AbstractController implements ControllerInterface
+class Controller extends AbstractController
 {
-    protected ContainerInterface $container;
     protected Token $token;
     protected MoneyManager $money;
     protected RequestHandler $request;
@@ -16,27 +15,20 @@ class Controller extends AbstractController implements ControllerInterface
     protected CacheInterface $cache;
     protected LoginForm $loginFrm;
     protected RegisterForm $registerFrm;
+    protected ForgotPasswordForm $forgotFrm;
     protected DispatcherInterface $dispatcher;
     /**
      * @var array
      */
-    protected array $middlewares = [];
     protected array $routeParams = [];
-
     /** @var array */
     protected array $callBeforeMiddlewares = [];
     /** @var array */
     protected array $callAfterMiddlewares = [];
-
     protected string $controller;
     protected string $method;
     protected string $filePath;
-    /**
-     * Model Suffix.
-     *
-     * @var string
-     */
-    protected $modelSuffix = 'Manager';
+    protected string $modelSuffix = 'Manager';
 
     public function __construct(array $params = [])
     {
@@ -47,6 +39,7 @@ class Controller extends AbstractController implements ControllerInterface
         // $this->buildControllerMenu($this->routeParams);
     }
 
+    /** @inheritDoc */
     public function __call($name, $argument) : void
     {
         if (is_string($name) && $name !== '') {
@@ -66,86 +59,14 @@ class Controller extends AbstractController implements ControllerInterface
             throw new Exception;
         }
     }
-    /**
-     * Register Controller Middlewares
-     * ==================================================================================================.
-     * @param BaseMiddleWare $middleware
-     * @return void
-     */
-    // public function registerMiddleware(BaseMiddleWare $middleware) : void
-    // {
-    //     $this->middlewares[] = $middleware;
-    // }
 
-    /**
-     * Get Middlewares
-     * ==================================================================================================.
-     * @return array
-     */
-    public function getMiddlewares() : array
-    {
-        return $this->middlewares;
-    }
-
-    /**
-     * Render View client side
-     *  =========================================================.
-     * @param string $viewName
-     * @param array $context
-     * @return void
-     */
+    /** @inheritDoc */
     public function render(string $viewName, array $context = []) : void
     {
         if ($this->view_instance === null) {
             throw new BaseLogicException('You cannot use the render method if the View is not available !');
         }
         $this->view_instance->render($viewName, $context);
-    }
-
-    public function resetView() : self
-    {
-        $this->view_instance->reset();
-        return $this;
-    }
-
-    public function siteTitle(?string $title = null)
-    {
-        if ($this->view_instance === null) {
-            throw new BaseLogicException('You cannot use the render method if the View is not available !');
-        }
-        return $this->view_instance->siteTitle($title);
-    }
-
-    public function pageTitle(?string $page = null)
-    {
-        if ($this->view_instance === null) {
-            throw new BaseLogicException('You cannot use the render method if the View is not available !');
-        }
-        return $this->view_instance->pageTitle($page);
-    }
-
-    /**
-     * Get Viw
-     * ==================================================================================================.
-     * @return View
-     */
-    public function getView() : View
-    {
-        if (!isset($this->view_instance)) {
-            $this->filePath = !isset($this->filePath) ? $this->container->make('ControllerPath') : $this->filePath;
-            return  $this->view_instance->initParams($this->filePath);
-        }
-        return $this->view_instance;
-    }
-
-    /**
-     * Get Container.
-     * ==================================================================================================.
-     * @return void
-     */
-    public function get_container()
-    {
-        return $this->container;
     }
 
     public function brand() : int
@@ -161,21 +82,7 @@ class Controller extends AbstractController implements ControllerInterface
         }
     }
 
-    /**
-     * Set Controller path
-     * ==================================================================================================.
-     * @param string $path
-     * @return self
-     */
-    public function set_path(string $path) : self
-    {
-        if (!isset($this->filePath)) {
-            $this->filePath = $path;
-        }
-        return $this;
-    }
-
-    public function jsonResponse(array $resp)
+    public function jsonResponse(array $resp) : void
     {
         // $this->response->setHeader();
         // header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
@@ -187,12 +94,12 @@ class Controller extends AbstractController implements ControllerInterface
         exit;
     }
 
-    public function get_controller()
+    public function getController() : string
     {
         return $this->controller;
     }
 
-    public function get_method()
+    public function getMethod() : string
     {
         return $this->method;
     }
@@ -200,41 +107,14 @@ class Controller extends AbstractController implements ControllerInterface
     public function redirect(string $url, bool $replace = true, int $responseCode = 303)
     {
         // $this->redirect = new BaseRedirect($url, $this->routeParams, $replace, $responseCode);
-
         if ($this->redirect) {
             $this->redirect->redirect();
         }
     }
 
-    // public function view(string $template, array $context = [])
-    // {
-    //     $this->throwViewException();
-    //     $templateContext = array_merge($this->templateGlobalContext(), $this->templateModelContext());
-    //     if ($this->eventDispatcher->hasListeners(BeforeRenderActionEvent::NAME)) {
-    //         $this->dispatchEvent(BeforeRenderActionEvent::class, $this->method, $templateContext, $this);
-    //     }
-    //     $response = $this->response->handler();
-    //     $request = $this->request->handler();
-    //     $response->setCharset('ISO-8859-1');
-    //     $response->headers->set('Content-Type', 'text/plain');
-    //     $response->setStatusCode($response::HTTP_OK);
-    //     $response->setContent($this->templateEngine->ashRender($template, array_merge($context, $templateContext)));
-    //     if ($response->isNotModified($request)) {
-    //         $response->prepare($request);
-    //         $response->send();
-    //     }
-    // }
-
     public function getRoutes(): array
     {
         return $this->routeParams;
-    }
-
-    public function onSelf()
-    {
-        if (isset($_SERVER['REQUEST_URI'])) {
-            return$_SERVER['REQUEST_URI'];
-        }
     }
 
     public function getSiteUrl(?string $path = null): string
@@ -242,57 +122,9 @@ class Controller extends AbstractController implements ControllerInterface
         return sprintf('%s://%s%s', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http', $_SERVER['SERVER_NAME'], ($path !== null) ? $path : $_SERVER['REQUEST_URI']);
     }
 
-    public function flashAndRedirect(bool $action, ?string $redirect, string $message, string $type = FlashType::SUCCESS): void
+    public function getCache() : CacheInterface
     {
-        if (is_bool($action)) {
-            $this->flashMessage($message, $type);
-            $this->redirect(($redirect === null) ? $this->onSelf() : $redirect);
-        }
-    }
-
-    public function flashMessage(string $message, string $type = FlashType::SUCCESS)
-    {
-        $flash = (new Flash(SessionTrait::sessionFromGlobal()))->add($message, $type);
-        if ($flash) {
-            return $flash;
-        }
-    }
-
-    public function flashWarning(): string
-    {
-        return FlashType::WARNING;
-    }
-
-    public function flashSuccess(): string
-    {
-        return FlashType::SUCCESS;
-    }
-
-    public function flashDanger(): string
-    {
-        return FlashType::DANGER;
-    }
-
-    public function flashInfo(): string
-    {
-        return FlashType::INFO;
-    }
-
-    public function locale(?string $locale = null): ?string
-    {
-        /*if (null !== $locale)
-            return Translation::getInstance()->$locale;*/
-        return $locale;
-    }
-
-    public function getCache()
-    {
-        return $this->cache();
-    }
-
-    public function cache(): object
-    {
-        return Application::getInstance()->loadCache();
+        return $this->cache;
     }
 
     public function getSession(): object
@@ -322,7 +154,8 @@ class Controller extends AbstractController implements ControllerInterface
         $this->view_instance = $this->container->make(ViewInterface::class, [
             'viewAry' => [
                 'loginFrm' => $this->loginFrm->createForm('security' . DS . 'login'),
-                'registerFrm' => $this->registerFrm->createForm('security' . DS . 'login'),
+                'registerFrm' => $this->registerFrm->createForm('security' . DS . 'register'),
+                'forgotFrm' => $this->forgotFrm->createForm('security' . DS . 'forgot'),
                 'search_box' => file_get_contents(FILES . 'Template' . DS . 'Base' . DS . 'search_box.php'),
                 'token' => $this->token,
                 'file_path' => $this->filePath,
@@ -331,12 +164,7 @@ class Controller extends AbstractController implements ControllerInterface
         ]);
     }
 
-    /**
-     * Before global conainers
-     * ==================================================================================================.
-     * @return void
-     */
-    protected function before()
+    protected function before() : void
     {
         // $object = new self($this->routeParams);
         $mdw = ($this->container->make(Middleware::class))->middlewares($this->callBeforeMiddlewares())
@@ -344,9 +172,7 @@ class Controller extends AbstractController implements ControllerInterface
                 return $object;
             });
         if ($this->filePath == 'Client' . DS) {
-            $this->dispatcher->add(name:NullEvent::class, listeners:[NullListener::class]);
-            $this->dispatcher->remove(name:NullEvent::class, listener:NullListener::class);
-        // $this->view_instance->settings = $this->helper->getSettings();
+            // $this->view_instance->settings = $this->helper->getSettings();
         // $this->session->set(BRAND_NUM, $this->brand());
             // $data = $this->helper->get_product_and_cart((int) $this->session->get(BRAND_NUM));
         // $this->view_instance->userFrmAttr = $this->helper->form_params();
@@ -360,7 +186,7 @@ class Controller extends AbstractController implements ControllerInterface
         }
     }
 
-    protected function after()
+    protected function after() : void
     {
         // $object = new self($this->routeParams);
         ($this->container->make(Middleware::class))->middlewares($this->callAfterMiddlewares())
@@ -401,13 +227,6 @@ class Controller extends AbstractController implements ControllerInterface
         return $this->modelSuffix;
     }
 
-    /**
-     * Get Options Model
-     * ==================================================================================================.
-     * @param array $data
-     * @param object $m
-     * @return mixed
-     */
     protected function get_optionsModel(array $data, Object $m) : mixed
     {
         if (isset($data['tbl_options']) && !empty($data['tbl_options'])) {
@@ -429,7 +248,6 @@ class Controller extends AbstractController implements ControllerInterface
                 }
             }
         }
-
         return null;
     }
 
@@ -437,24 +255,6 @@ class Controller extends AbstractController implements ControllerInterface
     {
         return $this->container->make(ModelFactory::class)->create($modelString);
     }
-    /**
-     * Action before and after controller
-     * ==========================================================.
-     * @param array $arguments
-     * @return void
-     */
-    // public function __call(string $name, array $arguments)
-    // {
-    //     $method = $name . 'Page';
-    //     if (method_exists($this, $method)) {
-    //         if ($this->before() !== false) {
-    //             call_user_func_array([$this, $method], $arguments);
-    //             $this->after();
-    //         }
-    //     } else {
-    //         throw new BaseBadMethodCallException('Method ' . $name . ' does not exist in ' . get_class($this));
-    //     }
-    // }
 
     /**
      * Init controller.
@@ -485,12 +285,4 @@ class Controller extends AbstractController implements ControllerInterface
     {
         return array_merge(['app' => YamlFile::get('app')], ['menu' => YamlFile::get('menu')], ['routes' => (isset($this->routeParams) ? $this->routeParams : [])]);
     }
-
-    // private function templateModelContext(): array
-    // {
-    //     if (!class_exists(UserModel::class) || !class_exists(PermissionModel::class)) {
-    //         return [];
-    //     }
-    //     return array_merge(['current_user' => Authorized::grantedUser()], ['privilege_user' => PrivilegedUser::getUser()], ['func' => new TemplateExtension($this)], );
-    // }
 }

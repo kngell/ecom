@@ -15,20 +15,13 @@ interface DataMapperInterface
     public function prepare(string $sql) : self;
 
     /**
-     * Bind (Original)
-     * --------------------------------------------------------------------------------------------------.
-     * @param mixed $value
-     * @return int
-     */
-    public function bind_type(mixed $value) : int;
-
-    /**
      * Bind params.
      * -------------------------------------------------------------------------------------------------.
      * @param mixed $param
      * @param mixed $value
      * @param [type] $type
      * @return void
+     * @throws DataMapperExceptions
      */
     public function bind(mixed $param, mixed $value, $type = null);
 

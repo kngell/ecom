@@ -7,7 +7,7 @@ trait ModelTrait
     {
         list($selectors, $conditions, $parameters, $options) = $this->queryParams->params('findBy');
         if (isset($options['return_mode']) && $options['return_mode'] == 'class' && !isset($options['class'])) {
-            $options = array_merge($options, ['class' => get_class($this)]);
+            $options = array_merge($options, ['class' => $this->getModelName()]);
         }
         $results = $this->repository->findBy($selectors, $conditions, $parameters, $options);
         $this->setResults($results->count() > 0 ? $results->get_results() : null);
@@ -90,25 +90,5 @@ trait ModelTrait
     public function get_media() : string
     {
         return isset($this->_media_img) ? $this->_media_img : '';
-    }
-
-    private function entity() : void
-    {
-        $this->entity = $this->container->make(str_replace(' ', '', ucwords(str_replace('_', ' ', $this->tableSchema))) . 'Entity');
-    }
-
-    private function properties() : void
-    {
-        $this->session = $this->container->make(SessionInterface::class);
-        $this->cache = $this->container->make(CacheInterface::class);
-        $this->cookie = $this->container->make(CookieInterface::class);
-        $this->request = $this->container->make(RequestHandler::class);
-        $this->response = $this->container->make(ResponseHandler::class);
-        $this->token = $this->container->make(Token::class);
-        $this->money = $this->container->make(MoneyManager::class);
-        $this->queryParams = $this->container->make(QueryParamsInterface::class, [
-            'tableSchema' => $this->tableSchema,
-        ]);
-        $this->helper = $this->container->make(ModelHelper::class);
     }
 }

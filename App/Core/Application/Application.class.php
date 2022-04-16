@@ -48,7 +48,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
     {
         $urlroute = $url == null ? $this->request->getPath() : $url;
         if (!empty($urlroute) && $urlroute[-1] === '/') {
-            return $this->response->setStatusCode(301)->redirect(substr($urlroute, 0, -1));
+            $this->response->redirect(substr($urlroute, 0, -1));
         }
         BaseConstants::load($this->app());
         $this->phpVersion();
@@ -59,10 +59,8 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
         $this->loadCookies();
         $this->loadLogger();
         $this->loadEnvironment();
-        $this->registerDataAccessLayerClass();
-        //$this->loadThemeBuilder();
+        $this->registeredClass();
         $this->loadRoutes()->resolve($urlroute);
-        // $this->instance('session_name', $this->getSessions()['session_name']);
     }
 
     /**
@@ -522,12 +520,12 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      *
      * @return void
      */
-    protected function registerDataAccessLayerClass()
+    protected function registeredClass()
     {
-        $objs = AppHelper::dataAccessLayerClass();
+        $objs = array_merge(AppHelper::dataAccessLayerClass(), AppHelper::bindedClass());
         if (is_array($objs)) {
             foreach ($objs as $obj => $value) {
-                $this->singleton($obj, $value);
+                $this->bind($obj, $value);
             }
         }
     }

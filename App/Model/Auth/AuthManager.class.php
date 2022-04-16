@@ -6,22 +6,12 @@ class AuthManager extends Model
     public static $currentLoggedInUser = null;
     protected $_colID = 'userID';
     protected $_table = 'users';
-    protected $_count;
-    private $_sessionName;
-    private $_cookieName;
     private $_isLoggedIn = false;
     private $_confirm;
 
     public function __construct()
     {
         parent::__construct($this->_table, $this->_colID);
-        $this->_sessionName = CURRENT_USER_SESSION_NAME;
-        $this->_cookieName = REMEMBER_ME_COOKIE_NAME;
-    }
-
-    public function gardedId(): array
-    {
-        return [];
     }
 
     public function initUser(string $user = '')
@@ -36,11 +26,6 @@ class AuthManager extends Model
         }
     }
 
-    //=====================================GUETTERS=============================================
-    //=======================================================================
-    //Get User email send request
-    //=======================================================================
-
     public function getUserRequests($email = '', $type = 0, $tt = 0)
     {
         $day_ago = $tt ? $tt : time() - 60 * 60 * 24;
@@ -52,7 +37,7 @@ class AuthManager extends Model
             'group_by' => ['userID' => ['tbl' => 'users']],
             'return_mode' => 'class',
         ];
-        $user = $this->getAllItems($data, $tables);
+        $user = $this->getAll($data, $tables);
         if ($user->count() > 0) {
             $u = current($user->get_results());
             $u->_count = $user->count();
@@ -73,7 +58,7 @@ class AuthManager extends Model
             ->groupBy(['users' => 'userID'])
             ->return('class')
             ->build();
-        $user = $this->getAllItems($query_params);
+        $user = $this->getAll($query_params);
         if ($user->count() > 0) {
             $u = current($user->get_results());
             $u->_count = $user->count();
@@ -96,15 +81,15 @@ class AuthManager extends Model
             if ($rememberMe) {
                 $user_session = $this->container->make(UserSessionsManager::class)->getDetails($this->userID, 'userID');
                 $session = $user_session->set_userSession($this);
-                if (!Cookies::exists($this->_cookieName)) {
+                if (!$this->cookie->exists($this->_cookieName)) {
                     if (empty($this->remember_cookie) || !isset($this->remenber_cookie)) {
-                        $this->remember_cookie = !is_bool($session) ? $session->remember_cookie : $this->get_unique('token');
+                        $this->remember_cookie = !is_bool($session) ? $session->remember_cookie : $this->getUniqueId('token');
                         $this->save();
                     }
-                    Cookies::set($this->_cookieName, $this->remember_cookie, COOKIE_EXPIRY);
+                    $this->cookie->set($this->_cookieName, $this->remember_cookie, COOKIE_EXPIRY);
                 } else {
-                    if ($this->remember_cookie != Cookies::get($this->_cookieName)) {
-                        $this->remember_cookie = Cookies::get($this->_cookieName);
+                    if ($this->remember_cookie != $this->cookie->get($this->_cookieName)) {
+                        $this->remember_cookie = $this->cookie->get($this->_cookieName);
                         $this->save();
                     }
                 }
@@ -123,7 +108,7 @@ class AuthManager extends Model
     {
         try {
             //check visitor Cookies
-            if (!Cookies::exists(VISITOR_COOKIE_NAME)) {
+            if (!$this->cookie->exists(VISITOR_COOKIE_NAME)) {
                 $this->container->make(VisitorsManager::class)->add_new_visitor();
             }
             //Delete Session
@@ -152,8 +137,8 @@ class AuthManager extends Model
             $this->container->make(UserExtraDataManager::class)->delete('', ['userID' => $user->userID]);
             $this->container->make(AddressBookManager::class)->delete('', ['relID' => $user->userID]);
             $this->container->make(GroupUserManager::class)->delete('', ['userID' => $user->userID]);
-            if (Cookies::exists(REMEMBER_ME_COOKIE_NAME)) {
-                Cookies::delete(REMEMBER_ME_COOKIE_NAME);
+            if ($this->cookie->exists(REMEMBER_ME_COOKIE_NAME)) {
+                $this->cookie->delete(REMEMBER_ME_COOKIE_NAME);
             }
             $this->session->delete(CURRENT_USER_SESSION_NAME);
 
@@ -179,12 +164,9 @@ class AuthManager extends Model
         return $this->findFirst($data);
     }
 
-    //=======================================================================
-    //Check current user state
-    //=======================================================================
-    public static function currentUser(?Container $container = null)
+    public static function currentUser()
     {
-        $session = GlobalsManager::get('global_session');
+        $session = Container::getInstance()->make(SessionInterface::class);
         if ($session->exists(CURRENT_USER_SESSION_NAME)) {
             $email = $session->get(CURRENT_USER_SESSION_NAME);
             if (!isset(self::$currentLoggedInUser)) {
@@ -192,7 +174,6 @@ class AuthManager extends Model
                 self::$currentLoggedInUser->initUser((string) $email);
             }
         }
-
         return self::$currentLoggedInUser;
     }
 
@@ -201,7 +182,7 @@ class AuthManager extends Model
     //=======================================================================
     public static function check_UserSession($params = [])
     {
-        $session = GlobalsManager::get('global_session');
+        $session = GlobalManager::get('global_session');
         if (isset($params['userID'])) {
             (self::$currentLoggedInUser->userID == $params['userID'] && self::$currentLoggedInUser->email != $params['email']) ? $session->set(CURRENT_USER_SESSION_NAME, $params['email']) : '';
         }
@@ -232,12 +213,12 @@ class AuthManager extends Model
     //=======================================================================
     public function register()
     {
-        if (!Cookies::exists(VISITOR_COOKIE_NAME)) {
-            $v_cookie = $this->get_unique('user_cookie');
-            Cookies::set(VISITOR_COOKIE_NAME, $v_cookie, COOKIE_EXPIRY);
+        if (!$this->cookie->exists(VISITOR_COOKIE_NAME)) {
+            $v_cookie = $this->getUniqueId('user_cookie');
+            $this->cookie->set(VISITOR_COOKIE_NAME, $v_cookie, COOKIE_EXPIRY);
             $this->user_cookie = $v_cookie;
         }
-        $this->user_cookie = Cookies::get(VISITOR_COOKIE_NAME);
+        $this->user_cookie = $this->cookie->get(VISITOR_COOKIE_NAME);
 
         return $this->save();
     }
@@ -246,15 +227,15 @@ class AuthManager extends Model
     public function rememberMe_checker()
     {
         $user_data = [];
-        if (Cookies::exists(REMEMBER_ME_COOKIE_NAME)) {
-            $rem = Cookies::get(REMEMBER_ME_COOKIE_NAME);
-            $user_session = $this->container->make(UserSessionsManager::class)->getDetails($rem, 'remember_cookie');
-            if ($user_session && $user_session->count() === 1) {
-                $user_session = current($user_session->get_results());
-                $user_data['remember'] = true;
-                $user_data['email'] = $user_session->email ?? '';
-            }
-        }
+        // if ($this->cookie->exists(REMEMBER_ME_COOKIE_NAME)) {
+        //     $rem = $this->cookie->get(REMEMBER_ME_COOKIE_NAME);
+        //     $user_session = $this->container->make(UserSessionsManager::class)->getDetails($rem, 'remember_cookie');
+        //     if ($user_session && $user_session->count() === 1) {
+        //         $user_session = current($user_session->get_results());
+        //         $user_data['remember'] = true;
+        //         $user_data['email'] = $user_session->email ?? '';
+        //     }
+        // }
 
         return $user_data;
     }
@@ -272,7 +253,7 @@ class AuthManager extends Model
             $user->save();
             $subject = 'Email verification';
             $body = '<h3>Cliquez sur le lien ci-dessous pour changer pour vérifier votre email</h3>.<p><a href="' . URLROOT . 'users/emailVerified/' . $userData['email'] . '">' . URLROOT . 'users/emailVerified/' . $userData['email'] . '</a><br>KnGELL! </p><p>Vous disposez de 30 minutes pour changer votre mot de pass. Au delà, vous devrez recommencer</p>';
-            H_Email::sendEmail($userData['email'], $subject, $body, $body);
+            // H_Email::sendEmail($userData['email'], $subject, $body, $body);
             $user->login();
         } else {
             $user->login();
@@ -288,13 +269,6 @@ class AuthManager extends Model
     {
         return $this->container->make(UsersManager::class)->get_selectedOptions($this) ?? [];
     }
-
-    //form validation
-    public function validator(array $source = [], array $items = [])
-    {
-        FH::validate_forms($source, $items, $this);
-    }
-
     //=======================================================================
     //Getters
     //=======================================================================
@@ -336,10 +310,10 @@ class AuthManager extends Model
             $this->terms = null;
         }
 
-        if ($this->isNew() == true) {
-            $this->password = password_hash($this->password, PASSWORD_DEFAULT);
-            $this->salt = $this->get_unique('salt');
-        }
+        // if ($this->isNew() == true) {
+        //     $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+        //     $this->salt = $this->getUniqueId('salt');
+        // }
         //Unset Auth providers ???
         unset($this->oauth_provider,$this->oauth_uid,$this->link);
         if (isset($this->Number)) {
@@ -373,7 +347,7 @@ class AuthManager extends Model
             'return_mode' => 'class',
             'return_type' => 'single',
         ];
-        $row = $this->getAllItems($conditions);
+        $row = $this->getAll($conditions);
 
         return $row;
     }
@@ -381,6 +355,6 @@ class AuthManager extends Model
     //Before update
     public function beforeSaveUpadate(Entity $entity) : Entity
     {
-        return parent::beforeSaveUpadate($fields);
+        return parent::beforeSaveUpadate($entity);
     }
 }

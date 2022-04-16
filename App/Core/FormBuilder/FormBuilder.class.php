@@ -71,7 +71,11 @@ class FormBuilder extends AbstractFormBuilder
     {
         if (is_array($args)) {
             foreach ($args as $objectType => $objectTypeOptions) {
-                $newTypeObject = $this->container->make($objectType)->setParams($objectTypeOptions, $options, $settings);
+                $newTypeObject = $this->container->make($objectType, [
+                    'fields' => $objectTypeOptions,
+                    'options' => $options,
+                    'settings' => $settings,
+                ]);
                 if (!$newTypeObject instanceof FormBuilderTypeInterface) {
                     throw new FormBuilderInvalidArgumentException('"' . $objectType . '" is not a valid form type object.', 0);
                 }
@@ -333,28 +337,11 @@ class FormBuilder extends AbstractFormBuilder
         } else {
             if ($container) {
                 //[before, after, element, element_id, element_class, element_style]
-                // extract($this->htmlAttr);
+                extract($this->htmlAttr);
                 $html .= (isset($field_wrapper) && $field_wrapper == true) ? $this->buildTemplate($objectType, $this->htmlAttr, $label_up) : ''; //"\n{$before}" : '';
                 $html = $this->buildLabel($objectType, $html, $this->htmlAttr, $label, $show_label);
+                $html = sprintf($html, $this->fieldWrapper($html, $element, $element_class, $input_wrapper));
                 return sprintf($html, $objectType->view($label));
-            // if (!empty($element)) {
-                //     /* Main wrapper element html tag are set with in the $before variable */
-                //     /* Form label wrapping element */
-                //     if ($label_up == false) {
-                //         $html .= $this->fieldWrapper($element, $element_class, $input_wrapper);
-                //         $html .= $objectType->view();
-                //         $html .= $input_wrapper == true ? "</{$element}>\n" : '';
-                //         $html .= ($show_label === true) ? $this->formLabel($objectType->getOptions(), '', $label) : '';
-                //     } else {
-                //         $html .= ($show_label === true) ? $this->formLabel($objectType->getOptions(), '', $label) : '';
-                //         $html .= $this->fieldWrapper($element, $element_class, $input_wrapper);
-                //         $html .= $objectType->view();
-                //         $html .= $input_wrapper == true ? "</{$element}>\n" : '';
-                //     }
-                // }
-
-                /* container element wrapper */
-                // $html .= (isset($before_after_wrapper) && $before_after_wrapper == true) ? "{$after}\n" : false;
             } else { /* else we can render the form field outside of a container */
                 $html .= $objectType->view();
             }
@@ -365,10 +352,10 @@ class FormBuilder extends AbstractFormBuilder
         return $html;
     }
 
-    private function fieldWrapper(string $element, array $element_class, bool $wrapper)
+    private function fieldWrapper(string $template, string $element, array $element_class, bool $wrapper)
     {
-        $html = '';
         if ($wrapper) {
+            $html = '';
             $html .= "\n<{$element}"; // open
             /* Get the element ID */
             $html .= (!empty($element_id) ? ' id="' . $element_id . '"' : '');
@@ -378,7 +365,10 @@ class FormBuilder extends AbstractFormBuilder
             $html .= (!empty($element_style) ? ' style="' . $element_style . '"' : '');
             $html .= '>'; // close
             /* Main element closing tag */
+            $html .= "\n %s ";
+            $html .= "\n</div>";
+            return $html;
         }
-        return $html;
+        return '%s';
     }
 }

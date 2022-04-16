@@ -168,7 +168,7 @@ trait FormBuilderTrait
     {
         $options = $objectType->getOptions();
         if ($template != '') {
-            $template = in_array($objectType::class, ['CheckboxType']) ? $template : str_replace('{{label}}', $objectType->getLabelTemplate(), $template);
+            $template = $this->getLabel($objectType, $template, $show_label);
             $template = str_replace('{{inputID}}', $options['id'] ?? '', $template);
             $template = str_replace('{{labelClass}}', implode(' ', $htmlAttr['labelClass']) ?? '', $template);
             $template = str_replace('{{spanClass}}', implode(' ', $htmlAttr['spanClass']), $template);
@@ -194,6 +194,18 @@ trait FormBuilderTrait
             if (!in_array($index, array_keys($extensionOptions), true)) {
                 throw new FormBuilderOutOfBoundsException('One or more key [' . $index . "] is not a valid key for the object type $extensionObjectName");
             }
+        }
+    }
+
+    private function getLabel(Object $objectType, string $template, $show_label) : string
+    {
+        if (in_array($objectType::class, ['CheckboxType'])) {
+            return $template;
+        }
+        if ($show_label) {
+            return str_replace('{{label}}', $objectType->getLabelTemplate(), $template);
+        } else {
+            return str_replace('{{label}}', '', $template);
         }
     }
 

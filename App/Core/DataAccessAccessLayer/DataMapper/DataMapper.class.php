@@ -12,16 +12,14 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     private $_results;
     private $bind_arr = [];
     private DatabaseConnexionInterface $_con;
-    private Entity $entity;
 
     /**
      * Set Database connection
      * ===================================================================.
      */
-    public function __construct(DatabaseConnexionInterface $_con, Entity $entity)
+    public function __construct(DatabaseConnexionInterface $_con)
     {
         $this->_con = $_con;
-        $this->entity = $entity;
     }
 
     /**
@@ -36,46 +34,19 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     /**
      * @inheritDoc
      */
-    public function bind_type(mixed $value) : int
-    {
-        try {
-            switch ($value) {
-            case is_bool($value):
-            case intval($value):
-                $type = PDO::PARAM_INT;
-            break;
-            case is_null($value):
-                $type = PDO::PARAM_NULL;
-            break;
-            default:
-                $type = PDO::PARAM_STR;
-            break;
-        }
-            return $type;
-        } catch (\DataMapperExceptions $ex) {
-            throw $ex;
-        }
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function bind($param, $value, $type = null)
     {
-        switch ($type === null) {
-            case is_int($value):
-                $type = PDO::PARAM_INT;
-            break;
-            case is_bool($value):
-                $type = PDO::PARAM_BOOL;
-            break;
-            case $value === null:
-                $type = PDO::PARAM_NULL;
-            break;
-            default:
-                $type = PDO::PARAM_STR;
+        try {
+            $type = match ($type === null) {
+                is_int($value) => PDO::PARAM_INT,
+                is_bool($value) => PDO::PARAM_BOOL,
+                $value === null => PDO::PARAM_NULL,
+                default => PDO::PARAM_STR
+            };
+            $this->_query->bindValue($param, $value, $type);
+        } catch (\Throwable $ex) {
+            throw new DataMapperExceptions($ex->getMessage(), $ex->getCode());
         }
-        $this->_query->bindValue($param, $value, $type);
     }
 
     /**
@@ -88,7 +59,7 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     {
         if ($this->isArray($fields)) {
             foreach ($fields as $key => $value) {
-                $this->_query->bindValue(':' . $key, $value, $this->bind_type($value));
+                $this->_query->bindValue(':' . $key, $value, $this->valueType($value));
             }
         }
         return $this->_query;
@@ -115,7 +86,6 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
      * ===============================================================.
      * @param array $fields
      * @return PDOStatement
-     * @throws DataMapperExceptions
      */
     public function bindValues(array $fields = []) : PDOStatement
     {
@@ -128,27 +98,12 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
                     $val = current($val);
                 }
                 if (is_array($val)) {
-                    switch (true) {
-                        case isset($val['operator']) && in_array($val['operator'], ['=', '!=', '>', '<', '>=', '<=']):
-                            $this->bind(":$key", $val['value']);
-                            break;
-                        case isset($val['operator']) && in_array($val['operator'], ['NOT IN', 'IN']):
-                            if (!empty($this->bind_arr)) {
-                                foreach ($this->bind_arr as $k => $v) {
-                                    $this->bind(":$k", $v);
-                                }
-                            }
-                            break;
-                        default:
-                            $this->bind(":$key", $val['value']);
-                            break;
-                    }
+                    $this->bindVal($key, $val);
                 } else {
                     $val != 'IS NULL' ? $this->bind(":$key", $val) : '';
                 }
             }
         }
-
         return $this->_query;
     }
 
@@ -161,7 +116,7 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     {
         $this->isArray($fields);
         foreach ($fields as $key => $value) {
-            $this->_query->bindValue(':' . $key, '%' . $value . '%', $this->bind_type($value));
+            $this->_query->bindValue(':' . $key, '%' . $value . '%', $this->valueType($value));
         }
 
         return $this->_query;
@@ -192,8 +147,6 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     }
 
     /**
-     * Single results as object
-     * =================================================================.
      *@inheritDoc
      */
     public function result(): Object
@@ -298,5 +251,35 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
         }
 
         return $sqlArr[0];
+    }
+
+    /**
+     * Bind usual values.
+     * ================================================.
+     * @param string $key
+     * @param array $val
+     * @return void
+     */
+    private function bindVal(string $key, array $val) : void
+    {
+        switch (true) {
+            case isset($val['operator']) && in_array($val['operator'], ['=', '!=', '>', '<', '>=', '<=']):
+                if (isset($val['value']) && is_array($val['value'])) {
+                    $this->bind(":$key", $val['value'][1] . '.' . $val['value'][0]);
+                } else {
+                    $this->bind(":$key", $val['value']);
+                }
+            break;
+            case isset($val['operator']) && in_array($val['operator'], ['NOT IN', 'IN']):
+                if (!empty($this->bind_arr)) {
+                    foreach ($this->bind_arr as $k => $v) {
+                        $this->bind(":$k", $v);
+                    }
+                }
+            break;
+            default:
+                $this->bind(":$key", $val['value']);
+            break;
+        }
     }
 }

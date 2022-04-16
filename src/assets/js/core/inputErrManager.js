@@ -7,14 +7,14 @@ class Input_Manager {
   removeInvalidInput(myform) {
     myform.on("focus", "input,textarea, .ck, .note-editor", function () {
       $(this).removeClass("is-invalid");
-      $(this).parent().children("div.invalid-feedback").html("");
+      $(this).parents(".input-box").children("div.invalid-feedback").html("");
     });
   }
   error = (form, InputErr) => {
     var arrErr = [];
     for (const [key, value] of Object.entries(InputErr)) {
       var input = form.find("#" + key).addClass("is-invalid");
-      input.parent().children("div.invalid-feedback").html(value);
+      input.parents(".input-box").children("div.invalid-feedback").html(value);
       arrErr.push(key);
     }
     return arrErr;

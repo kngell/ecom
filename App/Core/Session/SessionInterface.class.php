@@ -62,4 +62,6 @@ interface SessionInterface
      * @return bool
      */
     public function exists(string $key) : bool;
+
+    public static function uagent_no_version() : string;
 }

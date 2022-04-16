@@ -3,6 +3,10 @@
 declare(strict_types=1);
 class Token extends RandomStringGenerator
 {
+    public function __construct()
+    {
+    }
+
     public function generate_token(int $length = 8, string $frm = '', string $alphabet = '')
     {
         $identifiant = '';

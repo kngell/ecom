@@ -93,7 +93,7 @@ abstract class AbstractQueryBuilder
                 if ($withParams) {
                     $params = $options['join_on'][$all_tables[$index + 1]]['params'];
                     $args = $params[0];
-                    $sql .= ' ' . $params['separator'] . ' (' . $args[0] . ' ' . $params['operator'] . ' ' . $args[1] . ')' . $braceClose;
+                    $sql .= ' ' . $params['separator'] . ' (' . $args[0] . ' ' . $params['operator'] . ' ' . $this->getValue($args[1]) . ')' . $braceClose;
                 }
             }
         }
@@ -188,6 +188,15 @@ abstract class AbstractQueryBuilder
     protected function has(string $key): bool
     {
         return isset($this->key[$key]);
+    }
+
+    private function getValue(mixed $arg) : mixed
+    {
+        return match (gettype($arg)) {
+            'int' => intval($arg),
+            'bool' => boolval($arg),
+            default => "'" . $arg . "'"
+        };
     }
 
     private function whereConditions(array $aryCond, string $field) : string

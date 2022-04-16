@@ -3,7 +3,7 @@
 declare(strict_types=1);
 class NullListener implements ListenerInterface
 {
-    public function handle(EventsInterface $event): mixed
+    public function handle(EventsInterface $event): string
     {
         return $event->getName();
     }

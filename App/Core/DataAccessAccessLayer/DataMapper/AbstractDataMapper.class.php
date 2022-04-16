@@ -20,6 +20,27 @@ abstract class AbstractDataMapper
         return true;
     }
 
+    protected function valueType(mixed $value) : int
+    {
+        try {
+            switch ($value) {
+            case is_bool($value):
+            case intval($value):
+                $type = PDO::PARAM_INT;
+            break;
+            case is_null($value):
+                $type = PDO::PARAM_NULL;
+            break;
+            default:
+                $type = PDO::PARAM_STR;
+            break;
+        }
+            return $type;
+        } catch (\DataMapperExceptions $ex) {
+            throw $ex;
+        }
+    }
+
     /**
      * Select Results
      * ===============================================================.
@@ -29,56 +50,49 @@ abstract class AbstractDataMapper
      */
     protected function select_result($q, array $data) : mixed
     {
-        $value = '';
-        $type = $this->typeMode($data);
-        if (!empty($type)) {
-            isset($data['class']) ? $q->setFetchMode($type, $data['class'], $data['class_args'] ?? []) : $q->setFetchMode($type);
-            if (array_key_exists('return_type', $data)) {
-                switch ($data['return_type']) {
-                    case 'count':
-                        $value = $this->_count;
-                    break;
-                    case 'single':
-                        $value = $q->fetch();
-                    break;
-                    case 'first':
-                        $value = current($q->fetchAll());
-                    break;
-                    default:
-                        $value = '';
-                    break;
-                }
+        $type = $this->returnMode($data);
+        $q = $this->fetchMode($type, $q, $data);
+        $check = array_key_exists('return_type', $data) ? $data['return_type'] : 'all';
+        return match ($check) {
+            'count' => $q->rowCount(),
+            'single' => $q->fetch(),
+            'first' => current($q->fetchAll()),
+            default => $q->fetchAll()
+        };
+    }
+
+    private function fetchMode(int $type, PDOStatement $q, array $data) : PDOStatement
+    {
+        $className = isset($data['class']) ? $data['class'] : null;
+        $contructorArgs = isset($data['constructorArgs']) ? $data['constructorArgs'] : null;
+        if ($className != null) {
+            if ($contructorArgs != null) {
+                $q->setFetchMode($type, $className, $contructorArgs);
             } else {
-                $value = $q->fetchAll();
+                $q->setFetchMode($type, $className);
             }
         } else {
-            $value = $q->fetchAll();
+            $q->setFetchMode($type);
         }
-        return $value;
+        return $q;
     }
 
     /**
      * Get Result type
-     * =========================================================================================================.
+     * ================================================.
      * @param array $data
-     * @return void
+     * @return int
      */
-    private function typeMode(array $data)
+    private function returnMode(array $data) : int
     {
-        $type = '';
+        $returnMode = PDO::FETCH_DEFAULT;
         if (array_key_exists('return_mode', $data)) {
-            switch ($data['return_mode']) {
-                case 'object':
-                    $type = PDO::FETCH_OBJ;
-                break;
-                case 'class':
-                    $type = PDO::FETCH_CLASS;
-                break;
-                default:
-                    $type = PDO::FETCH_ASSOC;
-                break;
-            }
+            $returnMode = match ($data['return_mode']) {
+                'object' => PDO::FETCH_OBJ,
+                'class' => PDO::FETCH_CLASS,
+                default => PDO::FETCH_ASSOC
+            };
         }
-        return $type;
+        return $returnMode;
     }
 }

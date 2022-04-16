@@ -11,7 +11,6 @@ class EntityManagerFactory
     private string $tableSchema;
     private string $tableSchemaID;
     private array $options;
-    private Entity $entity;
 
     /**
      * Main constructor
@@ -20,12 +19,11 @@ class EntityManagerFactory
      * @param DataMapperInterface $datamapper
      * @param QueryBuilderInterface $querybuilder
      */
-    public function __construct(DataMapperEnvironmentConfig $dataMapperEnvConfig, string $tableSchema, string $tableSchamaID, ?array $options, Entity $entity)
+    public function __construct(DataMapperEnvironmentConfig $dataMapperEnvConfig, string $tableSchema, string $tableSchamaID, ?array $options)
     {
         $this->tableSchema = $tableSchema;
         $this->tableSchemaID = $tableSchamaID;
         $this->options = $options;
-        $this->entity = $entity;
         $this->dataMapperEnvConfig = $dataMapperEnvConfig;
     }
 
@@ -44,7 +42,6 @@ class EntityManagerFactory
             'crud' => $this->container->make(CrudInterface::class, [
                 'dataMapper' => $this->container->make(DataMapperFactory::class, [
                     'dataMapperEnvConfig' => $this->dataMapperEnvConfig,
-                    'entity' => $this->entity,
                 ])->create(),
                 'queryBuilder' => $this->container->make(QueryBuilderInterface::class),
                 'tableSchema' => $this->tableSchema,

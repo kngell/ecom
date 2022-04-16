@@ -38,9 +38,9 @@ class Cookie implements CookieInterface
      * @param mixed $value
      * @return self
      */
-    public function set(mixed $value): void
+    public function set(mixed $value, ?string $cookieName = null): void
     {
-        $this->cookieStore->setCookie($value);
+        $this->cookieStore->setCookie($value, $cookieName);
     }
 
     /**

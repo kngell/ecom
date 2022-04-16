@@ -59,8 +59,17 @@ const serverOpt = {
       secure: false,
       changeOrigin: true,
       pathRewrite: { "^/ecom": "" },
+      // onProxyReq: (proxyReq) => {
+      //   if (proxyReq.getHeader("origin")) {
+      //     proxyReq.setHeader("origin", "https://localhost");
+      //   }
+      // },
+      // onProxyRes: (response) => {
+      //   response.headers["access-control-allow-origin"] =
+      //     "https://localhost:8001";
+      // },
       // headers: {
-      //   cookie: 'COOKIE_AUTH_KEY=COOKIE_AUTH_VALUE;',
+      //   "Access-Control-Allow-Origin": "https://localhost:8001",
       // },
     },
   },

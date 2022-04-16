@@ -1,8 +1,1 @@
-CREATE TABLE user(
-    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
-);
-
-INSERT INTO products (name,description,price,created_at) VALUES ("PHP eCommerce Project #22: ", "Il est nécessaire si vous  ",94400,CURRENT_TIMESTAMP);
+SELECT users.*, COUNT(login_attempts.laID) AS number FROM users LEFT JOIN login_attempts ON ((users.userID = login_attempts.userID) AND (login_attempts.timestamp >= '1649521845'))  WHERE (users.email = 'paracyrius@gmail.com') GROUP BY users.userID

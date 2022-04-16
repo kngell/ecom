@@ -3,24 +3,12 @@
 declare(strict_types=1);
 class AuthController extends Controller
 {
-    public string $method = '';
-
-    /**
-     * Main Controller
-     * ===========================================================================================.
-     */
-    // public function __construct(private AuthMiddleWare $authmiddleware, private UploadHelper $uploadHelper)
-    // {
-    //     $authmiddleware->init(['profile']);
-    //     $this->registerMiddleware($authmiddleware);
-    // }
-
     public function ajaxLogin()
     {
         if ($this->request->exists('post') && $this->loginFrm->canHandleRequest()) {
             $data = $this->request->get();
             if ($data['csrftoken'] && $this->token->validateToken($data['csrftoken'], $data['frm_name'])) {
-                $model = $this->container->make(AuthManager::class)->assign($data);
+                $model = $this->model(AuthenticationManager::class)->authenticate($data);
                 method_exists('Form_rules', 'login') ? $model->validator($data, Form_rules::login()) : '';
                 if ($model->validationPasses()) {
                     list($user, $number) = $model->loginAttemps($data['email']);
@@ -90,11 +78,11 @@ class AuthController extends Controller
                             $request->timestamp = time();
                             if ($lastID = $request->save()['saveID']->get_lastID()) {
                                 $msg = '<a href="http://localhost/kngell/users/resetpassword/' . $lastID . '/' . $this->token->urlSafeEncode($code) . '">Click to reset your password.</a>';
-                                if (H_Email::sendEmail($data['email'], $user[0]->name, 'Password Reset', $msg)) {
-                                    $this->jsonResponse(['result' => 'success', 'msg' => FH::showMessage('success text-center', 'An Email has been sent if an account with that email exist.')]);
-                                } else {
-                                    $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('warning text-center', 'Failed to send email')]);
-                                }
+                            // if (H_Email::sendEmail($data['email'], $user[0]->name, 'Password Reset', $msg)) {
+                                //     $this->jsonResponse(['result' => 'success', 'msg' => FH::showMessage('success text-center', 'An Email has been sent if an account with that email exist.')]);
+                                // } else {
+                                //     $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('warning text-center', 'Failed to send email')]);
+                                // }
                             } else {
                                 $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Failed to create request in database! Plase try again.')]);
                             }
@@ -130,26 +118,26 @@ class AuthController extends Controller
                     $hash = array_pop($user_data);
                     $id = array_pop($user_data);
                     if (!empty($id) && !empty($hash)) {
-                        $user_request = (new UsersRequestsManager())->getDetails($id);
-                        if ($user_request && $user_request->count() === 1) {
-                            if (password_verify($this->token->urlSafeDecode($hash), $user_request->hash)) {
-                                if ($user_request->timestamp >= time() - PASSWORD_RESET_REQUEST_EXPIRY_TIME) {
-                                    $hash = password_hash($data['password'], PASSWORD_DEFAULT);
-                                    if ($this->model_instance->update(['userID' => $user_request->userID], ['password' => $hash])) {
-                                        $user_request->delete('', ['userID' => $user_request->userID, 'type' => 1]);
-                                        $this->jsonResponse(['result' => 'success', 'msg' => FH::showMessage('success text-center', 'Your password has been updated.')]);
-                                    } else {
-                                        $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Failed to update password')]);
-                                    }
-                                } else {
-                                    $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'This request has expired! Please try again.')]);
-                                }
-                            } else {
-                                $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Invalid password reset request')]);
-                            }
-                        } else {
-                            $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Invalid password reset request')]);
-                        }
+                        // $user_request = (new UsersRequestsManager())->getDetails($id);
+                        // if ($user_request && $user_request->count() === 1) {
+                        //     if (password_verify($this->token->urlSafeDecode($hash), $user_request->hash)) {
+                        //         if ($user_request->timestamp >= time() - PASSWORD_RESET_REQUEST_EXPIRY_TIME) {
+                        //             $hash = password_hash($data['password'], PASSWORD_DEFAULT);
+                        //             if ($this->model_instance->update(['userID' => $user_request->userID], ['password' => $hash])) {
+                        //                 $user_request->delete('', ['userID' => $user_request->userID, 'type' => 1]);
+                        //                 $this->jsonResponse(['result' => 'success', 'msg' => FH::showMessage('success text-center', 'Your password has been updated.')]);
+                        //             } else {
+                        //                 $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Failed to update password')]);
+                        //             }
+                        //         } else {
+                        //             $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'This request has expired! Please try again.')]);
+                        //         }
+                        //     } else {
+                        //         $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Invalid password reset request')]);
+                        //     }
+                        // } else {
+                        //     $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Invalid password reset request')]);
+                        // }
                     } else {
                         $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Your Link is corrupt! Please request a new password reset link.')]);
                     }
@@ -196,7 +184,7 @@ class AuthController extends Controller
     //Check for remember me cookies
     //=======================================================================
 
-    public function remember_check()
+    public function rememberCheck(array $arg = [])
     {
         if ($this->request->exists('post')) {
             if ($userdata = $this->container->make(AuthManager::class)->rememberMe_checker()) {
@@ -280,9 +268,9 @@ class AuthController extends Controller
                 $msg = '<h2>Invalid Verification Request</h2>';
             }
             $request = null;
-            Rooter::redirect('users' . DS . 'emailverified' . DS . $msg);
+        // Rooter::redirect('users' . DS . 'emailverified' . DS . $msg);
         } else {
-            Rooter::redirect('restricted');
+            // Rooter::redirect('restricted');
         }
     }
 
@@ -302,9 +290,9 @@ class AuthController extends Controller
                     $request->timestamp = time();
                     $request->hash = password_hash($verifiCode, PASSWORD_DEFAULT);
                     if ($resp = $request->save()) {
-                        if (H_Email::sendEmail($email, $user[0]->name, 'Email Verification', '<a href="http://localhost/kngell/auth/verifyEmail/' . $resp->get_lastID() . '/' . $this->token->urlSafeEncode($verifiCode) . '">Click to verify your email</a>')) {
-                            return true;
-                        }
+                        // if (H_Email::sendEmail($email, $user[0]->name, 'Email Verification', '<a href="http://localhost/kngell/auth/verifyEmail/' . $resp->get_lastID() . '/' . $this->token->urlSafeEncode($verifiCode) . '">Click to verify your email</a>')) {
+                        //     return true;
+                        // }
                     }
                 }
             }
@@ -321,7 +309,7 @@ class AuthController extends Controller
     {
         $email = array_pop($userInfos);
         $salt = array_pop($userInfos);
-        $this->view_instance->set_pageTitle('Email verification');
+        // $this->view_instance->setPageTitle('Email verification');
         $user = $this->model_instance['users']->getDetails($email, 'email');
         $msg = file_get_contents(FILES . 'template' . DS . 'home' . DS . 'LR' . DS . 'verification_result.php');
         if ($user && $user->salt === $salt) {
@@ -378,7 +366,7 @@ class AuthController extends Controller
 
     public function resetpass()
     {
-        $this->view_instance->set_pageTitle('Reset password');
+        // $this->view_instance->set_pageTitle('Reset password');
         $this->view_instance->render('users' . DS . 'resetpass');
     }
 
@@ -434,7 +422,7 @@ class AuthController extends Controller
         if ($user = AuthManager::currentUser()) {
             if (AuthManager::currentUser()->logout()) {
                 if ($members) {
-                    Rooter::redirect('');
+                    // Rooter::redirect('');
                 }
                 if ($this->session->exists(REDIRECT)) {
                     $this->session->delete(REDIRECT);
