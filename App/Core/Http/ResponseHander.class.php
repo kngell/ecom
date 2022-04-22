@@ -51,6 +51,44 @@ class ResponseHandler extends GlobalVariables
         }
     }
 
+    /**
+     * Transform Key -> transform source key from old to new key when present on $item
+     * ==================================================================================.
+     * @param array $source
+     * @param array $item
+     * @return array
+     */
+    public function transform_keys(array $source = [], array | null $newKeys = []) : array
+    {
+        $S = $source;
+        if (isset($newKeys) && !empty($newKeys)) {
+            foreach ($source as $key => $val) {
+                if (isset($newKeys[$key])) {
+                    $S = $this->_rename_arr_key($key, $newKeys[$key], $S);
+                }
+            }
+        }
+        return $S;
+    }
+
+    /**
+     * Rename keys
+     * ==================================================================================.
+     * @param string $oldkey
+     * @param string $newkey
+     * @param array $arr
+     * @return array|bool
+     */
+    private function _rename_arr_key(string $oldkey, string $newkey, array $arr = []) : bool|array
+    {
+        if (array_key_exists($oldkey, $arr)) {
+            $arr[$newkey] = $arr[$oldkey];
+            unset($arr[$oldkey]);
+            return $arr;
+        } else {
+            return false;
+        }
+    }
     // public function cacheRefresh()
     // {
     //     $session = GlobalManager::get('global_session');

@@ -2,18 +2,21 @@ import { BASE_URL } from "corejs/config";
 import { Call_controller } from "corejs/form_crud";
 import input from "corejs/inputErrManager";
 import { readurl } from "corejs/profile_img";
+// import modal from "corejs/bootstrap_modal";
 
 class Login_And_Register {
-  constructor(element) {
+  constructor(element, header) {
     this.element = element;
+    this.header = header;
   }
   _init = () => {
     this._setupVariables();
     this._setupEvents();
   };
-  //=======================================================================
-  //Setup variables
-  //=======================================================================
+  /**
+   * Setup Variables
+   * -----------------------------------------------------------------------
+   */
   _setupVariables = () => {
     this.logbox = this.element.find("#login-box");
     this.loginfrm = this.element.find("#login-frm");
@@ -24,10 +27,13 @@ class Login_And_Register {
     this.bs_login_box = document.getElementById("login-box");
     this.bs_register_box = document.getElementById("register-box");
     this.bs_forgot_box = document.getElementById("forgot-box");
+    // this.login_modal = new modal(["login-box"])._init();
+    this.logout = this.header.find("a:contains('Logout')");
   };
-  //=======================================================================
-  //Setup events
-  //=======================================================================
+  /**
+   * Setup Events
+   * ------------------------------------------------------------------
+   */
   _setupEvents = () => {
     var phpLR = this;
 
@@ -95,14 +101,12 @@ class Login_And_Register {
         notification: "admin",
         frm_name: $(this).attr("id"),
       };
-      console.log($(this).attr("id"));
-      Call_controller(inputData, gestionR);
-      function gestionR(response) {
+      Call_controller(inputData, (response) => {
         phpLR.regfrm.find("#register-btn").val("Enregistrer");
         if (response.result == "success") {
           phpLR.regbox
             .find(".upload-profile-image .img")
-            .attr("src", BASE_URL + "/public\\assets\\img\\users/avatar.png");
+            .attr("src", "/public\\assets\\img\\users/avatar.png");
           phpLR.regfrm.get(0).reset();
           phpLR.regfrm.find("#regAlert").html(response.msg);
         } else {
@@ -112,7 +116,7 @@ class Login_And_Register {
             phpLR.regfrm.find("#regAlert").html(response.msg);
           }
         }
-      }
+      });
     });
     //read profile image on change
     phpLR.regbox
@@ -138,16 +142,19 @@ class Login_And_Register {
         phpLR.loginfrm.find("#login-btn").val("Login");
         if (response.result == "success") {
           if (response.msg == "checkout") {
-            window.location.href = BASE_URL + "checkout";
+            window.location.href = "checkout";
           } else {
             if (response.msg == "chk_navigation") {
             } else {
+              // phpLR.login_modal.then((mod) => {
+              //   mod[0].hide();
+              //   $(".connect").load(location.href + " .connect");
+              // });
               window.location.reload();
             }
           }
         } else {
           if (response.result == "error-field") {
-            console.log(response);
             input.error(phpLR.loginfrm, response.msg);
           } else {
             phpLR.loginfrm.find("#alertErr").html(response.msg);
@@ -180,29 +187,31 @@ class Login_And_Register {
       }
     });
     //logout
-    var logout = $("a:contains('Logout')");
-    $(logout).on("click", function () {
+    phpLR.logout.on("click", function () {
       if (typeof FB !== "undefined") {
         FB.logout().then((response) => {
           // logged out
         });
       }
-      $.ajax({
-        url: BASE_URL + "logout",
-        method: "POST",
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        success: function (response) {
-          if (response.result == "success") {
-            logout.closest("div").load(location.href + " .connect");
-            if (response.msg == "redirect") {
-              window.location.href = BASE_URL;
-            }
+      var data = {
+        url: "ajaxlogout",
+        csrftoken: document
+          .querySelector('meta[name="csrftoken"]')
+          .getAttribute("content"),
+        frm_name: "home_page",
+      };
+      Call_controller(data, (response) => {
+        if (response.result == "success") {
+          phpLR.logout.closest("div").load(location.href + " .connect");
+          if (response.msg == "redirect") {
+            window.location.href = window.location.href;
           }
-        },
+        }
       });
     });
   };
 }
-export default new Login_And_Register($("#Login-Register-System"))._init();
+export default new Login_And_Register(
+  $("#Login-Register-System"),
+  $("#header")
+)._init();

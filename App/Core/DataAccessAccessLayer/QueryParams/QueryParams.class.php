@@ -72,7 +72,7 @@ class QueryParams extends AbstractQueryParams
                     if (is_string($k) && str_contains($k, '|')) {
                         $this->getParams($k, $arg);
                     } else {
-                        $tbl = is_numeric($k) ? $this->current_table : $k;
+                        $tbl = is_numeric($k) ? $this->query_params['options']['table'][$k] : $k;
                         array_push($this->query_params['options']['join_on'][$this->current_table], $tbl . '.' . $arg);
                     }
                 }

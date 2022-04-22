@@ -28,7 +28,7 @@ trait ModelTrait
             return $this;
         }
         $this->setCount($dataMapperResults->count());
-        $this->setResults($this->helper->afterFind($dataMapperResults)->get_results());
+        $this->setResults($this->afterFind($dataMapperResults)->get_results());
         return $this;
     }
 
@@ -42,6 +42,7 @@ trait ModelTrait
     public function update() : self
     {
         list($conditions) = $this->conditions()->getQueryParams()->params('update');
+        $this->getEntity()->delete($this->getEntity()->getColID());
         $this->_count = $this->getRepository()->entity($this->getEntity())->update($conditions);
         return $this;
     }
@@ -49,12 +50,7 @@ trait ModelTrait
     public function delete() : self
     {
         list($conditions) = $this->conditions()->getQueryParams()->params('delete');
-        $delete = $this->getRepository()->entity($this->getEntity())->delete($conditions);
-        if ($delete->count() <= 0) {
-            $this->setCount(0);
-            return $this;
-        }
-        $this->setCount($delete);
+        $this->setCount($this->getRepository()->entity($this->getEntity())->delete($conditions));
         return $this;
     }
 

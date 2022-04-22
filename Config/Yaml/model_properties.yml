@@ -8,3 +8,4 @@ money: MoneyManager
 queryParams: QueryParamsInterface
 helper: ModelHelper
 repository: RepositoryFactory
+validator: Validator

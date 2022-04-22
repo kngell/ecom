@@ -3,9 +3,9 @@ export default class Logreg {
     this.isLoad = false;
     this.editors = editors;
   }
-  check() {
+  check = () => {
     return this;
-  }
+  };
   login = async () => {
     const login = await import(
       /* webpackMode: "lazy" */
@@ -14,9 +14,7 @@ export default class Logreg {
     );
     this.isLoad = true;
   };
-  // async load() {
-  // $.each(this.editors, async (i, ed) => {
-  //   this.editor[ed] = await createEditor(ed);
-  // });
-  // }
+  isLoadStatus = (status) => {
+    this.isLoad = status;
+  };
 }

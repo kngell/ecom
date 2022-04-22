@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 class Controller extends AbstractController
 {
+    use ControllerTrait;
+
     protected Token $token;
     protected MoneyManager $money;
     protected RequestHandler $request;

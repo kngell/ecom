@@ -88,20 +88,19 @@ class View extends AbstractView
                 $path .= $value . $separator;
                 $i++;
             }
-            switch ($check) {
-                case 'img':
-                    return ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . US . IMG . $path : IMG . $asset;
-                break;
-                case 'fonts':
-                    return ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . US . FONT . $path : FONT . $asset;
-                break;
-                default:
-                    if (isset($this->ressources->$asset)) {
-                        return ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . $this->ressources->$asset->$ext ?? '' : $this->ressources->$asset->$ext ?? '';
-                    }
-            }
+            return $this->getAsset($check, $path, $asset, $ext);
         }
         return '';
+    }
+
+    private function getAsset(string $check, string $path, string $asset, string $ext) : string
+    {
+        return match (true) {
+            $check == 'img' => ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . US . IMG . $path : IMG . $asset,
+            $check == 'fonts' => ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . US . FONT . $path : FONT . $asset,
+            isset($this->ressources->$asset) => ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . $this->ressources->$asset->$ext ?? '' : $this->ressources->$asset->$ext ?? '',
+            default => ''
+        };
     }
 
     private function renderViewContent($view, array $params = []) : void

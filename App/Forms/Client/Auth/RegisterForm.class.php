@@ -22,7 +22,7 @@ class RegisterForm extends ClientFormBuilder implements ClientFormBuilderInterfa
             TextType::class => ['name' => 'firstName'],
         ])->placeholder('First Name :')->noLabel(), $this->template);
         $this->template = str_replace('{{username}}', (string) $form->input([
-            TextType::class => ['name' => 'username'],
+            TextType::class => ['name' => 'userName'],
         ])->placeholder('UserName')->noLabel(), $this->template);
         $this->template = str_replace('{{email}}', (string) $form->input([
             EmailType::class => ['name' => 'email', 'id' => 'reg_email'],

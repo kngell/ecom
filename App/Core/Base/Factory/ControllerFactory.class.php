@@ -26,8 +26,8 @@ class ControllerFactory
         if (!$controllerObject instanceof Controller) {
             throw new BadControllerExeption($this->controllerString . ' is not a valid Controller');
         }
-        $this->container->bind($this->controllerString, fn () => $controllerObject);
-        $this->container->bind($this->method, fn () => $this->method);
+        $this->container->bind('controller', fn () => $controllerObject);
+        $this->container->bind('method', fn () => $this->method);
         return $controllerObject;
     }
 

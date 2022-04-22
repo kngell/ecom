@@ -88,7 +88,7 @@ abstract class AbstractQueryBuilder
                 $braceClose = $withParams ? ') ' : '';
                 if (is_numeric($index)) {
                     $sql .= ' ' . $join_rule . ' ' . $all_tables[$index + 1];
-                    $sql .= ' ON' . $braceOpen . '(' . $options['join_on'][$all_tables[$index + 1]][1] . ' = ' . $options['join_on'][$all_tables[$index + 1]][0] . ')';
+                    $sql .= ' ON ' . $braceOpen . '(' . $options['join_on'][$all_tables[$index + 1]][1] . ' = ' . $options['join_on'][$all_tables[$index + 1]][0] . ')';
                 }
                 if ($withParams) {
                     $params = $options['join_on'][$all_tables[$index + 1]]['params'];

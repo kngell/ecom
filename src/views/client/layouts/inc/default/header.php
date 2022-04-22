@@ -11,6 +11,7 @@
     <meta name="description"
         content="K'nGELL est un cabinet de conseil et d'ingénierie Logistique spécialisé dans la maitrise des process logistique et production grâce à l'usage de stratégies et tactiques Lean Management et six Sigma (6Sigma">
     <meta name="robots" content="index,follow">
+    <meta name="csrftoken" content="<?=$this->token->generate_token(8, 'home_page')?>" />
     <link rel="stylesheet" type="image/ico" href="<?='favicon.ico'?>">
     <title>
         <?= $this->getSiteTitle()?>

@@ -81,9 +81,9 @@ abstract class AbstractModel implements ModelInterface
     }
 
     //Before delete
-    public function beforeDelete($params = [])
+    public function beforeDelete(Entity $entity)
     {
-        return empty($params) ? true : $params;
+        return !is_null($entity) ? true : false;
     }
 
     //After delete

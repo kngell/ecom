@@ -35,4 +35,12 @@ interface ModelInterface
     public function assign(array $data) : self;
 
     public function save(?Entity $entity = null) : ?Object;
+
+    public function getDetails(mixed $id, string $colID = '') : ?self;
+
+    public function delete() : self;
+
+    public function update() : self;
+
+    public function getQueryParams() : QueryParams;
 }

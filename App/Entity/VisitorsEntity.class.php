@@ -254,4 +254,9 @@ class VisitorsEntity extends Entity
     {
         return $this->date_enreg;
     }
+
+    public function delete(string $field) : void
+    {
+        unset($this->$field);
+    }
 }

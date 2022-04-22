@@ -115,4 +115,9 @@ class LoginAttemptsEntity extends Entity
 
         return $this;
     }
+
+    public function delete(string $field) : void
+    {
+        unset($this->$field);
+    }
 }

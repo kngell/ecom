@@ -31,6 +31,7 @@ class UsersEntity extends Entity
     private int $deleted;
     private int $verified;
     private string $fb_access_token;
+    private string $terms;
 
     public function __construct()
     {
@@ -375,6 +376,43 @@ class UsersEntity extends Entity
     public function setFb_access_token(string $fb_access_token) : self
     {
         $this->fb_access_token = $fb_access_token;
+        return $this;
+    }
+
+    /**
+     * Set the value of userID.
+     *
+     * @return  self
+     */
+    public function setUserID($userID)
+    {
+        $this->userID = $userID;
+
+        return $this;
+    }
+
+    public function delete(string $field) : void
+    {
+        unset($this->$field);
+    }
+
+    /**
+     * Get the value of terms.
+     */
+    public function getTerms()
+    {
+        return $this->terms;
+    }
+
+    /**
+     * Set the value of terms.
+     *
+     * @return  self
+     */
+    public function setTerms($terms)
+    {
+        $this->terms = $terms;
+
         return $this;
     }
 }

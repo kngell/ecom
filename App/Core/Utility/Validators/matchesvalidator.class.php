@@ -7,6 +7,6 @@ class MatchesValidator extends CustomValidator
     {
         $value = $this->getModel()->{$this->getField()};
 
-        return $value == $this->rule;
+        return $value == $this->getRule();
     }
 }

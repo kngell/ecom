@@ -48,10 +48,10 @@ class Cookie implements CookieInterface
      *
      * @return void
      */
-    public function delete(): void
+    public function delete(?string $name = null): void
     {
         if ($this->exists()) {
-            $this->cookieStore->deleteCookie();
+            $this->cookieStore->deleteCookie($name);
         }
     }
 

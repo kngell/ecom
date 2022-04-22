@@ -60,9 +60,10 @@ class VisitorsManager extends Model
 
     private function updateVisitorInfos(Model $m, mixed $ipData = [])
     {
+        /** @var ModelInterface */
         $info = current($m->get_results());
         $info->assign(array_merge($info->request->transform_keys(!is_array($ipData) ? ['ipAddress' => $ipData] : $ipData, H_visitors::new_IpAPI_keys()), (array) $info));
-        $info->getQueryParams()->reset();
+        //$info->getQueryParams()->reset();
         if (!$update = $info->update()) {
             throw new BaseRuntimeException('Erreur lors de la mise à jour des données visiteur!');
         }

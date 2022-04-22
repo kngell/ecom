@@ -2,9 +2,6 @@ import { get_visitors_data, send_visitors_data } from "corejs/visitors";
 import log_reg from "corejs/logregloader";
 import "focus-within-polyfill";
 import select2 from "corejs/select2_manager";
-// import "smartWizard";
-// import { isIE } from "corejs/config";
-
 class HomePlugin {
   constructor(element) {
     this.element = element;
@@ -23,19 +20,18 @@ class HomePlugin {
   };
   _setupEvents = (event) => {
     var phpPlugin = this;
-
-    //=======================================================================
-    //Import login system
-    //=======================================================================
-
+    /**
+     * Login and Register
+     * ------------------------------------------------------
+     */
     phpPlugin.header.on(
       "click show.bs.dropdown",
       ".connect .connexion",
       function (e) {
         var loader = new log_reg().check();
         if (!loader.isLoad) {
+          loader.isLoadStatus(true);
           loader.login();
-          console.log("click");
         }
       }
     );

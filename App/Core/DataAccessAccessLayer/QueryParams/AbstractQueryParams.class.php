@@ -21,6 +21,9 @@ abstract class AbstractQueryParams implements QueryParamsInterface
     public function reset() : self
     {
         $this->query_params = [];
+        $this->current_table = '';
+        $this->conditionBreak = [];
+        $this->braceOpen = '';
         return $this;
     }
 

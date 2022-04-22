@@ -15,6 +15,7 @@ class Model extends AbstractModel
     protected Token $token;
     protected RequestHandler $request;
     protected ResponseHandler $response;
+    protected Validator $validator;
     protected bool $validates = true;
     protected array $validationErr = [];
     protected string $tableSchema;
@@ -110,7 +111,7 @@ class Model extends AbstractModel
 
     public function validator(array $items = []) : void
     {
-        FH::validate_forms($items, $this);
+        $this->validator->forms($items, $this);
     }
 
     public function count() : int
@@ -128,9 +129,9 @@ class Model extends AbstractModel
         $this->_results = $results;
     }
 
-    public function getErrorMessages() : array
+    public function getErrorMessages(array $newKeys = []) : array
     {
-        return $this->validationErr;
+        return $this->response->transform_keys($this->validationErr, $newKeys);
     }
 
     /**

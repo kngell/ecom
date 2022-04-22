@@ -9,19 +9,13 @@ class AuthManager extends Model
     private $_isLoggedIn = false;
     private $_confirm;
 
-    public function __construct()
+    public function __construct(string $user = '')
     {
         parent::__construct($this->_table, $this->_colID);
-    }
-
-    public function initUser(string $user = '')
-    {
         if ($user) {
-            $u = is_int($user) ? $this->getDetails($user) : $this->getDetails($user, 'email');
+            $u = is_numeric($user) ? $this->getDetails($user) : $this->getDetails($user, 'email');
             if ($u->count() > 0) {
-                foreach (current($u->get_results()) as $key => $val) {
-                    $this->$key = $val;
-                }
+                $this->entity->assign((array) $u->get_results());
             }
         }
     }
@@ -168,10 +162,11 @@ class AuthManager extends Model
     {
         $session = Container::getInstance()->make(SessionInterface::class);
         if ($session->exists(CURRENT_USER_SESSION_NAME)) {
-            $email = $session->get(CURRENT_USER_SESSION_NAME);
-            if (!isset(self::$currentLoggedInUser)) {
-                self::$currentLoggedInUser = Container::getInstance()->make(self::class);
-                self::$currentLoggedInUser->initUser((string) $email);
+            $id = $session->get(CURRENT_USER_SESSION_NAME);
+            if (self::$currentLoggedInUser === null) {
+                self::$currentLoggedInUser = Container::getInstance()->make(self::class, [
+                    'user' => (int) $id,
+                ]);
             }
         }
         return self::$currentLoggedInUser;

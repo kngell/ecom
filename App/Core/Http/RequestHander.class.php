@@ -6,10 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RequestHandler extends GlobalVariables
 {
-    /**
-     * Main constructor
-     * ==================================================================================.
-     */
     public function __construct(private Sanitizer $sanitizer)
     {
     }
@@ -59,7 +55,7 @@ class RequestHandler extends GlobalVariables
 
     /**
      * Get Http Method
-     * ==================================================================================.
+     * ====================================================.
      * @return string
      */
     public function getMethod() : string
@@ -90,55 +86,35 @@ class RequestHandler extends GlobalVariables
     }
 
     /**
-     * Transform Key -> transform source key from old to new key when present on $item
-     * ==================================================================================.
-     * @param array $source
-     * @param array $item
-     * @return array
-     */
-    public function transform_keys(array $source = [], array | null $item = []) : array
-    {
-        $S = $source;
-        if (isset($item)) {
-            foreach ($source as $key => $val) {
-                if (isset($item[$key])) {
-                    $S = $this->_rename_arr_key($key, $item[$key], $S);
-                }
-            }
-        }
-
-        return $S;
-    }
-
-    /**
      * Get Data From user input
-     * ==================================================================================.
+     * ==================================================.
      * @param string $input
      * @return mixed
      */
     public function get(string $input = '') : mixed
     {
-        if (isset($_REQUEST[$input]) && is_array($_REQUEST[$input])) {
+        $postData = $this->getPost();
+        if (isset($postData[$input]) && is_array($postData[$input])) {
             $r = [];
-            foreach ($_REQUEST[$input] as $val) {
-                $r[] = $this->sanitizer->clean($val);
+            foreach ($postData[$input] as $val) {
+                $r[] = $this->sanitizer::clean($val);
             }
             return $r;
         }
         if (!$input) {
             $data = [];
-            foreach ($_REQUEST as $field => $value) {
-                !is_array($value) ? $data[$field] = $this->sanitizer->clean($value) : '';
+            foreach ($postData as $field => $value) {
+                !is_array($value) ? $data[$field] = $this->sanitizer::clean($value) : '';
             }
 
             return $data;
         }
-        return isset($_REQUEST[$input]) ? $this->sanitizer->clean($_REQUEST[$input]) : false;
+        return isset($postData[$input]) ? $this->sanitizer::clean($postData[$input]) : false;
     }
 
     /**
      * Get Params
-     * ==================================================================================.
+     * =====================================================.
      * @param array $source
      * @return array
      */
@@ -158,7 +134,7 @@ class RequestHandler extends GlobalVariables
 
     /**
      * Check if Http is get request
-     * ==================================================================================.
+     * =========================================================.
      * @return bool
      */
     public function isGet() : bool
@@ -168,7 +144,7 @@ class RequestHandler extends GlobalVariables
 
     /**
      * Check if Http is post Request
-     * ==================================================================================.
+     * =========================================================.
      * @return bool
      */
     public function isPost() : bool
@@ -178,7 +154,7 @@ class RequestHandler extends GlobalVariables
 
     /**
      * Add slashes
-     * ==================================================================================.
+     * ========================================================.
      * @param mixed $data
      * @return string
      */
@@ -189,32 +165,12 @@ class RequestHandler extends GlobalVariables
 
     /**
      * Get Html Decode texte
-     * =========================================================================================================.
+     * ========================================================.
      * @param string $str
      * @return string
      */
     public function htmlDecode(string $str) : string
     {
         return !empty($str) ? htmlspecialchars_decode(html_entity_decode($str), ENT_QUOTES) : '';
-    }
-
-    /**
-     * Rename keys
-     * ==================================================================================.
-     * @param string $oldkey
-     * @param string $newkey
-     * @param array $arr
-     * @return array|null
-     */
-    private function _rename_arr_key(string $oldkey, string $newkey, array $arr = []) : ?array
-    {
-        if (array_key_exists($oldkey, $arr)) {
-            $arr[$newkey] = $arr[$oldkey];
-            unset($arr[$oldkey]);
-
-            return $arr;
-        } else {
-            return false;
-        }
     }
 }

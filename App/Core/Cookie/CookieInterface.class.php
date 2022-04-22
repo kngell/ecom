@@ -23,11 +23,12 @@ interface CookieInterface
     public function exists(string $name = '') : bool;
 
     /**
-     * delete a single cookie from the domain.
+     * Delete Cookies.
      *
+     * @param string|null $name
      * @return void
      */
-    public function delete() : void;
+    public function delete(?string $name = null): void;
 
     /**
      * Invalid all cookie i.e delete all set cookie within this domain.

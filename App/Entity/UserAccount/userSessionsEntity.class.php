@@ -178,4 +178,21 @@ class UserSessionsEntity extends Entity
 
         return $this;
     }
+
+    public function delete(string $field) : void
+    {
+        unset($this->$field);
+    }
+
+    /**
+     * Set the value of usID.
+     *
+     * @return  self
+     */
+    public function setUsID($usID)
+    {
+        $this->usID = $usID;
+
+        return $this;
+    }
 }

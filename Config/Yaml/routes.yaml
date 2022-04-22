@@ -35,6 +35,12 @@ post: # Http Post method =======================================================
   ajaxLogin:
     controller: login_with_ajax
     method: index
+  ajaxlogout:
+    controller: logout_with_ajax
+    method: index
+  ajaxRegister:
+    controller: register_with_ajax
+    method: index
   remember_me:
     controller: auth
     method: remember_check

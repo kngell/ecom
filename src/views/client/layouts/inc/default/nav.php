@@ -12,7 +12,7 @@
         <div class="font-rale font-size-14 left-side">
             <?=$this->search_box?>
             <div class="connect">
-                <?php if (AuthManager::$currentLoggedInUser == null) : ?>
+                <?php if (AuthManager::currentUser() == null) : ?>
                 <button type="button" class="px-3 border-right border-left text-dark connexion text-decoration-none"
                     data-bs-toggle="modal" data-bs-target="#login-box" id="login_btn">
                     <span class="icon login"></span>&nbsp;&nbsp;Login</button>
@@ -20,10 +20,10 @@
                 <a class="dropdown-toggle px-3 border-right border-left text-dark connexion text-decoration-none"
                     id="navbarDropdownMenuLink" data-bs-toggle="dropdown" role="button">
                     <span
-                        class="icon login"></span>&nbsp;&nbsp;<?= 'Bonjour&nbsp;' . AuthManager::currentUser()->firstName; ?>
+                        class="icon login"></span>&nbsp;&nbsp;<?= 'Bonjour&nbsp;' . AuthManager::currentUser()->getEntity()->{'getFirstName'}(); ?>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <?php $drop = GrantAccess::getMenu('menu_acl')['log_reg_menu']?>
+                    <?php $drop = GrantAccess::getInstance()->getMenu('menu_acl')['log_reg_menu']?>
                     <?php
                     foreach ($drop as $k => $v) :
                     $active = ($v == H::currentPage()) ? 'active' : ''; ?>

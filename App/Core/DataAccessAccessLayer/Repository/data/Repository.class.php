@@ -89,7 +89,7 @@ class Repository extends AbstractRepository implements RepositoryInterface
     {
         if ($this->isArray($conditions)) {
             try {
-                return $this->em->getCrud()->read([], $conditions, [], [], $options);
+                return $this->em->getCrud()->read([], $conditions, [], $options);
             } catch (\Throwable $th) {
                 throw $th;
             }
