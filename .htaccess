@@ -7,8 +7,9 @@
             Header always set Access-Control-Allow-Origin "*"
         </FilesMatch>
     </IfModule>
-    #RewriteBase /
     RewriteEngine On
+    RewriteBase /
+    RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
     RewriteRule ^(.+)/$ /$1 [L,R=301]
     RewriteRule ^(.*)$ /public/$1 [L]
 </IfModule>

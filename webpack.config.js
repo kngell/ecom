@@ -7,15 +7,15 @@ const RemovePlugin = require("remove-files-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const ImageMinimizerPlugin = require("image-minimizer-webpack-plugin");
-
+const config = require("./config");
 const {
   alias,
   fontendAssetsConfig,
   adminAssetsConfig,
   viewsConfig,
 } = require("./webpack.partials");
-const ASSET_PATH =
-  process.env.ASSET_PATH || `${path.sep}public${path.sep}assets${path.sep}`;
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const ASSET_PATH = config.PATH;
 
 const commonConfig = merge(plugins, {
   devtool: false,
@@ -124,6 +124,12 @@ const productionConfig = {
 module.exports = () => {
   switch (process.env.NODE_ENV) {
     case "development":
+      adminAssetsConfig.plugins.push(new CleanWebpackPlugin());
+      viewsConfig.plugins.push(
+        new CleanWebpackPlugin({
+          dangerouslyAllowCleanPatternsOutsideProject: true,
+        })
+      );
       return [
         merge(viewsConfig, commonConfig, developmentConfig),
         merge(fontendAssetsConfig, commonConfig, developmentConfig),
@@ -138,7 +144,8 @@ module.exports = () => {
               path.join(__dirname, "app", "views"),
             ],
           },
-        })
+        }),
+        new CleanWebpackPlugin()
       );
       return [
         merge(viewsConfig, commonConfig, productionConfig),

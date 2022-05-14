@@ -10,6 +10,7 @@ abstract class AbstractBaseBootLoader extends Container
     protected Application $application;
     protected RequestHandler $request;
     protected ResponseHandler $response;
+    protected AppHelper $helper;
 
     /**
      * Main class constructor.
@@ -211,5 +212,12 @@ abstract class AbstractBaseBootLoader extends Container
         if ($themeBuilder) {
             return $themeBuilder;
         }
+    }
+
+    protected function properties()
+    {
+        $this->request = $this->make(RequestHandler::class);
+        $this->response = $this->make(ResponseHandler::class);
+        $this->helper = $this->make(AppHelper::class);
     }
 }

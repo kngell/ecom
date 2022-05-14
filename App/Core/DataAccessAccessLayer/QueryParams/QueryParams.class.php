@@ -27,6 +27,7 @@ class QueryParams extends AbstractQueryParams
 
     public function table(?string $tbl = null, mixed $columns = null) : self
     {
+        $tbl = $this->parseTable($tbl);
         $this->query_params['table_join'] = [$tbl != null ? $tbl : $this->tableSchema => $columns != null ? $columns : ['*']];
         $this->addTableToOptions($tbl);
         return $this;
@@ -34,6 +35,7 @@ class QueryParams extends AbstractQueryParams
 
     public function join(?string $tbl = null, mixed $columns = null, string $joinType = 'INNER JOIN') : self
     {
+        $tbl = $this->parseTable($tbl);
         $this->key('table_join');
         if (!array_key_exists($tbl, $this->query_params['table_join'])) {
             $this->query_params['table_join'] += [$tbl != null ? $tbl : $this->tableSchema => $columns != null ? $columns : ['*']];
@@ -55,27 +57,25 @@ class QueryParams extends AbstractQueryParams
         return $this->join($tbl, $columns, 'RIGHT JOIN');
     }
 
-    public function on(array $columns, array $params = []) : self
+    public function on(...$params) : self
     {
         $this->key('options');
         if (!array_key_exists('join_on', $this->query_params['options'])) {
             $this->query_params['options']['join_on'] = [];
         }
-        if (!array_key_exists($this->current_table, $this->query_params['options']['join_on'])) {
-            $this->query_params['options']['join_on'][$this->current_table] = [];
-        }
-        $args = func_get_args();
-        $op = '';
-        foreach ($args as $key => $join_params) {
+        //$args = func_get_args();
+        $tableIndex = 0;
+        //$on = '';
+        foreach ($params as $key => $join_params) {
             if (is_array($join_params) && !empty($join_params)) {
                 foreach ($join_params as $k => $arg) {
-                    if (is_string($k) && str_contains($k, '|')) {
+                    if (is_array($arg)) {
                         $this->getParams($k, $arg);
                     } else {
-                        $tbl = is_numeric($k) ? $this->query_params['options']['table'][$k] : $k;
-                        array_push($this->query_params['options']['join_on'][$this->current_table], $tbl . '.' . $arg);
+                        $this->getJoinOptions($tableIndex + $k, $arg);
                     }
                 }
+                $tableIndex++;
             }
         }
         return $this;
@@ -121,7 +121,7 @@ class QueryParams extends AbstractQueryParams
     public function groupBy(array $groupByAry) : self
     {
         $this->key('options');
-        foreach ($groupByAry as $tbl => $field) {
+        foreach ($groupByAry as $field => $tbl) {
             if (is_numeric($tbl)) {
                 $this->query_params['options']['group_by'][] = $field;
             } else {
@@ -164,20 +164,6 @@ class QueryParams extends AbstractQueryParams
         return $this;
     }
 
-    private function getParams(string $k, mixed $arg) : void
-    {
-        $parts = is_string($k) ? explode('|', $k) : '';
-        $field = $parts[0] == 'or' ? $parts[1] : $parts[0];
-        if (!array_key_exists('params', $this->query_params['options']['join_on'][$this->current_table])) {
-            $this->query_params['options']['join_on'][$this->current_table]['params'] = [];
-        }
-        $tbl = is_array($arg) ? $arg[1] : $this->current_table;
-        $value = is_array($arg) ? $arg[0] : $arg;
-        array_push($this->query_params['options']['join_on'][$this->current_table]['params'], [$tbl . '.' . $field, $value]);
-        $this->query_params['options']['join_on'][$this->current_table]['params']['separator'] = $parts[0] == 'or' ? 'OR' : 'AND';
-        $this->query_params['options']['join_on'][$this->current_table]['params']['operator'] = $parts[0] == 'or' ? $parts[2] : $parts[1];
-    }
-
     private function getSelectors() : array
     {
         $selectors = [];
@@ -191,9 +177,9 @@ class QueryParams extends AbstractQueryParams
                     if (str_contains($column, '|')) {
                         $parts = explode('|', $column);
                         if (is_array($parts) && count($parts) < 3) {
-                            array_push($selectors, $tbl . '.' . $parts[1] . '(' . $parts[0] . ')');
+                            array_push($selectors, $parts[0] . '(' . $tbl . '.' . $parts[1] . ')');
                         } else {
-                            array_push($selectors, $parts[1] . '(' . $tbl . '.' . $parts[0] . ') AS ' . $parts[2]);
+                            array_push($selectors, $parts[0] . '(' . $tbl . '.' . $parts[1] . ') AS ' . $parts[2]);
                         }
                     } else {
                         array_push($selectors, $tbl . '.' . $column);

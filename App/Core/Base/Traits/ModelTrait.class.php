@@ -35,7 +35,7 @@ trait ModelTrait
     public function insert() : self
     {
         $this->_lastID = $this->getRepository()->entity($this->getEntity())->create();
-        $this->setCount($this->_lastID ? $this->_lastID : 0);
+        $this->setCount($this->_lastID ?? 0);
         return $this;
     }
 

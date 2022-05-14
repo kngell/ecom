@@ -14,9 +14,9 @@ class UsersManager extends Model
         parent::__construct($this->_table, $this->_colID);
     }
 
-    public function get_selectedOptions(?ModelInterface $m = null)
+    public function get_selectedOptions(?Model $m = null)
     {
-        /** @var ModelInterface */
+        /** @var Model */
         $groups = $this->container->make(GroupsMaganer::class);
         $query_params = $groups->table()->join('group_user', ['userID', 'groupID'])
             ->on(['grID', 'groupID'])

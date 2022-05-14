@@ -3,16 +3,22 @@
 declare(strict_types=1);
 class GrantAccess
 {
-    private static ContainerInterface $container;
-    private static ModelInterface $loggedInUser;
-    private static array $aclGroup;
+    private ContainerInterface $container;
+    private bool $loggedInUser;
+    private array $aclGroup;
     private static $instance;
+    private SessionInterface $session;
+    private FilesSystemInterface $fileSystem;
+    private array $acl;
 
     public function __construct()
     {
-        self::$aclGroup = AuthManager::currentUser()->acls();
-        self::$container = Container::getInstance();
-        self::$loggedInUser = AuthManager::currentUser();
+        $this->container = Container::getInstance();
+        $this->session = $this->container->make(SessionInterface::class);
+        $this->aclGroup = AuthManager::acls();
+        $this->loggedInUser = AuthManager::isLoggedIn();
+        $this->fileSystem = $this->container->make(FilesSystemInterface::class);
+        $this->acl = $this->fileSystem->get(APP, 'acl.json', true);
     }
 
     final public static function getInstance() : mixed
@@ -23,12 +29,12 @@ class GrantAccess
         return static::$instance;
     }
 
-    public function getMenu($menu)
+    public function getMenu(string $menu)
     {
         $menuAry = [];
-        $menu_file = file_get_contents(APP . $menu . '.json');
-        $acl = json_decode($menu_file, true);
-        foreach ($acl as $key => $val) {
+        $menu = $this->fileSystem->get(APP, $menu . '.json');
+        $menu = $this->accountIsVerified($menu);
+        foreach ($menu as $key => $val) {
             if (is_array($val)) {
                 $sub = [];
                 foreach ($val as $k => $v) {
@@ -36,7 +42,7 @@ class GrantAccess
                         $sub[$k] = '';
                         continue;
                     }
-                    if ($finalVal = self::get_link($v)) {
+                    if ($finalVal = $this->get_link($v)) {
                         $sub[$k] = $finalVal;
                     }
                 }
@@ -44,7 +50,7 @@ class GrantAccess
                     $menuAry[$key] = $sub;
                 }
             } else {
-                if ($finalVal = self::get_link($val)) {
+                if ($finalVal = $this->get_link($val)) {
                     $menuAry[$key] = $finalVal;
                 }
             }
@@ -52,21 +58,34 @@ class GrantAccess
         return $menuAry;
     }
 
+    private function accountIsVerified(array $acl) : array
+    {
+        if ($this->session->exists(CURRENT_USER_SESSION_NAME)) {
+            $session_values = $this->session->get(CURRENT_USER_SESSION_NAME);
+            if (array_key_exists('verified', $session_values)) {
+                if ($session_values['verified'] > 0) {
+                    if (array_key_exists('Confirmez votre compte', $acl['log_reg_menu'])) {
+                        unset($acl['log_reg_menu']['Confirmez votre compte']);
+                    }
+                }
+            }
+        }
+        return $acl;
+    }
+
     private function hasAccess($controller, $method = 'index')
     {
-        $acl = self::$container->make(FilesSyst::class)->get(APP, 'acl.json');
         $current_user_acls = ['Guest'];
         $grantAccess = false;
-        $session = self::$container->make(SessionInterface::class);
-        if ($session->exists(CURRENT_USER_SESSION_NAME) && self::$loggedInUser != null) {
+        if ($this->session->exists(CURRENT_USER_SESSION_NAME) && $this->loggedInUser != null) {
             $current_user_acls[] = 'LoggedIn';
-            foreach (self::$aclGroup as $a) {
+            foreach ($this->aclGroup as $a) {
                 $current_user_acls[] = $a;
             }
         }
         foreach ($current_user_acls as $level) {
-            if (array_key_exists($level, $acl) && array_key_exists($controller, $acl[$level])) {
-                if (in_array($method, $acl[$level][$controller]) || in_array('*', $acl[$level][$controller])) {
+            if (array_key_exists($level, $this->acl) && array_key_exists($controller, $this->acl[$level])) {
+                if (in_array($method, $this->acl[$level][$controller]) || in_array('*', $this->acl[$level][$controller])) {
                     $grantAccess = true;
                     break;
                 }
@@ -74,7 +93,7 @@ class GrantAccess
         }
         // Checck for denied
         foreach ($current_user_acls as $level) {
-            $denied = $acl[$level]['denied'];
+            $denied = $this->acl[$level]['denied'];
             if (!empty($denied) && array_key_exists($controller, $denied) && in_array($method, $denied[$controller])) {
                 $grantAccess = false;
                 break;
@@ -88,7 +107,7 @@ class GrantAccess
         if (preg_match('/https?:\/\//', $route) == 1) {
             return $route;
         } else {
-            if ($this->hasAccess(get_class(self::$container->make('controller')), self::$container->make('method'))) {
+            if ($this->hasAccess(get_class($this->container->make('controller')), $this->container->make('method'))) {
                 return $route;
             }
             return false;

@@ -12,6 +12,7 @@ class Model extends AbstractModel
     protected ModelHelper $helper;
     protected SessionInterface $session;
     protected CookieInterface $cookie;
+    protected CacheInterface $cache;
     protected Token $token;
     protected RequestHandler $request;
     protected ResponseHandler $response;
@@ -39,7 +40,6 @@ class Model extends AbstractModel
         $this->throwException($tableSchema, $tableSchemaID);
         $this->tableSchema = $tableSchema;
         $this->tableSchemaID = $tableSchemaID;
-        $this->_matchingTestColumn = $matchingTestCol;
         $this->properties();
         $this->_modelName = $this::class;
     }
@@ -47,6 +47,24 @@ class Model extends AbstractModel
     public function guardedID(): array
     {
         return [];
+    }
+
+    public function getTableName() : string
+    {
+        return $this->tableSchema;
+    }
+
+    public function getLastID() : int
+    {
+        if (isset($this->_lasID)) {
+            return $this->_lasID;
+        }
+    }
+
+    public function setLastID(int $lastID) : self
+    {
+        $this->_lasID = $lastID;
+        return $this;
     }
 
     /**
@@ -111,7 +129,7 @@ class Model extends AbstractModel
 
     public function validator(array $items = []) : void
     {
-        $this->validator->forms($items, $this);
+        $this->validator->validate($items, $this);
     }
 
     public function count() : int
@@ -194,6 +212,11 @@ class Model extends AbstractModel
         return $this->entity;
     }
 
+    public function getMoney() : MoneyManager
+    {
+        return $this->money;
+    }
+
     /**
      * Set the value of entity.
      *
@@ -236,20 +259,21 @@ class Model extends AbstractModel
         $props = array_merge(['entity' => str_replace(' ', '', ucwords(str_replace('_', ' ', $this->tableSchema))) . 'Entity'], YamlFile::get('model_properties'));
         foreach ($props as $prop => $class) {
             if (property_exists($this, $prop)) {
-                if ($prop === 'queryParams') {
-                    $this->{$prop} = $this->container->make($class, [
+                $this->{$prop} = match ($prop) {
+                    'queryParams' => $this->container->make($class, [
                         'tableSchema' => $this->tableSchema,
-                    ]);
-                } elseif ($prop === 'repository') {
-                    $this->{$prop} = $this->container->make($class, [
+                    ]),
+                    'repository' => $this->container->make($class, [
                         'crudIdentifier' => 'crudIdentifier',
                         'tableSchema' => $this->tableSchema,
                         'tableSchemaID' => $this->tableSchemaID,
                         'entity' => $this->entity,
-                    ])->create();
-                } else {
-                    $this->{$prop} = $this->container->make($class);
-                }
+                    ])->create(),
+                    'validator' => $this->container->make($class, [
+                        'validator' => YamlFile::get('validator'),
+                    ]),
+                    default => $this->container->make($class)
+                };
             }
         }
     }

@@ -14,26 +14,27 @@ class FormBuilder extends AbstractFormBuilder
     protected bool $addCsrf = true;
     protected string $element = '';
     protected string $template;
+    protected CoreError $error;
+    protected RequestHandler $request;
+    protected Token $token;
+    protected GlobalVariablesInterface $globals;
     private object|null $dataRepository = null;
     private ContainerInterface $container;
+    private FormHelper $formHelper;
 
     /**
      * Main class constructor.
      *
      * @return void
      */
-    public function __construct(protected CoreError $error, protected RequestHandler $request, protected Token $token, protected GlobalVariablesInterface $globals)
+    public function __construct()
     {
-        $this->container = Container::getInstance();
-        $path = FILES . 'Template' . DS . 'Users' . DS . 'Auth' . DS . $this::class . 'Template.php';
-        if (file_exists($path)) {
-            $this->template = file_get_contents($path);
-        }
+        $this->properties();
     }
 
     public function __toString() : string
     {
-        return sprintf('%s', $this->processformFields());
+        return sprintf('%s', $this->processform());
     }
 
     /**
@@ -104,7 +105,7 @@ class FormBuilder extends AbstractFormBuilder
         $this->htmlAttr($args);
         $this->element .= $this->begin();
         $this->element .= PHP_EOL;
-        $this->element .= $this->processformFields();
+        $this->element .= $this->processform();
         $this->element .= PHP_EOL;
         $this->element .= $this->end();
         if (isset($this->element) && !empty($this->element)) {
@@ -133,7 +134,7 @@ class FormBuilder extends AbstractFormBuilder
         return sprintf('<form %s>', $this->renderHtmlElement($this->formAttr)) . PHP_EOL . $alertHtml;
     }
 
-    public function processformFields() : string
+    public function processform() : string
     {
         $fields = '';
         if (is_array($this->inputObject)) {
@@ -161,13 +162,7 @@ class FormBuilder extends AbstractFormBuilder
      */
     public function csrfForm(mixed $lock = null): string
     {
-        // static $addCsrf;
-        // if ($addCsrf === null) {
-        //     $addCsrf = new AntiCSRF();
-        // }
-
-        // return $addCsrf->insertToken($lock, false);
-        return FH::csrfInput('csrftoken', $this->token->generate_token(8, $lock));
+        return $this->token->csrfInput('csrftoken', $lock);
     }
 
     /**
@@ -312,6 +307,16 @@ class FormBuilder extends AbstractFormBuilder
                 throw new FormBuilderUnexpectedValueException('Invalid Data');
             }
         }
+    }
+
+    private function properties()
+    {
+        $this->container = Container::getInstance();
+        $this->error = $this->container->make(CoreError::class);
+        $this->token = $this->container->make(Token::class);
+        $this->request = $this->container->make(RequestHandler::class);
+        $this->globals = $this->container->make(GlobalVariablesInterface::class);
+        $this->formHelper = $this->container->make(FormHelper::class);
     }
 
     /**

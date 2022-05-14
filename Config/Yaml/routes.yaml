@@ -1,46 +1,80 @@
 get: # Http Get ===========================================
-  "/":
+  /:
     controller: home
     method: index
     namespace: Client
-  "home":
+
+  home:
     controller: home
     method: index
     namespace: Client
-  "learn":
+
+  learn:
     controller: learning
     method: index
     namespace: Client
+
   login:
     controller: security
     method: login
     namespace: Client
+
+  verify_email:
+    controller: verify_user_account
+    method: index
+    namespace: Client
+
   assets:
     controller: assets
     method: get_asset
     namespace: Client
+
+  email:
+    controller: emailing
+    method: email
+    namespace: Client
+
   admin/{controller}/{method}:
     namespace: Admin
+
   admin/{controller}/{method}/{id:[\da-f]+}:
     namespace: Admin
+
   client/{controller}/{method}:
-    namespace: Client
+    namespace: Admin
+
   client/{controller}/{method}/{id:[\da-f]+}:
-    namespace: Client
-  test: errors
+    namespace: Admin
+
 post: # Http Post method =========================================================
   visitors:
     controller: visitors
     method: track
+
   ajaxLogin:
-    controller: login_with_ajax
+    controller: login_user_with_ajax
     method: index
+
   ajaxlogout:
-    controller: logout_with_ajax
+    controller: logout_user_with_ajax
     method: index
+
   ajaxRegister:
-    controller: register_with_ajax
+    controller: register_user_with_ajax
     method: index
+
+  forgotPassword:
+    controller: forgot_password_ajax
+    method: index
+
+  verify:
+    controller: verify_user_account
+    method: verify
+
   remember_me:
     controller: auth
     method: remember_check
+
+  activation/activate/{token:[\da-f]+}:
+    controller: activate_user_with_ajax
+    method: activate

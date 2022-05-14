@@ -3,6 +3,7 @@
     "denied": {
       "AdminController": ["*"]
     },
+    "VerifyUserAccountController": ["*"],
     "HomeController": ["*"],
     "ErrorsController": ["*"],
     "ClothingController": ["*"],

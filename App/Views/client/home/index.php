@@ -6,15 +6,27 @@ $this->start('head'); ?>
 <?php $this->start('body'); ?>
 <!-- Start Main -->
 <main id="main-site">
-    <?=$table?>
-    <?=$pagination?>
-    <div id="special-price">
-        <div class="grid">
-            <div class="grid-item">
-                <img alt="">
-            </div>
-        </div>
-    </div>
+    <!-- Owl carousel -->
+    <?php require_once 'partials/_banner_area.php'?>
+    <!-- End Owl carousel -->
+    <!-- Top Sales -->
+    <?php require_once 'partials/_top_sales.php'?>
+    <!-- End top Sales -->
+
+    <!-- Special price -->
+    <?php require_once 'partials/_special_price.php'?>
+    <!-- End Special price -->
+
+    <!-- Banner Adds -->
+    <?php require_once 'partials/_banner_adds.php'?>
+    <!-- End Banner Adds -->
+
+    <!-- New Phones -->
+    <?php require_once 'partials/_new_products.php'?>
+    <!-- End New Phones -->
+
+    <!-- Blog -->
+    <?php require_once 'partials/_blog.php'?>
     <!-- End blog -->
     <input type="hidden" id="ip_address" style="display:none" value="<?=H_visitors::getIP()?>">
 </main>

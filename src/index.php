@@ -24,6 +24,6 @@ try {
         ->setContainerProviders(YamlFile::get('providers'))
         ->setThemeBuilder(YamlFile::get('app')['theme_builder'], true)
         ->run();
-} catch (Exception $e) {
-    throw new BaseResourceNotFoundException($e->getMessage());
+} catch (\Throwable $e) {
+    throw new BaseResourceNotFoundException($e->getMessage(), $e->getCode());
 }

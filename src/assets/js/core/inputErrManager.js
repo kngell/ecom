@@ -15,14 +15,19 @@ class Input_Manager {
     var arrErr = [];
     for (const [key, value] of Object.entries(InputErr)) {
       if (key == "terms") {
-        var div = document.createElement("div");
-        div.classList.add("invalid-feedback");
-        div.innerHTML = value;
         const terms = document.getElementById(key);
-        eL.upToTag(terms, "label").appendChild(div);
+        var div = eL
+          .uPToClass(terms, "input-box")
+          .querySelector(".invalid-feedback");
+        div.classList.add("form-text", "d-block");
+        div.innerHTML = value;
+      } else {
+        var input = form.find("#" + key).addClass("is-invalid");
+        input
+          .parents(".input-box")
+          .children("div.invalid-feedback")
+          .html(value);
       }
-      var input = form.find("#" + key).addClass("is-invalid");
-      input.parents(".input-box").children("div.invalid-feedback").html(value);
       arrErr.push(key);
     }
 

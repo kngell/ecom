@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-abstract class AbstractView implements ViewInterface
+abstract class AbstractView
 {
     protected string  $page_title;
     protected string $_siteTitle = SITE_TITLE;
     protected string $_layout = DEFAULT_LAYOUT;
     protected string $file_path;
     protected mixed $view_data;
+    protected bool $webView = true;
 
     /**
      * Set Site titile.
@@ -31,6 +32,12 @@ abstract class AbstractView implements ViewInterface
     public function layout(string $path) : self
     {
         $this->_layout = $path;
+        return $this;
+    }
+
+    public function webView(bool $wv) : self
+    {
+        $this->webView = $wv;
         return $this;
     }
 

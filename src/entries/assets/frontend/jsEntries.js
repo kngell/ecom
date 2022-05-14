@@ -15,5 +15,10 @@ module.exports = {
       import: ["js/custom/client/home/index"],
       dependOn: "js/librairies/frontlib",
     },
+    //Ecommerce - Validate user account
+    "js/custom/client/users/account/validate": {
+      import: ["js/custom/client/users/account/validate"],
+      dependOn: "js/librairies/frontlib",
+    },
   },
 };

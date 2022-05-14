@@ -37,13 +37,12 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     public function bind($param, $value, $type = null)
     {
         try {
-            $type = match ($type === null) {
+            $this->_query->bindValue($param, $value, $type === null ? match (true) {
                 is_int($value) => PDO::PARAM_INT,
                 is_bool($value) => PDO::PARAM_BOOL,
                 $value === null => PDO::PARAM_NULL,
                 default => PDO::PARAM_STR
-            };
-            $this->_query->bindValue($param, $value, $type);
+            } : $type);
         } catch (\Throwable $ex) {
             throw new DataMapperExceptions($ex->getMessage(), $ex->getCode());
         }

@@ -67,8 +67,7 @@ class Rooter implements RooterInterface
     /** @inheritDoc */
     public function resolve(string $url): self
     {
-        list($controllerString) = $this->resolveWithException($this->helper->formatQueryString(strtolower($url)));
-        $method = $this->createMethod();
+        list($controllerString, $method) = $this->resolveWithException($this->helper->formatQueryString(strtolower($url)));
         $controllerObject = $this->controllerObject($controllerString, $method);
         if (preg_match('/method$/i', $method) == 0) {
             if (YamlFile::get('app')['system']['use_resolvable_method'] === true) {
@@ -167,16 +166,9 @@ class Rooter implements RooterInterface
         return $controllerName;
     }
 
-    private function createMethod(): string
-    {
-        $method = $this->params['method'];
-        return Stringify::camelCase($method);
-    }
-
     private function resolveWithException(string $url): array
     {
         $url = $this->parseUrl($url);
-        //$this->getMatchRoute($url, $this->routes[$this->request->getMethod()])
         if (!$this->getMatchRoute($url, $this->routes[$this->request->getMethod()])) {
             http_response_code(404);
             throw new RouterNoRoutesFound('Route ' . $url . ' does not match any valid route.', 404);
@@ -184,6 +176,12 @@ class Rooter implements RooterInterface
         if (!class_exists($controller = $this->createController())) {
             throw new RouterBadFunctionCallException('Class ' . $controller . ' does not exists.');
         }
-        return [$controller];
+        return [$controller, $this->createMethod()];
+    }
+
+    private function createMethod(): string
+    {
+        $method = $this->params['method'];
+        return Stringify::camelCase($method);
     }
 }

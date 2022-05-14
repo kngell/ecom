@@ -94,7 +94,7 @@ class AuthController extends Controller
                     }
                 } else {
                     $newKeys = ['email' => 'forgot_email'];
-                    $this->jsonResponse(['result' => 'error-field', 'msg' => $this->request->transform_keys($this->model_instance->getErrorMessages(), $newKeys)]);
+                    $this->jsonResponse(['result' => 'error-field', 'msg' => $this->response->transform_keys($this->model_instance->getErrorMessages(), $newKeys)]);
                 }
             } else {
                 $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Invalid Token! Please try again')]);
@@ -143,7 +143,7 @@ class AuthController extends Controller
                     }
                 } else {
                     $newKeys = ['password' => 'r_password', 'cpassword' => 'r_cpassword'];
-                    $this->jsonResponse(['result' => 'error-field', 'msg' => $this->request->transform_keys($this->model_instance->getErrorMessages(), $newKeys)]);
+                    $this->jsonResponse(['result' => 'error-field', 'msg' => $this->response->transform_keys($this->model_instance->getErrorMessages(), $newKeys)]);
                 }
             } else {
                 $this->jsonResponse(['result' => 'error', 'msg' => FH::showMessage('danger text-center', 'Invalid Token! Please try again')]);
@@ -226,7 +226,7 @@ class AuthController extends Controller
                         }
                     } else {
                         $newKeys = ['email' => 'reg_email', 'password' => 'pass', 'cpassword' => 'cpass'];
-                        $this->jsonResponse(['result' => 'error-field', 'msg' => $this->request->transform_keys($model->getErrorMessages(), $newKeys)]);
+                        $this->jsonResponse(['result' => 'error-field', 'msg' => $this->response->transform_keys($model->getErrorMessages(), $newKeys)]);
                     }
                 } else {
                     $this->jsonResponse(['result' => 'error-field', 'msg' => $file['msg']]);
@@ -408,7 +408,7 @@ class AuthController extends Controller
                     }
                 } else {
                     $newKeys = ['password' => 'password_ch'];
-                    $this->jsonResponse(['result' => 'error-field', 'msg' => $this->request->transform_keys($this->model_instance['users']->getErrorMessages(), $newKeys)]);
+                    $this->jsonResponse(['result' => 'error-field', 'msg' => $this->response->transform_keys($this->model_instance['users']->getErrorMessages(), $newKeys)]);
                 }
             } else {
             }

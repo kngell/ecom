@@ -3,6 +3,8 @@
 declare(strict_types=1);
 class NotFoundException extends Exception
 {
-    protected $message = 'Page not Found';
-    protected $code = 404;
+    public function __construct(string $message = 'Page not Found', int $code = 404, ?Exception $previous = null)
+    {
+        parent::__construct($message, $code, $previous);
+    }
 }

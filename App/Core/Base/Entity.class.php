@@ -49,17 +49,22 @@ abstract class Entity
         return $this->reflectionInstance()->getProperty($field)->getName();
     }
 
-    public function getColId() :  string
+    public function getColId(string $withDocComment = 'id') :  string
     {
         $props = $this->getAllAttributes();
         foreach ($props as $field) {
             $docs = $this->getPropertyComment($field);
-            if ($docs == 'id') {
+            if ($docs == $withDocComment) {
                 return $field;
                 exit;
             }
         }
         return '';
+    }
+
+    public function getField(string $withDocComment) : string
+    {
+        return $this->getColID($withDocComment);
     }
 
     public function getPropertyComment(string $field) : string

@@ -8,7 +8,7 @@ class UploadHelper
     {
     }
 
-    public function upload(array $path, array $file)
+    public function saveFile(array $path, array $file) : string
     {
         $targetDir = $path[1];
         //filename
@@ -37,7 +37,7 @@ class UploadHelper
         // return md5(rand('image')) . '.' . $ext;
     }
 
-    public function upload_files($files, $model)
+    public function upload($files, $model) : array
     {
         $paths = [];
         $status = [];
@@ -99,7 +99,6 @@ class UploadHelper
             $status['url'] = $model->$media != '' ? $model->$media : '';
             $arr_file = [];
             $path_dir = '';
-
             return $status;
         }
         //Validate type

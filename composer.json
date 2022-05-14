@@ -11,6 +11,7 @@
   "readme": "",
   "time": "",
   "support": {
+    "email": "paracyrius@gmail.com",
     "issues": "https://github.com/kngell/ecom/issues",
     "source": "https://github.com/kngell/ecom",
     "wiki": "https://github.com/kngell/ecom/wiki"
@@ -42,8 +43,10 @@
     "stripe/stripe-php": "^7.97",
     "phpmailer/phpmailer": "^6.5",
     "sendgrid/sendgrid": "^7.9",
-    "paragonie/anti-csrf": "^2.3",
-    "symfony/http-foundation": "^6.0"
+    "symfony/http-foundation": "^6.0",
+    "symfony/console": "^5.3",
+    "tijsverkoyen/css-to-inline-styles": "^2.2",
+    "pelago/emogrifier": "^6.0"
   },
   "require-dev": {
     "symfony/var-dumper": "^6.0",

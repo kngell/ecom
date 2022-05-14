@@ -19,6 +19,7 @@ class UsersEntity extends Entity
     private DateTimeInterface $registerDate;
     /** @var DateTimeInterface */
     private DateTimeInterface $updateAt;
+    /** @media */
     private string $profileImage;
     private string $salt;
     private string $token;
@@ -32,6 +33,7 @@ class UsersEntity extends Entity
     private int $verified;
     private string $fb_access_token;
     private string $terms;
+    private string $cpassword;
 
     public function __construct()
     {
@@ -391,9 +393,12 @@ class UsersEntity extends Entity
         return $this;
     }
 
-    public function delete(string $field) : void
+    public function delete(string $field) : self
     {
-        unset($this->$field);
+        if (isset($this->$field)) {
+            unset($this->$field);
+        }
+        return $this;
     }
 
     /**
@@ -413,6 +418,25 @@ class UsersEntity extends Entity
     {
         $this->terms = $terms;
 
+        return $this;
+    }
+
+    /**
+     * Get the value of cpassword.
+     */
+    public function getCpassword()
+    {
+        return $this->cpassword;
+    }
+
+    /**
+     * Set the value of cpassword.
+     *
+     * @return  self
+     */
+    public function setCpassword($cpassword)
+    {
+        $this->cpassword = $cpassword;
         return $this;
     }
 }

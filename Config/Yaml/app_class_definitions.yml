@@ -1,0 +1,43 @@
+singleton:
+  GlobalVariablesInterface: GlobalVariables
+  GlobalManagerInterface: GlobalManager
+  SessionEnvironment: SessionEnvironment
+  SessionStorageInterface: NativeSessionStorage
+  SessionInterface: Session
+  ResponseHandler: ResponseHandler
+  RequestHandler: RequestHandler
+  Token: Token
+  Sanitizer: Sanitizer
+  MoneyManager: MoneyManager
+  RooterInterface: Rooter
+  CookieStoreInterface: NativeCookieStore
+  CookieInterface: Cookie
+  CacheEnvironmentConfigurations: CacheEnvironmentConfigurations
+  CacheStorageInterface: NativeCacheStorage
+  CacheInterface: Cache
+  LoggerHandlerInterface: NativeLoggerHandler
+  LoggerInterface: Logger
+  LoggerFactory: LoggerFactory
+  LoginForm: LoginForm
+  RegisterForm: RegisterForm
+  DispatcherInterface: Dispatcher
+  MailerInterface: Mailer
+  DataMapperEnvironmentConfig: DataMapperEnvironmentConfig
+  DataMapperInterface: DataMapper
+  QueryBuilderInterface: QueryBuilder
+  DatabaseConnexionInterface: DatabaseConnexion
+  FilesSystemInterface: FileSystem
+  UploaderInterface: Uploader
+  EventDispatcherInterface: EventDispatcher
+  ListenerProviderInterface: ListenerProvider
+
+dataAccessLayerClass:
+  EntityManagerInterface: EntityManager
+  RepositoryInterface: Repository
+  DataAccessLayerManager: DataAccessLayerManager
+  QueryParamsInterface: QueryParamsInterface
+  CrudInterface: Crud
+
+bindedClass:
+  QueryParamsInterface: QueryParams
+  View: View

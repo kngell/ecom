@@ -1,0 +1,10 @@
+required: RequireValidator
+min: MinValidator
+max: MaxValidator
+valid_email: ValidEmailValidator
+is_numeric: NumericValidator
+matches: MatchesValidator
+unique: UniqueValidator
+Valid_string: ValidStringValidator
+Valid_password: ValidPasswordValidator
+Valid_domain: ValidDomainValidator

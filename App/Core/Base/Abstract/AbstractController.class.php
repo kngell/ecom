@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-abstract class AbstractController implements ControllerInterface
+abstract class AbstractController
 {
     protected array $middlewares = [];
     protected ContainerInterface $container;
+    protected View $view_instance;
 
     public function registerMiddleware(BaseMiddleWare $middleware) : void
     {
@@ -23,12 +24,21 @@ abstract class AbstractController implements ControllerInterface
         return $this;
     }
 
-    public function siteTitle(?string $title = null) : ViewInterface
+    public function siteTitle(?string $title = null) : View
     {
         if ($this->view_instance === null) {
             throw new BaseLogicException('You cannot use the render method if the View is not available !');
         }
         return $this->view_instance->siteTitle($title);
+    }
+
+    public function setLayout(string $layout) : self
+    {
+        if ($this->view_instance === null) {
+            throw new BaseLogicException('View doest not exist !');
+        }
+        $this->view_instance->layout($layout);
+        return $this;
     }
 
     public function pageTitle(?string $page = null)
@@ -39,7 +49,7 @@ abstract class AbstractController implements ControllerInterface
         return $this->view_instance->pageTitle($page);
     }
 
-    public function getView() : ViewInterface
+    public function getView() : View
     {
         if (!isset($this->view_instance)) {
             $this->filePath = !isset($this->filePath) ? $this->container->make('ControllerPath') : $this->filePath;

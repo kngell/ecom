@@ -37,11 +37,9 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     public function __construct()
     {
-        // parent::__construct($this);
+        $this->properties();
         $this->registerBaseBindings();
         $this->registerBaseAppSingleton();
-        $this->request = $this->make(RequestHandler::class);
-        $this->response = $this->make(ResponseHandler::class);
     }
 
     public function run(?string $url = null)
@@ -522,7 +520,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     protected function registeredClass()
     {
-        $objs = array_merge(AppHelper::dataAccessLayerClass(), AppHelper::bindedClass());
+        $objs = array_merge($this->helper->dataAccessLayerClass(), $this->helper->bindedClass());
         if (is_array($objs)) {
             foreach ($objs as $obj => $value) {
                 $this->bind($obj, $value);
@@ -537,7 +535,7 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     protected function registerBaseAppSingleton()
     {
-        $objs = AppHelper::singleton();
+        $objs = $this->helper->singleton();
         if (is_array($objs)) {
             foreach ($objs as $obj => $value) {
                 $this->singleton($obj, $value);
@@ -566,187 +564,4 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
     {
         $this->instance('path.appRoot', $this->getPath());
     }
-    // /**
-    //  * Set the base path for the application.
-    //  *
-    //  * @param  string  $basePath
-    //  * @return self
-    //  */
-    // public function setAppRoot($appRoot) : self
-    // {
-    //     self::$appRoot = rtrim($appRoot, '\/');
-    //     $this->bindPathsInContainer();
-    //     return $this;
-    // }
-
-    // /**
-    //  * Get the base path of the Laravel installation.
-    //  *
-    //  * @param  string  $path Optionally, a path to append to the base path
-    //  * @return string
-    //  */
-    // public function getAppRoot($path = '')
-    // {
-    //     return self::$appRoot . ($path ? DIRECTORY_SEPARATOR . $path : $path);
-    // }
-    // /**
-    //  * Run
-    //  * =========================================================.
-    //  * @return self|null
-    //  */
-    // public function run() : ?self
-    // {
-    //     try {
-    //         if (version_compare($phpVersion = PHP_VERSION, $coreVersion = Config::APP_MIN_VERSION, '<')) {
-    //             die(sprintf('You are running php %s, but, the core framwork required at least PHP %s', $phpVersion, $coreVersion));
-    //         }
-    //         $this->registerDatabaseAccessLayerClass();
-    //         $this->rooter = $this->make(RooterFactory::class)->create($this->request, $this->response, YamlFile::get('routes'))
-    //             ->buildRoutes()
-    //             ->resolve();
-    //         return $this;
-    //     } catch (\Exception $e) {
-    //         $this->response->setStatusCode($e->getCode());
-    //         $this->make(ErrorsController::class)->iniParams(ErrorsController::class, 'index', [], 'Client/')
-    //             ->index(['exception' => $e]);
-    //         return null;
-    //     }
-    // }
-
-    // public function setConst() : self
-    // {
-    //     $this->make(ConstantConfig::class)->ds()->appConstants(self::$appRoot)->rootPath();
-    //     return $this;
-    // }
-
-    // public function getRequest() : RequestHandler
-    // {
-    //     return $this->request;
-    // }
-
-    // public function getResponse() : ResponseHandler
-    // {
-    //     return $this->response;
-    // }
-
-    // public function registerAccessLayerClass()
-    // {
-    //     $dataMapperEnvConfig = $this->singleton(DataMapperEnvironmentConfig::class, fn () => new DataMapperEnvironmentConfig(YamlFile::get('database')))->make(DataMapperEnvironmentConfig::class);
-    //     $credentials = $dataMapperEnvConfig->getDatabaseCredentials('mysql');
-    //     $this->singleton(DatabaseConnexionInterface::class, fn () => new DatabaseConnexion($credentials));
-    //     $this->singleton(DataMapper::class, fn () => new DataMapper($this->make(DatabaseConnexionInterface::class)));
-    //     $this->singleton(QueryBuilder::class, fn () => new QueryBuilder());
-    //     $this->bind(DataMapperInterface::class, fn () => $this->make(DataMapper::class));
-    //     $this->bind(QueryBuilderInterface::class, fn () => $this->make(QueryBuilder::class));
-    //     $this->bind(EntityManagerFactory::class);
-    //     $this->singleton(DataMapperFactory::class, fn () => new DataMapperFactory($dataMapperEnvConfig));
-    //     $this->bind(RepositoryInterface::class, fn () => $this->make(Repository::class));
-    //     $this->bind(RepositoryFactory::class, fn () => new RepositoryFactory($dataMapperEnvConfig));
-    // }
-
-    // /**
-    //  * Determine if the given abstract type has been bound.
-    //  *
-    //  * @param  string  $abstract
-    //  * @return bool
-    //  */
-    // public function bound($abstract)
-    // {
-    //     return $this->isDeferredService($abstract) || parent::bound($abstract);
-    // }
-
-    // /**
-    //  * Determine if the given service is a deferred service.
-    //  *
-    //  * @param  string  $service
-    //  * @return bool
-    //  */
-    // public function isDeferredService($service)
-    // {
-    //     return isset($this->deferredServices[$service]);
-    // }
-
-    // public function setrouteHandler(?string $url = null) : self
-    // {
-    //     try {
-    //         $this->rooter = $this->make(RooterFactory::class)->create(YamlFile::get('routes'))
-    //             ->buildRoutes()
-    //             ->revolve();
-    //     } catch (\Exception $e) {
-    //         $this->make(ResponseHandler::class)->setStatusCode($e->getCode());
-    //         $this->make(ErrorsController::class)->iniParams(ErrorsController::class, 'index', [], 'Client/')
-    //             ->index(['exception' => $e]);
-    //     }
-    //     return $this;
-    // }
-
-    // public function handleCors()
-    // {
-    //     $this->make(Cors::class)->handle();
-    //     return $this;
-    // }
-
-    // /**
-    //  * Register the basic bindings into the container.
-    //  *
-    //  * @return void
-    //  */
-    // protected function registerBaseBindings()
-    // {
-    //     static::setInstance($this);
-    //     $this->instance('app', $this);
-    //     $this->instance(Container::class, $this);
-    // }
-
-    // // public function registerMiddleware(BaseMiddleWare $middleware) : void
-    // // {
-    // //     $this->middlewares[] = $middleware;
-    // // }
-
-    // /**
-    //  * Register the basic bindings into the container.
-    //  *
-    //  * @return void
-    //  */
-    // protected function registerBaseAppSingleton()
-    // {
-    //     $objs = AppHelper::singleton(self::$instance);
-    //     if (is_array($objs)) {
-    //         foreach ($objs as $obj => $value) {
-    //             $this->singleton($obj, $value);
-    //         }
-    //     }
-    // }
-
-    // /**
-    //  * Bind all of the application paths in the container.
-    //  *
-    //  * @return void
-    //  */
-    // protected function bindPathsInContainer()
-    // {
-    //     $this->instance('path.appRoot', $this->getAppRoot());
-    // }
-
-    // /**
-    //  * Environnement
-    //  * =======================================================.
-    //  * @return void
-    //  */
-    // private function environment()
-    // {
-    //     ini_set('default_charset', 'UTF-8');
-    // }
-
-    // /**
-    //  * ErrorHandler
-    //  * =======================================================.
-    //  * @return void
-    //  */
-    // private function errorHandler() : void
-    // {
-    //     error_reporting(E_ALL | E_STRICT);
-    //     set_error_handler('ErroHandling::errorHandler');
-    //     set_exception_handler('ErroHandling::exceptionHandler');
-    // }
 }

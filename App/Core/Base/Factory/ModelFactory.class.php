@@ -9,10 +9,10 @@ class ModelFactory
     {
     }
 
-    public function create(string $modelString) : ModelInterface
+    public function create(string $modelString) : Model
     {
         $modelObject = $this->container->make($modelString);
-        if (!$modelObject instanceof ModelInterface) {
+        if (!$modelObject instanceof Model) {
             throw new BadControllerExeption($modelString . ' is not a valid Model');
         }
         $this->container->bind($modelString, fn () => $modelObject);

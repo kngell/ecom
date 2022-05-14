@@ -10,6 +10,7 @@
     "Mon compte": "account/account",
     "Espace admin": "admin",
     "separator": "",
+    "Confirmez votre compte": "verify_email",
     "Logout": "logout"
   }
 }

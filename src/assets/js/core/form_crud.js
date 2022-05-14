@@ -70,6 +70,7 @@ export function Call_controller(data, gestion) {
       gestion(response, data.params ? data.params : "");
     },
     error: function (request, status, error) {
+      $("#alertErr").html(request.responseText);
       console.log(request.responseText, error);
     },
   });

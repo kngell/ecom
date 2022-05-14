@@ -12,15 +12,14 @@
         <div class="font-rale font-size-14 left-side">
             <?=$this->search_box?>
             <div class="connect">
-                <?php if (AuthManager::currentUser() == null) : ?>
+                <?php if (!AuthManager::isLoggedIn()) : ?>
                 <button type="button" class="px-3 border-right border-left text-dark connexion text-decoration-none"
                     data-bs-toggle="modal" data-bs-target="#login-box" id="login_btn">
                     <span class="icon login"></span>&nbsp;&nbsp;Login</button>
                 <?php else : ?>
                 <a class="dropdown-toggle px-3 border-right border-left text-dark connexion text-decoration-none"
                     id="navbarDropdownMenuLink" data-bs-toggle="dropdown" role="button">
-                    <span
-                        class="icon login"></span>&nbsp;&nbsp;<?= 'Bonjour&nbsp;' . AuthManager::currentUser()->getEntity()->{'getFirstName'}(); ?>
+                    <span class="icon login"></span>&nbsp;&nbsp;<?= 'Bonjour&nbsp;' . AuthManager::user(); ?>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <?php $drop = GrantAccess::getInstance()->getMenu('menu_acl')['log_reg_menu']?>
@@ -29,6 +28,12 @@
                     $active = ($v == H::currentPage()) ? 'active' : ''; ?>
                     <?php if ($k == 'separator') : ?>
                     <li role="separator" class="dropdown-divider"></li>
+                    <?php elseif ($k == 'Confirmez votre compte') : ?>
+                    <li class="dropdown-item nav-item <?= $active ?> alert alert-warning">
+                        <a class="nav-link text-danger" href="<?= ($k != 'Logout') ? $v : 'javascript:void(0)' ?>">
+                            <?= $k ?>
+                        </a>
+                    </li>
                     <?php else : ?>
                     <li class="dropdown-item nav-item <?= $active ?>">
                         <a class="nav-link" href="<?= ($k != 'Logout') ? $v : 'javascript:void(0)' ?>">
@@ -58,7 +63,7 @@
     <!-- Primary navigation -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="<?= PROOT ?>"><img src="../../../../../assets/img/logo1.png" alt="Logo"></a>
+            <a class="navbar-brand" href="/"><img src="../../../../../assets/img/logo1.png" alt="Logo"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-menu"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="bar"><i class="far fa-bars"></i></span>

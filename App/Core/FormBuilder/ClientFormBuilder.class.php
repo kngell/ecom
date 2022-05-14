@@ -7,9 +7,7 @@ class ClientFormBuilder extends FormBuilder
     /**
      * @var mixed
      */
-    protected mixed $repositoryObject;
-
-    protected string $repositoryObjectName;
+    protected ?RepositoryInterface $repositoryObject;
 
     /**
      * Main purpose of this constructor is to provide an easy way for us
@@ -20,17 +18,14 @@ class ClientFormBuilder extends FormBuilder
      *
      * @param string|null $repositoryObjectName - the name of the repository we want to instantiate
      */
-    public function setParams(?string $repositoryObjectName = null) : self
+    public function __construct(?Object $repository = null, ?string $templateName = null)
     {
-        if ($repositoryObjectName != null) {
-            $this->repositoryObjectName = $repositoryObjectName;
-            $repositoryObject = new $repositoryObjectName();
-            if (!$repositoryObject) {
-                throw new FormBuilderInvalidArgumentException('Invalid repository');
-            }
-            $this->repositoryObject = $repositoryObject;
-            return $this;
+        $this->repositoryObject = $repository;
+        $path = FILES . 'Template' . DS . 'Users' . DS . 'Auth' . DS . 'Forms' . DS . ($templateName ?? $this::class) . 'Template.php';
+        if (file_exists($path)) {
+            $this->template = file_get_contents($path);
         }
+        parent::__construct();
     }
 
     /**
@@ -41,7 +36,7 @@ class ClientFormBuilder extends FormBuilder
     public function hasRepo() : bool
     {
         if (!$this->repositoryObject) {
-            throw new FormBuilderInvalidArgumentException($this->repositoryObjectName . ' repository has returned null. Repository is only valid if your editing existing data.');
+            throw new FormBuilderInvalidArgumentException($this->repositoryObject::class . ' repository has returned null. Repository is only valid if your editing existing data.');
         }
         return true;
     }
@@ -56,6 +51,12 @@ class ClientFormBuilder extends FormBuilder
         if ($this->hasRepo()) {
             return $this->repositoryObject;
         }
+    }
+
+    public function setRepo(RepositoryInterface $repository) : self
+    {
+        $this->repositoryObject = $repository;
+        return $this;
     }
 
     /**

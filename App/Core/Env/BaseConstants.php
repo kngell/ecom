@@ -55,8 +55,8 @@ final class BaseConstants
         // -----------------------------------------------------------------------
         // URL ROOT
         // -----------------------------------------------------------------------
-        defined('URLROOT') or define('URLROOT', 'https://localhost' . US . 'kngell' . US);
-        defined('ASSET_SERVICE_PROVIDER') or define('ASSET_SERVICE_PROVIDER', 'https://localhost');
+        defined('HOST') or define('HOST', 'https://localhost:8001');
+        defined('URLROOT') or define('URLROOT', HOST . US . 'kngell' . US);
         // -----------------------------------------------------------------------
         // SITE NAME
         // -----------------------------------------------------------------------
@@ -107,6 +107,7 @@ final class BaseConstants
         defined('SMTP_FROM') or define('SMTP_FROM', 'admin@kngell.com');
         defined('SMTP_FROM_NAME') or define('SMTP_FROM_NAME', 'K\'nGELL Consulting & Services');
         defined('MAX_LOGIN_ATTEMPTS_PER_HOUR') or define('MAX_LOGIN_ATTEMPTS_PER_HOUR', 5);
+        defined('MAX_IMG_SIZE') or define('MAX_IMG_SIZE', 5 * 1024 * 1024);
         defined('MAX_EMAIL_VERIFICATION_PER_DAY') or define('MAX_EMAIL_VERIFICATION_PER_DAY', 3);
         defined('PASSWORD_RESET_REQUEST_EXPIRY_TIME') or define('PASSWORD_RESET_REQUEST_EXPIRY_TIME', 60 * 60);
         defined('MAX_PW_RESET_REQUESTS_PER_DAY') or define('MAX_PW_RESET_REQUESTS_PER_DAY', 3);

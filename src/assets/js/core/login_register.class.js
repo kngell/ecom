@@ -1,4 +1,3 @@
-import { BASE_URL } from "corejs/config";
 import { Call_controller } from "corejs/form_crud";
 import input from "corejs/inputErrManager";
 import { readurl } from "corejs/profile_img";
@@ -27,7 +26,6 @@ class Login_And_Register {
     this.bs_login_box = document.getElementById("login-box");
     this.bs_register_box = document.getElementById("register-box");
     this.bs_forgot_box = document.getElementById("forgot-box");
-    // this.login_modal = new modal(["login-box"])._init();
     this.logout = this.header.find("a:contains('Logout')");
   };
   /**
@@ -89,6 +87,9 @@ class Login_And_Register {
         input.reset_invalid_input(phpLR.forgotfrm);
       }
     });
+    phpLR.regfrm.on("click", "#terms", function (e) {
+      $(this).parents(".input-box").children(".invalid-feedback").empty();
+    });
     //Register form
     phpLR.regfrm.on("submit", function (e) {
       e.preventDefault();
@@ -111,6 +112,7 @@ class Login_And_Register {
           phpLR.regfrm.find("#regAlert").html(response.msg);
         } else {
           if (response.result == "error-field") {
+            console.log(response);
             input.error(phpLR.regfrm, response.msg);
           } else {
             phpLR.regfrm.find("#regAlert").html(response.msg);
@@ -167,7 +169,7 @@ class Login_And_Register {
       e.preventDefault();
       phpLR.forgotfrm.find("#forgot-btn").val("Please wait...");
       var data = {
-        url: "auth/forgotPassword",
+        url: "forgotPassword",
         frm: phpLR.forgotfrm,
         frm_name: "forgot-frm",
       };

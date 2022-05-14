@@ -43,30 +43,17 @@ class RandomStringGenerator
     protected function getRandomInteger($min, $max)
     {
         $range = ($max - $min);
-
         if ($range < 0) {
-            // Not so random...
             return $min;
         }
-
         $log = log($range, 2);
-
-        // Length in bytes.
         $bytes = (int) ($log / 8) + 1;
-
-        // Length in bits.
         $bits = (int) $log + 1;
-
-        // Set all lower bits to 1.
         $filter = (int) (1 << $bits) - 1;
-
         do {
             $rnd = hexdec(bin2hex(random_bytes($bytes)));
-
-            // Discard irrelevant bits.
             $rnd = $rnd & $filter;
         } while ($rnd >= $range);
-
         return $min + $rnd;
     }
 }

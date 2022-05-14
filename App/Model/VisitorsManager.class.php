@@ -33,7 +33,7 @@ class VisitorsManager extends Model
     {
         $attr = [];
         if (is_array($data) && count($data) > 0) {
-            $attr = $this->request->transform_keys($data, H_visitors::new_IpAPI_keys());
+            $attr = $this->response->transform_keys($data, H_visitors::new_IpAPI_keys());
         } else {
             $attr = ['ipAddress' => $data];
         }
@@ -60,9 +60,9 @@ class VisitorsManager extends Model
 
     private function updateVisitorInfos(Model $m, mixed $ipData = [])
     {
-        /** @var ModelInterface */
+        /** @var Model */
         $info = current($m->get_results());
-        $info->assign(array_merge($info->request->transform_keys(!is_array($ipData) ? ['ipAddress' => $ipData] : $ipData, H_visitors::new_IpAPI_keys()), (array) $info));
+        $info->assign(array_merge($info->response->transform_keys(!is_array($ipData) ? ['ipAddress' => $ipData] : $ipData, H_visitors::new_IpAPI_keys()), (array) $info));
         //$info->getQueryParams()->reset();
         if (!$update = $info->update()) {
             throw new BaseRuntimeException('Erreur lors de la mise à jour des données visiteur!');

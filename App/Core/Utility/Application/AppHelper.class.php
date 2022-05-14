@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 final class AppHelper
 {
-    public static function singleton()
+    public function singleton()
     {
         return [
             'GlobalVariablesInterface' => GlobalVariables::class,
+            'GlobalManagerInterface' => GlobalManager::class,
             'SessionEnvironment' => SessionEnvironment::class,
             'SessionStorageInterface' => NativeSessionStorage::class,
             'SessionInterface' => Session::class,
             'ResponseHandler' => ResponseHandler::class,
             'RequestHandler' => RequestHandler::class,
-            'View' => View::class,
             'Token' => Token::class,
             'Sanitizer' => Sanitizer::class,
             'MoneyManager' => MoneyManager::class,
@@ -29,30 +29,34 @@ final class AppHelper
             'LoginForm' => LoginForm::class,
             'RegisterForm' => RegisterForm::class,
             'DispatcherInterface' => Dispatcher::class,
-            'ViewInterface' => View::class,
             'MailerInterface' => Mailer::class,
             'DataMapperEnvironmentConfig' => DataMapperEnvironmentConfig::class,
             'DataMapperInterface' => DataMapper::class,
             'QueryBuilderInterface' => QueryBuilder::class,
             'DatabaseConnexionInterface' => DatabaseConnexion::class,
-            'CrudInterface' => Crud::class,
+            'FilesSystemInterface' => FileSystem::class,
+            'UploaderInterface' => Uploader::class,
+            'EventDispatcherInterface' => EventDispatcher::class,
+            'ListenerProviderInterface' => ListenerProvider::class,
         ];
     }
 
-    public static function dataAccessLayerClass()
+    public function dataAccessLayerClass()
     {
         return[
             'EntityManagerInterface' => EntityManager::class,
             'RepositoryInterface' => Repository::class,
             'DataAccessLayerManager' => DataAccessLayerManager::class,
             'QueryParamsInterface' => QueryParamsInterface::class,
+            'CrudInterface' => Crud::class,
         ];
     }
 
-    public static function bindedClass()
+    public function bindedClass()
     {
         return [
             'QueryParamsInterface' => QueryParams::class,
+            'View' => View::class,
         ];
     }
 }

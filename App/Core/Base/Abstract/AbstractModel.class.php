@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-abstract class AbstractModel implements ModelInterface
+abstract class AbstractModel
 {
     protected string $_modelName;
     protected QueryParams $queryParams;

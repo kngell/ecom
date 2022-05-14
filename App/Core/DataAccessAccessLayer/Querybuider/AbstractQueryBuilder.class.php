@@ -88,13 +88,20 @@ abstract class AbstractQueryBuilder
                 $braceClose = $withParams ? ') ' : '';
                 if (is_numeric($index)) {
                     $sql .= ' ' . $join_rule . ' ' . $all_tables[$index + 1];
-                    $sql .= ' ON ' . $braceOpen . '(' . $options['join_on'][$all_tables[$index + 1]][1] . ' = ' . $options['join_on'][$all_tables[$index + 1]][0] . ')';
+                    $i = count($options['join_on'][$all_tables[$index]]) - 1;
+                    $sql .= ' ON ' . $braceOpen . '(' . $options['join_on'][$all_tables[$index + 1]][0] . ' = ' . $options['join_on'][$all_tables[$index]][$i] . ')';
                 }
-                if ($withParams) {
-                    $params = $options['join_on'][$all_tables[$index + 1]]['params'];
-                    $args = $params[0];
-                    $sql .= ' ' . $params['separator'] . ' (' . $args[0] . ' ' . $params['operator'] . ' ' . $this->getValue($args[1]) . ')' . $braceClose;
+            }
+            if (array_key_exists('params', $options['join_on'])) {
+                $allParams = array_filter($options['join_on'], function ($rule) {
+                    return $rule === 'params';
+                }, ARRAY_FILTER_USE_KEY);
+                foreach ($allParams as $params) {
+                    foreach ($params as $args) {
+                        $sql .= ' ' . $args['separator'] . ' (' . $args[0] . ' ' . $args['operator'] . ' ' . $this->getValue($args[1]) . ')';
+                    }
                 }
+                $sql .= $braceClose;
             }
         }
         return $sql;
@@ -117,7 +124,8 @@ abstract class AbstractQueryBuilder
             foreach ($whereCond as $field => $aryCond) {
                 if ($field != 'or' && $field != 'and') {
                     if (is_array($aryCond) && !empty($aryCond)) {
-                        $where .= $this->whereConditions($aryCond, $field);
+                        $sep = $i > 0 ? ' ' : '';
+                        $where .= $sep . $this->whereConditions($aryCond, $field);
                         $i++;
                         unset($whereCond[$field]);
                     }

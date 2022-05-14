@@ -1,4 +1,11 @@
-NewVisitoregisteredEvent:
-  - WelcomeVisitorLst
-  - RegisterVisitorToNewsLetterLst
-  - NotifyAdminLst
+RegistrationEvent:
+  - callback: RegisterVisitorToNewsLetterListener
+    priority: 0
+  - callback: EmailSenderlistener
+    priority: 1
+ForgotPasswordEvent:
+  - callback: EmailSenderlistener
+    priority: 0
+EmailVerificationEvent:
+  - callback: EmailSenderlistener
+    priority: 0

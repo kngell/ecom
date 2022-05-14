@@ -9,7 +9,6 @@ class Controller extends AbstractController
     protected Token $token;
     protected MoneyManager $money;
     protected RequestHandler $request;
-    protected View $view_instance;
     protected ResponseHandler $response;
     protected ControllerHelper $helper;
     protected SessionInterface $session;
@@ -18,7 +17,7 @@ class Controller extends AbstractController
     protected LoginForm $loginFrm;
     protected RegisterForm $registerFrm;
     protected ForgotPasswordForm $forgotFrm;
-    protected DispatcherInterface $dispatcher;
+    protected EventDispatcherInterface $dispatcher;
     /**
      * @var array
      */
@@ -62,13 +61,18 @@ class Controller extends AbstractController
         }
     }
 
-    /** @inheritDoc */
-    public function render(string $viewName, array $context = []) : void
+    public function render(string $viewName, array $context = []) : ?string
     {
+        $this->throwViewException();
         if ($this->view_instance === null) {
             throw new BaseLogicException('You cannot use the render method if the View is not available !');
         }
-        $this->view_instance->render($viewName, $context);
+        return $this->view_instance->render($viewName, $context);
+    }
+
+    public function view() : View
+    {
+        return $this->view_instance;
     }
 
     public function brand() : int
@@ -88,7 +92,7 @@ class Controller extends AbstractController
     {
         // $this->response->setHeader();
         // header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS');
-        header('Access-Control-Expose-Headers: Content-Length, X-JSON');
+        // header('Access-Control-Expose-Headers: Content-Length, X-JSON');
         // header('Access-Control-Allow-Headers: Content-Type, Authorization, Accept, Accept-Language, X-Authorization');
         // header('Access-Control-Max-Age: 86400');
         // http_response_code(200);
@@ -153,7 +157,7 @@ class Controller extends AbstractController
 
     protected function createView() : void
     {
-        $this->view_instance = $this->container->make(ViewInterface::class, [
+        $this->view_instance = $this->container->make(View::class, [
             'viewAry' => [
                 'loginFrm' => $this->loginFrm->createForm('security' . DS . 'login'),
                 'registerFrm' => $this->registerFrm->createForm('security' . DS . 'register'),
@@ -197,33 +201,6 @@ class Controller extends AbstractController
             });
     }
 
-    protected function open_userCheckoutSession()
-    {
-        $user_data = $this->view_instance->user_data;
-        $shipping = current(array_filter($this->view_instance->shipping_class->get_results(), function ($shipping) {
-            return $shipping->default_shipping_class == '1';
-        }));
-        $userCheckoutSession = [
-            'cart_items' => array_column($this->view_instance->user_cart[0], 'cart_id'),
-            'email' => $user_data->email,
-            'ship_address' => [
-                'id' => $user_data->abID,
-                'name' => $this->request->htmlDecode($user_data->address1 ?? '') . ' ' . $this->request->htmlDecode($user_data->address2 ?? '') . ', ' . $this->request->htmlDecode($user_data->zip_code ?? '') . ', ' . $this->request->htmlDecode($user_data->ville ?? '') . ' (' . $this->request->htmlDecode($user_data->region ?? '') . ') - ' . $this->request->htmlDecode($user_data->pays ?? ''),
-            ],
-            'bill_address' => [
-                'id' => $user_data->abID,
-                'name' => $this->request->htmlDecode($user_data->address1 ?? '') . ' ' . $this->request->htmlDecode($user_data->address2 ?? '') . ', ' . $this->request->htmlDecode($user_data->zip_code ?? '') . ', ' . $this->request->htmlDecode($user_data->ville ?? '') . ' (' . $this->request->htmlDecode($user_data->region ?? '') . ') - ' . $this->request->htmlDecode($user_data->pays ?? ''),
-            ],
-            'shipping' => [
-                'id' => $shipping->shcID,
-                'price' => $shipping->price,
-                'name' => $shipping->sh_name,
-            ],
-            'ttc' => $this->view_instance->user_cart[2][1],
-        ];
-        $this->session->set(CHECKOUT_PROCESS_NAME, $userCheckoutSession);
-    }
-
     protected function getModelSuffix()
     {
         return $this->modelSuffix;
@@ -253,7 +230,7 @@ class Controller extends AbstractController
         return null;
     }
 
-    protected function model(string $modelString)
+    protected function model(string $modelString) : Model
     {
         return $this->container->make(ModelFactory::class)->create($modelString);
     }

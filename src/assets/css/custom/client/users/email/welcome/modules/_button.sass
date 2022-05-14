@@ -1,0 +1,64 @@
+@use 'corecss/variables' as *
+
+.btn 
+    box-sizing: border-bo
+    min-width: 100% !important
+    width: 100%
+.btn > tbody > tr > td 
+    padding-bottom: 16px
+.btn table 
+    width: auto
+.btn table td 
+    background-color: #ffffff
+    border-radius: 4px
+    text-align: center
+.btn a 
+    background-color: #ffffff
+    border: solid 2px #3498db
+    border-radius: 4px
+    box-sizing: border-box
+    color: #3498db
+    cursor: pointer
+    display: inline-block
+    font-size: 14px
+    font-weight: bold
+    margin: 0
+    padding: 12px 24px
+    text-decoration: none
+    text-transform: capitalize
+
+.btn-primary table td 
+    background-color: #3498db
+
+.btn-primary a 
+    background-color: #3498db
+    border-color: #3498db
+    color: #ffffff
+
+@media all 
+    .btn-primary table td:hover 
+        background-color: #34495e !important
+    .btn-primary a:hover 
+        background-color: #34495e !important
+        border-color: #34495e !important
+
+.btn-secondary table td 
+    background-color: transparent
+
+.btn-secondary a 
+    background-color: transparent
+    border-color: #3498db
+    color: #3498db
+
+@media all 
+    .btn-secondary a:hover 
+        border-color: #34495e !important
+        color: #34495e !important
+
+.btn-tertiary table td 
+    background-color: transparent
+
+.btn-tertiary a 
+    background-color: transparent
+    border-color: #ffffff
+    color: #ffffff

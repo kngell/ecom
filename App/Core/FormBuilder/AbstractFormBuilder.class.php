@@ -228,7 +228,6 @@ abstract class AbstractFormBuilder implements FormBuilderInterface
                 return false;
         break;
         endswitch;
-
         $this->formAttr[$key] = $value;
         return true;
     }

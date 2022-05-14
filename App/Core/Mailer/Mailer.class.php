@@ -49,15 +49,14 @@ class Mailer extends AbstractMailer
 
     /**
      * @inheritdoc
-     * @param string $from
-     * @param string|null $name
+     * @param array $from
      * @return self
      * @throws MailerInvalidArgumentException
      */
-    public function from(string $from, ?string $name = null) : self
+    public function from(array $from = []) : self
     {
-        $this->isValid($from);
-        $this->transporterObject->setFrom($from, ($name !== null) ? $name : null);
+        $this->isValid($from['email']);
+        $this->transporterObject->setFrom($from['email'], (isset($from['name']) && !empty($from['name'])) ? $from['name'] : '');
         return $this;
     }
 

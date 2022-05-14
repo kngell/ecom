@@ -5,6 +5,11 @@ class RegisterForm extends ClientFormBuilder implements ClientFormBuilderInterfa
 {
     private string $label = '<div>J\'accepte&nbsp;<a href="#">les termes&nbsp;</a>&amp;&nbsp;<a href="#">conditions</a> d\'utilisation</div>';
 
+    public function __construct(?Object $repository = null, ?string $templateName = null)
+    {
+        parent::__construct($repository, $templateName);
+    }
+
     public function createForm(string $action, ?object $dataRepository = null, ?object $callingController = null) : mixed
     {
         $form = $this->form([
@@ -30,8 +35,8 @@ class RegisterForm extends ClientFormBuilder implements ClientFormBuilderInterfa
         $this->template = str_replace('{{password}}', (string) $form->input([
             PasswordType::class => ['name' => 'password', 'id' => 'reg_password'],
         ])->placeholder('Password :')->noLabel(), $this->template);
-        $this->template = str_replace('{{c_password}}', (string) $form->input([
-            PasswordType::class => ['name' => 'c_password'],
+        $this->template = str_replace('{{cpassword}}', (string) $form->input([
+            PasswordType::class => ['name' => 'cpassword'],
         ])->placeholder('Confirm Password :')->noLabel(), $this->template);
         $this->template = str_replace('{{terms}}', (string) $form->input([
             CheckboxType::class => ['name' => 'terms'],

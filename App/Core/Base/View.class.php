@@ -16,6 +16,7 @@ class View extends AbstractView
     private string $search_box;
     private Token $token;
     private ResponseHandler $response;
+    private array $properties = [];
 
     /**
      * Main constructor
@@ -37,13 +38,34 @@ class View extends AbstractView
         }
     }
 
-    /** @inheritDoc */
-    public function render(string $viewname = '', array $params = []) : void
+    public function addProperties(array $args = []) : void
+    {
+        if (!empty($args)) {
+            foreach ($args as $prop => $value) {
+                $this->properties[$prop] = $value;
+            }
+        }
+    }
+
+    public function getProperty(string $name) : mixed
+    {
+        return isset($this->properties[$name]) ? $this->properties[$name] : null;
+    }
+
+    /**
+     * Render View.
+     * --------------------------------------------------------------.
+     * @param string $viewname
+     * @param array $params
+     * @return ?string
+     */
+    public function render(string $viewname = '', array $params = []) : ?string
     {
         if (!empty($viewname)) { //$this->view_file != $viewname
             $this->view_file = preg_replace("/\s+/", '', $viewname);
+            //home/kngell/projects/ecom/App/Views/client/users/account/verifyUserAccount.php
             if (file_exists(VIEW . strtolower($this->file_path) . $this->view_file . '.php')) {
-                $this->renderViewContent(VIEW . strtolower($this->file_path) . $this->view_file . '.php', $params);
+                return $this->renderViewContent(VIEW . strtolower($this->file_path) . $this->view_file . '.php', $params);
             } else {
                 //Rooter::redirect('restricted' . DS . 'index');
             }
@@ -61,10 +83,10 @@ class View extends AbstractView
     public function content(string $type) : bool|string
     {
         return match ($type) {
-            'head' => $this->_head,
-            'body' => $this->_body,
-            'footer' => $this->_footer,
-            'html' => $this->_html,
+            'head' => $this->_head ?? '',
+            'body' => $this->_body ?? '',
+            'footer' => $this->_footer ?? '',
+            'html' => $this->_html ?? '',
             default => false
         };
     }
@@ -96,14 +118,14 @@ class View extends AbstractView
     private function getAsset(string $check, string $path, string $asset, string $ext) : string
     {
         return match (true) {
-            $check == 'img' => ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . US . IMG . $path : IMG . $asset,
-            $check == 'fonts' => ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . US . FONT . $path : FONT . $asset,
-            isset($this->ressources->$asset) => ASSET_SERVICE_PROVIDER ? ASSET_SERVICE_PROVIDER . $this->ressources->$asset->$ext ?? '' : $this->ressources->$asset->$ext ?? '',
+            $check == 'img' => HOST ? HOST . US . IMG . $path : IMG . $asset,
+            $check == 'fonts' => HOST ? HOST . US . FONT . $path : FONT . $asset,
+            isset($this->ressources->$asset->$ext) => HOST ? HOST . $this->ressources->$asset->$ext ?? '' : $this->ressources->$asset->$ext ?? '',
             default => ''
         };
     }
 
-    private function renderViewContent($view, array $params = []) : void
+    private function renderViewContent($view, array $params = []) : ?string
     {
         foreach ($params as $key => $value) {
             $$key = $value;
@@ -112,6 +134,12 @@ class View extends AbstractView
         $this->start('html');
         require_once VIEW . strtolower($this->file_path) . 'layouts' . DS . $this->_layout . '.php';
         $this->end();
-        $this->response->handler()->setContent($this->content('html'))->send();
+        if ($this->webView) {
+            $this->response->handler()->setContent($this->content('html'))->send();
+            return null;
+        } else {
+            header('Content-Type:text/html; charset=UTF-8');
+            return html_entity_decode($this->content('html'));
+        }
     }
 }

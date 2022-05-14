@@ -3,6 +3,11 @@
 declare(strict_types=1);
 class ForgotPasswordForm extends ClientFormBuilder implements ClientFormBuilderInterface
 {
+    public function __construct(?Object $repository = null, ?string $templateName = null)
+    {
+        parent::__construct($repository, $templateName);
+    }
+
     public function createForm(string $action, ?object $dataRepository = null, ?object $callingController = null) : mixed
     {
         $form = $this->form([

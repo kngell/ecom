@@ -15,7 +15,7 @@ class SessionConfig
     public function baseConfiguration(): array
     {
         return [
-            'session_name' => 'LavaStudio',
+            'session_name' => 'kngell_enterprise',
             'lifetime' => 3600,
             'path' => '/',
             'domain' => 'localhost',

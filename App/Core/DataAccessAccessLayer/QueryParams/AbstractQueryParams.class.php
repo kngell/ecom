@@ -7,6 +7,7 @@ abstract class AbstractQueryParams implements QueryParamsInterface
     protected const OPERATOR = ['!=', '=', '<=', '>=', 'IN', 'NOT IN'];
     protected string $current_table = '';
     protected string $tableSchema;
+    protected string $tableSuffix = '';
     /** @var array */
     protected array $query_params = [];
     /** @var array */
@@ -76,7 +77,7 @@ abstract class AbstractQueryParams implements QueryParamsInterface
         return $where;
     }
 
-    protected function addTableToOptions(?string $tbl = null) : void
+    protected function addTableToOptions(?string $tbl = null, mixed $columns = null) : void
     {
         $tbl == null ? $tbl = $this->tableSchema : '';
         $this->key('options');
@@ -125,5 +126,69 @@ abstract class AbstractQueryParams implements QueryParamsInterface
         $whereParams['braceEnd'] = $this->braceClose($whereParams['separator'], $key);
         $whereParams['value'] = $value;
         return $whereParams;
+    }
+
+    protected function getJoinOptions(string|int $key, string $arg) : string
+    {
+        $tbl = '';
+        $field = '';
+        if (null != $arg && str_contains($arg, '|')) {
+            $parts = is_string($arg) ? explode('|', $arg) : '';
+            $tbl = $parts[1];
+            $field = $parts[0];
+        } elseif (is_numeric($key)) {
+            $tbl = $this->query_params['options']['table'][$key];
+            $field = $arg;
+        }
+        if ($tbl != '' & $field != '') {
+            if (!array_key_exists($tbl, $this->query_params['options']['join_on'])) {
+                $this->query_params['options']['join_on'][$tbl] = [];
+            }
+            return $this->query_params['options']['join_on'][$tbl][] = $tbl . '.' . $field;
+        }
+    }
+
+    protected function getAryParams(string $k, array $arg)
+    {
+        $tbl = $arg[1];
+    }
+
+    protected function getParams(string $k, mixed $arg) : void
+    {
+        $parts = is_string($k) ? explode('|', $k) : '';
+        if (empty(end($parts))) {
+            unset($parts[count($parts) - 1]);
+        }
+        $field = $parts[0] == 'or' ? $parts[1] : $parts[0];
+        if (!array_key_exists('params', $this->query_params['options']['join_on'])) {
+            $this->query_params['options']['join_on']['params'] = [];
+        }
+        $tbl = is_array($arg) ? $arg[1] : $this->current_table;
+        $value = is_array($arg) ? $arg[0] : $arg;
+        array_push($this->query_params['options']['join_on']['params'], [
+            $tbl . '.' . $field, $value,
+            'separator' => $parts[0] == 'or' ? 'OR' : 'AND',
+            'operator' => $this->operator($parts),
+        ]);
+    }
+
+    protected function parseTable(?string $tbl = null) : ?string
+    {
+        if (null != $tbl && str_contains($tbl, '|')) {
+            $parts = explode('|', $tbl);
+            $this->tableSuffix = trim($parts[1]);
+            return trim($parts[0]);
+        }
+        return $tbl;
+    }
+
+    private function operator(array $parts) : string
+    {
+        $end = end($parts);
+        if (in_array($end, self::OPERATOR)) {
+            return $end;
+        } else {
+            return '=';
+        }
     }
 }

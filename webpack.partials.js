@@ -2,12 +2,13 @@ const path = require("path");
 const { merge } = require("webpack-merge");
 const devMode = process.env.NODE_ENV !== "production";
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-// const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const frontendEntries = require("./src/entries/assets/frontend/frontendEntries");
 const adminEntries = require("./src/entries/assets/backend/admin/adminEntries");
 const { viewRules, assetsRuless } = require("./webpack.modules");
-const ASSET_PATH =
-  process.env.ASSET_PATH || `${path.sep}public${path.sep}assets${path.sep}`;
+const config = require("./config");
+const ASSET_PATH = config.PATH;
+
+//process.env.ASSET_PATH || `${path.sep}public${path.sep}assets${path.sep}`;
 
 /**
  * Alias
@@ -219,12 +220,9 @@ exports.viewsConfig = merge(
           .join("/");
         return `${filepath}/[name][ext]`;
       },
+      clean: true,
     },
     plugins: [],
   },
   viewRules
 );
-/**
- * Development config
- * ========================================================================================
- */

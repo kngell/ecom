@@ -58,12 +58,14 @@ class Form_rules
                 'min' => 2,
                 'max' => 64,
                 'display' => 'Firstname',
+                'Valid_string' => true,
             ],
             'lastName' => [
                 'required' => true,
                 'min' => 2,
                 'max' => 64,
                 'display' => 'Lastname',
+                'Valid_string' => true,
             ],
             'userName' => [
                 'display' => 'Username',
@@ -71,6 +73,7 @@ class Form_rules
                 'unique' => $table_users ? 'users' : 'users_related_profile',
                 'min' => 2,
                 'max' => 20,
+                // 'Valid_string' => true,
             ],
             'email' => [
                 'display' => 'Email',
@@ -78,18 +81,22 @@ class Form_rules
                 'unique' => 'users',
                 'max' => 150,
                 'valid_email' => true,
+                // 'Valid_string' => true,
+                // 'Valid_domain' => true,
             ],
             'password' => [
                 'display' => 'Password',
                 'required' => true,
-                'min' => 5,
+                'min' => 8,
                 'max' => 64,
+                'Valid_password' => true,
             ],
             'cpassword' => [
                 'display' => 'Confirm Password',
                 'required' => true,
-                'min' => 5,
+                'min' => 8,
                 'matches' => 'password',
+                'Valid_password' => true,
             ],
         ];
     }
@@ -134,7 +141,7 @@ class Form_rules
         ];
     }
 
-    public static function forgot()
+    public static function email()
     {
         return [
             'email' => [

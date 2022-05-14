@@ -5,6 +5,19 @@ class LoginForm extends ClientFormBuilder implements ClientFormBuilderInterface
 {
     private string $label = '<div>&nbspRemember Me&nbsp</div>';
 
+    public function __construct(?Object $repository = null, ?string $templateName = null)
+    {
+        parent::__construct($repository, $templateName);
+    }
+
+    /**
+     * Create Login form.
+     *
+     * @param string $action
+     * @param object|null $dataRepository
+     * @param object|null $callingController
+     * @return mixed
+     */
     public function createForm(string $action, ?object $dataRepository = null, ?object $callingController = null) : mixed
     {
         $form = $this->form([

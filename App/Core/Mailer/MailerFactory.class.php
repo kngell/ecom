@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
+use Symfony\Component\Dotenv\Dotenv;
+
 class MailerFactory
 {
     /** @var array|null */
     protected ?array $settings = null;
-    private ContainerInterface $container;
 
     /**
      * Construct.
@@ -33,7 +34,7 @@ class MailerFactory
         return Container::getInstance()->make(MailerInterface::class, [
             'transporterObject' => $transporterObject,
             'settings' => $this->settings,
-            'dotEnvString' => Symfony\Component\Dotenv\Dotenv::class,
+            'dotEnvString' => Dotenv::class,
         ]);
     }
 }

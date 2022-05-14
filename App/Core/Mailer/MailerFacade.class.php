@@ -1,17 +1,19 @@
 <?php
 
 declare(strict_types=1);
+
+use PHPMailer\PHPMailer\PHPMailer;
+
 class MailerFacade
 {
     /** @var object */
     protected object $mailer;
-    private ContainerInterface $container;
 
     public function __construct(?array $settings = null)
     {
-        $this->mailer = $this->container->make(MailerFactory::class, [
+        $this->mailer = Container::getInstance()->make(MailerFactory::class, [
             'settings' => $settings,
-        ])->create(\PHPMailer\PHPMailer\PHPMailer::class);
+        ])->create(PHPMailer::class);
     }
 
     /**
@@ -24,7 +26,7 @@ class MailerFacade
      * @return mixed
      * @throws Exception\MailerException
      */
-    public function basicMail(string $subject, string $from, string $to, string $message): mixed
+    public function basicMail(string $subject, array $from, string $to, string $message): mixed
     {
         return $this->mailer
             ->subject($subject)

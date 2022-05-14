@@ -36,8 +36,8 @@ class RooterFactory
     public function buildRoutes() : ?RooterInterface
     {
         if (is_array($this->routes) && !empty($this->routes)) {
-            $args = [];
             foreach ($this->routes as $mthd => $routes) {
+                $args = [];
                 foreach ($routes as $route => $params) {
                     if (isset($params['namespace']) && $params['namespace'] != '') {
                         $args = ['namespace' => $params['namespace']];
