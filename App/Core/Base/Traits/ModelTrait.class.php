@@ -34,16 +34,17 @@ trait ModelTrait
 
     public function insert() : self
     {
-        $this->_lastID = $this->getRepository()->entity($this->getEntity())->create();
-        $this->setCount($this->_lastID ?? 0);
+        $lastID = $this->getRepository()->entity($this->getEntity())->create();
+        $this->setCount($lastID ?? 0);
+        $this->setLastID($lastID ?? 0);
         return $this;
     }
 
     public function update() : self
     {
         list($conditions) = $this->conditions()->getQueryParams()->params('update');
-        $this->getEntity()->delete($this->getEntity()->getColID());
-        $this->_count = $this->getRepository()->entity($this->getEntity())->update($conditions);
+        $this->getEntity()->delete($this->getEntity()->regenerateField($this->getEntity()->getColID()));
+        $this->setCount($this->getRepository()->entity($this->getEntity())->update($conditions));
         return $this;
     }
 
@@ -62,6 +63,7 @@ trait ModelTrait
      */
     public function afterFind(?DataMapper $m = null) : DataMapper
     {
+        $this->assign((array) current($m->get_results()));
         if ($m->count() === 1) {
             $model = current($m->get_results());
             $array = false;
@@ -69,7 +71,7 @@ trait ModelTrait
                 $array = true;
                 $model = (object) $model;
             }
-            $media_key = $this->get_media();
+            $media_key = $this->getEntity()->getFieldWithDoc('media');
             if ($media_key != '') {
                 $model->$media_key = $model->$media_key != null ? unserialize($model->$media_key) : ['products' . US . 'product-80x80.jpg'];
                 if (is_array($model->$media_key)) {
@@ -86,5 +88,30 @@ trait ModelTrait
     public function get_media() : string
     {
         return isset($this->_media_img) ? $this->_media_img : '';
+    }
+
+    private function properties() : void
+    {
+        $this->container = property_exists($this, 'container') ? Container::getInstance() : '';
+        $props = array_merge(['entity' => str_replace(' ', '', ucwords(str_replace('_', ' ', $this->tableSchema))) . 'Entity'], YamlFile::get('model_properties'));
+        foreach ($props as $prop => $class) {
+            if (property_exists($this, $prop)) {
+                $this->{$prop} = match ($prop) {
+                    'queryParams' => $this->container->make($class, [
+                        'tableSchema' => $this->tableSchema,
+                    ]),
+                    'repository' => $this->container->make($class, [
+                        'crudIdentifier' => 'crudIdentifier',
+                        'tableSchema' => $this->tableSchema,
+                        'tableSchemaID' => $this->tableSchemaID,
+                        'entity' => $this->entity,
+                    ])->create(),
+                    'validator' => $this->container->make($class, [
+                        'validator' => YamlFile::get('validator'),
+                    ]),
+                    default => $this->container->make($class)
+                };
+            }
+        }
     }
 }

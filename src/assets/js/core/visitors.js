@@ -1,7 +1,7 @@
 //Get visitors Data
 
-export const get_visitors_data = (e) => {
-  e.preventDefault();
+export const get_visitors_data = () => {
+  // e.preventDefault();
   return new Promise((resolve, reject) => {
     let data = {
       ip: $("#ip_address").val(),
@@ -23,6 +23,10 @@ export const send_visitors_data = (data, manageR) => {
       table: data.table,
       ip: data.ip ? data.ip : "",
       cookies: data.cookies ? data.cookies : "",
+      csrftoken: document
+        .querySelector('meta[name="csrftoken"]')
+        .getAttribute("content"),
+      frm_name: "home_page",
     },
   })
     .done((response) => {

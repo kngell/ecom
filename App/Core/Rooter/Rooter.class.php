@@ -13,21 +13,8 @@ class Rooter implements RooterInterface
     private string $methodSuffix = 'Page';
     private ContainerInterface $container;
 
-    public function __construct(private RooterHelper $helper, private ResponseHandler $response, private RequestHandler $request)
+    public function __construct(private RooterHelper $helper, private ResponseHandler $response, private RequestHandler $request, private array $controllerProperties)
     {
-    }
-
-    /** @inheritDoc */
-    public function setProperties(array $params = []) : self
-    {
-        if (!empty($params)) {
-            foreach ($params as $key => $value) {
-                if ($key != '' && property_exists($this, $key)) {
-                    $this->{$key} = $value;
-                }
-            }
-        }
-        return $this;
     }
 
     /** @inheritDoc */
@@ -57,23 +44,24 @@ class Rooter implements RooterInterface
                 $url = explode(DS, filter_var(rtrim($urlroute, DS), FILTER_SANITIZE_URL));
                 $this->route = isset($url[0]) ? strtolower($url[0]) : $this->route;
                 unset($url[0]);
-                $this->arguments = count($url) > 0 ? array_values($url) : [];
+                $this->arguments = count($url) > 0 ? $this->helper->formatUrlArguments(array_values($url)) : [];
             }
-            return strtolower($urlroute);
+            return strtolower($this->route);
         }
         return DS;
     }
 
     /** @inheritDoc */
-    public function resolve(string $url): self
+    public function resolve(): self
     {
-        list($controllerString, $method) = $this->resolveWithException($this->helper->formatQueryString(strtolower($url)));
+        $url = $this->request->getPath();
+        list($controllerString, $method) = $this->resolveWithException($url);
         $controllerObject = $this->controllerObject($controllerString, $method);
         if (preg_match('/method$/i', $method) == 0) {
             if (YamlFile::get('app')['system']['use_resolvable_method'] === true) {
                 $this->resolveControllerMethodDependencies($controllerObject, $method);
             } elseif (\is_callable([$controllerObject, $method], true, $callableName)) {
-                $controllerObject->$method($this->arguments); //$callableName($this->arguments);
+                $controllerObject->$method($this->arguments);
             } else {
                 throw new NoActionFoundException("Method $method in controller $controllerString cannot be called");
             }
@@ -113,8 +101,8 @@ class Rooter implements RooterInterface
         return $this->container->make(ControllerFactory::class, [
             'controllerString' => $controllerString,
             'method' => $method,
-            'params' => $this->params,
             'path' => $this->getNamespace($controllerString),
+            'controllerProperties' => $this->controllerProperties,
         ])->create();
     }
 

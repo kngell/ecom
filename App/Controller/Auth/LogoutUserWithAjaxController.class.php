@@ -6,13 +6,13 @@ class LogoutUserWithAjaxController extends Controller
 {
     public function index()
     {
-        if ($this->request->exists('post')) {
-            $data = $this->request->get();
-            if ($data['csrftoken'] && $this->token->validate($data['csrftoken'], $data['frm_name'])) {
-                $model = $this->model(LogoutManager::class)->assign($data);
-                $resp = $model->logout();
-                $resp !== null ? $this->jsonResponse(['result' => 'success', 'msg' => $this->helper->showMessage('warning text-success', 'Welcome')]) : $this->jsonResponse(['result' => 'error', 'msg' => $this->helper->showMessage('warning text-warning', 'Something goes wrong! plase contact the administrator!')]);
-            }
+        /** @var LogoutUserManager */
+        $model = $this->model(LogoutUserManager::class)->assign($this->isValidRequest());
+        $resp = $model->logout();
+        if ($resp !== null) {
+            $this->dispatcher->dispatch(new LogoutEvent($resp->getEntity()));
+            $this->jsonResponse(['result' => 'success', 'msg' => 'success']);
         }
+        $this->jsonResponse(['result' => 'error', 'msg' => $this->helper->showMessage('warning text-warning', 'Something goes wrong! plase contact the administrator!')]);
     }
 }

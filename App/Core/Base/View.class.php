@@ -10,9 +10,6 @@ class View extends AbstractView
     private string $_html;
     private string $_outputBuffer;
     private string $view_file;
-    private string $loginFrm;
-    private string $registerFrm;
-    private string $forgotFrm;
     private string $search_box;
     private Token $token;
     private ResponseHandler $response;
@@ -36,6 +33,12 @@ class View extends AbstractView
                 }
             }
         }
+    }
+
+    public function route(string $route)
+    {
+        $route = $route == DS ? 'home' : $route;
+        return HOST . DS . $route;
     }
 
     public function addProperties(array $args = []) : void
@@ -132,13 +135,12 @@ class View extends AbstractView
         }
         require_once $view;
         $this->start('html');
-        require_once VIEW . strtolower($this->file_path) . 'layouts' . DS . $this->_layout . '.php';
+        require_once VIEW . strtolower(explode(DS, $this->file_path)[0]) . DS . 'layouts' . DS . $this->_layout . '.php';
         $this->end();
         if ($this->webView) {
             $this->response->handler()->setContent($this->content('html'))->send();
             return null;
         } else {
-            header('Content-Type:text/html; charset=UTF-8');
             return html_entity_decode($this->content('html'));
         }
     }

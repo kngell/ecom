@@ -28,11 +28,6 @@ class Container implements ContainerInterface
     {
     }
 
-    public static function setInstance(?Application $container = null)
-    {
-        return static::$instance = $container;
-    }
-
     /**
      * Get container instance
      * ===============================================.
@@ -44,6 +39,11 @@ class Container implements ContainerInterface
             static::$instance = new static();
         }
         return static::$instance;
+    }
+
+    public static function setInstance(?Application $container = null)
+    {
+        return static::$instance = $container;
     }
 
     /**
@@ -90,7 +90,7 @@ class Container implements ContainerInterface
 
     /**
      * Determine if the given abstract type has been bound.
-     * =========================================================================================.
+     * ========================================================.
      * @param  string  $abstract
      * @return bool
      */
@@ -102,7 +102,7 @@ class Container implements ContainerInterface
 
     /**
      * Make object
-     * =========================================================================================.
+     * ========================================================.
      * @param string $abstract
      * @return mixed
      */
@@ -181,7 +181,7 @@ class Container implements ContainerInterface
                     if ($dependency->isDefaultValueAvailable() && !array_key_exists($dependency->name, $args)) {
                         $results[] = $dependency->getDefaultValue();
                     }
-                    if (!empty($args)) {
+                    if (array_key_exists($dependency->name, $args)) {
                         $results[] = $args[$dependency->name];
                     }
                 } else {
@@ -190,16 +190,12 @@ class Container implements ContainerInterface
             } elseif (!$reflector->isUserDefined()) {
                 $results[] = $this->make($dependency->name);
             } else {
-                if (!empty($args)) {
+                if (array_key_exists($dependency->name, $args)) {
                     $results[] = $args[$dependency->name];
                 } else {
                     $results[] = $this->make($type->getName());
                 }
             }
-
-            // else {
-            //     throw new BindingResolutionException("Unresolvable dependency resolving [$dependency] in class {$dependency->getDeclaringClass()->getName()}");
-            // }
         }
         return $results;
     }

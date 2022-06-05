@@ -14,12 +14,12 @@ class ProductsManager extends Model
     public function getProducts(mixed $brand = 2) : array
     {
         $query_params = $this->table()
-            ->leftJoin('product_categorie', ['pdtID', 'catID'])
+            ->leftJoin('product_categorie', ['pdt_id', 'cat_id'])
             ->leftJoin('categories', ['categorie'])
             ->leftJoin('brand', ['br_name'])
-            ->on(['pdtID',  'pdtID'], ['catID', 'catID'], ['brID', 'brID'])
-            ->where(['brID' => [$brand, 'categories']])
-            ->groupBy(['pdtID DESC' => 'product_categorie'])
+            ->on(['pdt_id',  'pdt_id'], ['cat_id', 'cat_id'], ['br_id', 'br_id'])
+            ->where(['br_id' => [$brand, 'categories']])
+            ->groupBy(['pdt_id DESC' => 'product_categorie'])
             ->return('object');
         $pdt = $this->getAll();
         return $pdt->count() > 0 ? $pdt->get_results() : false;

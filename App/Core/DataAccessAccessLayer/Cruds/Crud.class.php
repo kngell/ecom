@@ -134,7 +134,7 @@ class Crud extends AbstractCrud implements CrudInterface
                 'where' => $conditions,
             ];
             $query = $this->queryBuilder->buildQuery($arg)->update();
-            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($fields, $conditions));
+            $this->dataMapper->persist($query, $this->dataMapper->buildQueryParameters($conditions, $fields));
             if ($this->dataMapper->numrow() == 1) {
                 return $this->dataMapper->numrow();
             }

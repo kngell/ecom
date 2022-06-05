@@ -15,17 +15,17 @@ class CacheFacade
      *
      * @param string|null $cacheIdentifier
      * @param string|null $storage
+     * @param array $cacheConfig
      * @param array $options
      * @return CacheInterface
      */
-    public function create(?string $cacheIdentifier = null, array $options = []): CacheInterface
+    public function create(?string $cacheIdentifier = null, array $cacheConfig = [], array $options = []): CacheInterface
     {
         try {
             return $this->container->make(CacheFactory::class, [
-                'cacheConfig' => $this->container->make(CacheEnvironmentConfigurations::class, [
+                'cacheEnvConfig' => $this->container->make(CacheEnvironmentConfigurations::class, [
                     'cacheIdentifier' => $cacheIdentifier,
-                    'fileCacheBasePath' => CACHE_PATH,
-                    'maximumPathLength' => PHP_MAXPATHLEN,
+                    'cacheConfig' => $cacheConfig,
                 ]),
             ])->create($cacheIdentifier, $options);
         } catch (CacheException $e) {

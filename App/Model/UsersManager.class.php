@@ -18,9 +18,9 @@ class UsersManager extends Model
     {
         /** @var Model */
         $groups = $this->container->make(GroupsMaganer::class);
-        $query_params = $groups->table()->join('group_user', ['userID', 'groupID'])
-            ->on(['grID', 'groupID'])
-            ->where(['userID' => [$m->getEntity()->{'getUserID'}(), 'group_user']])
+        $query_params = $groups->table()->join('group_user', ['user_id', 'group_id'])
+            ->on(['gr_id', 'group_id'])
+            ->where(['user_id' => [$m->getEntity()->{'getUserId'}(), 'group_user']])
             ->return('class')
             ->build();
         $user_roles = $groups->getAll($query_params);

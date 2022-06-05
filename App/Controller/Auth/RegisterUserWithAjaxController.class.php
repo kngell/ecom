@@ -7,7 +7,7 @@ class RegisterUserWithAjaxController extends Controller
     public function index(array $args = []) : void
     {
         /** @var RegisterUserManager */
-        $model = $this->model(RegisterUserManager::class)->assign($this->isPostRequest());
+        $model = $this->model(RegisterUserManager::class)->assign($this->isValidRequest());
         $this->isIncommingDataValid(m: $model, ruleMethod:'users', newKeys: [
             'email' => 'reg_email',
             'password' => 'reg_password',

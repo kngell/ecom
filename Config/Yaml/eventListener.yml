@@ -1,11 +1,41 @@
 RegistrationEvent:
-  - callback: RegisterVisitorToNewsLetterListener
+  - callback: RegisterUserToNewsLetterListener
     priority: 0
   - callback: EmailSenderlistener
     priority: 1
 ForgotPasswordEvent:
   - callback: EmailSenderlistener
     priority: 0
-EmailVerificationEvent:
+VerifyUserAccountEvent:
   - callback: EmailSenderlistener
+    priority: 0
+ValidateUserAccountEvent:
+  - callback: EmailSenderlistener
+    priority: 3
+  - callback: RegisterUserToNewsLetterListener
+    priority: 1
+  - callback: UpdateAccountValidationDataListener
+    priority: 2
+  - callback: DeleteVerificationRequestListener
+    priority: 0
+  - callback: UpdateUserSessionListener
+    priority: 4
+LoginEvent:
+  - callback: ManageVisitorListener
+    priority: 0
+  - callback: ClearLoginAttempsListener
+    priority: 1
+  - callback: UpdateUserCokkiesListener
+    priority: 2
+LogoutEvent:
+  - callback: ClearUserSessionListener
+    priority: 0
+NewCommentEvent:
+  - callback: RetrieveCommentsListener
+    priority: 0
+NewCommentVoteEvent:
+  - callback: CheckMultipleVotesListener
+    priority: 0
+PageDisplayingEvent:
+  - callback: RetrieveCommentsListener
     priority: 0

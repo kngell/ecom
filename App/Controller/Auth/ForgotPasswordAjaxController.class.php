@@ -7,7 +7,7 @@ class ForgotPasswordAjaxController extends Controller
     public function index(array $args = []) : void
     {
         /** @var ForgotPasswordManager */
-        $model = $this->model(ForgotPasswordManager::class)->assign($this->isPostRequest());
+        $model = $this->model(ForgotPasswordManager::class)->assign($this->isValidRequest());
         $this->isIncommingDataValid(m: $model, ruleMethod:'forgot', newKeys: [
             'email' => 'forgot_email',
         ]);

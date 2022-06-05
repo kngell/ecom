@@ -5,7 +5,6 @@ class Model extends AbstractModel
 {
     use ModelTrait;
 
-    protected RepositoryInterface $repository;
     protected ContainerInterface $container;
     protected MoneyManager $money;
     protected Entity $entity;
@@ -54,11 +53,12 @@ class Model extends AbstractModel
         return $this->tableSchema;
     }
 
-    public function getLastID() : int
+    public function getLastID() : ?int
     {
         if (isset($this->_lasID)) {
             return $this->_lasID;
         }
+        return null;
     }
 
     public function setLastID(int $lastID) : self
@@ -74,11 +74,11 @@ class Model extends AbstractModel
      * @param string $colID
      * @return self|null
      */
-    public function getDetails(mixed $id, string $colID = '') : ?self
+    public function getDetails(mixed $id, string $colID = '', string $mode = 'class') : ?self
     {
         $data_query = $this->table()
             ->where([$colID != '' ? $colID : $this->get_colID() => $id])
-            ->return('class')
+            ->return($mode)
             ->build();
         return $this->findFirst($data_query);
     }
@@ -107,7 +107,7 @@ class Model extends AbstractModel
     {
         $en = is_null($entity) ? $this->entity : $entity;
         if ($this->beforeSave($entity)) {
-            if (( new ReflectionProperty($en, $en->getColId()))->isInitialized($en)) {
+            if (( new ReflectionProperty($en, $en->regenerateField($en->getColId())))->isInitialized($en)) {
                 $en = $this->beforeSaveUpadate($en);
                 $save = $this->update($en);
             } else {
@@ -253,28 +253,9 @@ class Model extends AbstractModel
         return $this->validates;
     }
 
-    private function properties() : void
+    public function unsetProperty(string $p) : self
     {
-        $this->container = property_exists($this, 'container') ? Container::getInstance() : '';
-        $props = array_merge(['entity' => str_replace(' ', '', ucwords(str_replace('_', ' ', $this->tableSchema))) . 'Entity'], YamlFile::get('model_properties'));
-        foreach ($props as $prop => $class) {
-            if (property_exists($this, $prop)) {
-                $this->{$prop} = match ($prop) {
-                    'queryParams' => $this->container->make($class, [
-                        'tableSchema' => $this->tableSchema,
-                    ]),
-                    'repository' => $this->container->make($class, [
-                        'crudIdentifier' => 'crudIdentifier',
-                        'tableSchema' => $this->tableSchema,
-                        'tableSchemaID' => $this->tableSchemaID,
-                        'entity' => $this->entity,
-                    ])->create(),
-                    'validator' => $this->container->make($class, [
-                        'validator' => YamlFile::get('validator'),
-                    ]),
-                    default => $this->container->make($class)
-                };
-            }
-        }
+        unset($this->$p);
+        return $this;
     }
 }

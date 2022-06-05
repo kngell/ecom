@@ -7,7 +7,7 @@
                     <div class="modal-body">
                         <button type="button" class="close float-end" data-bs-dismiss="modal"
                             aria-label="Close"><span>&times;</span></button>
-                        <?= $this->loginFrm?>
+                        <?= $loginFrm?>
                     </div>
                     <div class="modal-footer">
                         <div class="input-group form-footer d-flex justify-content-center d-inline-block">
@@ -29,7 +29,7 @@
                     <div class="modal-body">
                         <button type="button" class="close float-end" data-bs-dismiss="modal">
                             <span>&times;</span></button>
-                        <?= $this->registerFrm?>
+                        <?= $registerFrm?>
                     </div>
                     <div class="modal-footer">
                         <div class="form-footer d-flex justify-content-center mb-3">
@@ -49,7 +49,7 @@
                     <div class="modal-body">
                         <button type="button" class="close float-end" data-bs-dismiss="modal">
                             <span>&times;</span></button>
-                        <?= $this->forgotFrm?>
+                        <?= $forgotFrm?>
                     </div>
                 </div>
             </div>

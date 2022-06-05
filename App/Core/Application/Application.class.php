@@ -37,17 +37,13 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
      */
     public function __construct()
     {
-        $this->properties();
+        $this->helper = $this->make(AppHelper::class);
         $this->registerBaseBindings();
         $this->registerBaseAppSingleton();
     }
 
-    public function run(?string $url = null)
+    public function run()
     {
-        $urlroute = $url == null ? $this->request->getPath() : $url;
-        if (!empty($urlroute) && $urlroute[-1] === '/') {
-            $this->response->redirect(substr($urlroute, 0, -1));
-        }
         BaseConstants::load($this->app());
         $this->phpVersion();
         $this->handleCors();
@@ -55,10 +51,9 @@ class Application extends AbstractBaseBootLoader implements ApplicationInterface
         $this->loadSession();
         $this->loadCache();
         $this->loadCookies();
-        $this->loadLogger();
         $this->loadEnvironment();
         $this->registeredClass();
-        $this->loadRoutes()->resolve($urlroute);
+        $this->loadRoutes()->resolve();
     }
 
     /**

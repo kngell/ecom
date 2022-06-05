@@ -6,13 +6,19 @@ class VisitorsController extends Controller
 {
     public function track()
     {
-        if ($this->request->exists('post')) {
-            $data = $this->request->get();
-            $table = str_replace(' ', '', ucwords(str_replace('_', ' ', $data['table'])));
-            $model = $this->model($table . 'Manager'::class);
-            if ($output = $model->manageVisitors($data)) {
+        $data = $this->isValidRequest();
+        if (!$this->cache->exists('visitor' . $data['ip'])) {
+            /** @var VisitorsManager */
+            $model = $this->model(VisitorsManager::class)->assign($data);
+            $output = $model->manageVisitors($data);
+            if ($output->count() > 0) {
+                $this->cache->set('visitor' . $data['ip'], $output->count());
                 $this->jsonResponse(['result' => 'success', 'msg' => true]);
             }
+        }
+
+        if ($this->cache->get('visitor' . $data['ip']) > 0) {
+            $this->jsonResponse(['result' => 'success', 'msg' => true]);
         }
     }
 

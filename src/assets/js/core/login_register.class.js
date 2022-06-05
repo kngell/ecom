@@ -57,23 +57,24 @@ class Login_And_Register {
 
     //Fill in login from cookies on shonw
     phpLR.bs_login_box.addEventListener("shown.bs.modal", function () {
-      $.ajax({
+      var data = {
         url: "remember_me",
-        method: "POST",
-        processData: false,
-        contentType: false,
-        dataType: "json",
-        success: function (response) {
-          if (response.result === "success") {
-            phpLR.loginfrm.find("#email").val(response.msg.email);
-            phpLR.loginfrm
-              .find("#customCheckRem")
-              .attr("checked", response.msg.remember);
-          } else {
-            phpLR.loginfrm.find("#email").val("");
-            phpLR.loginfrm.find("#password").val("");
-          }
-        },
+        csrftoken: phpLR.loginfrm.find("input[name='csrftoken']").val(),
+        frm_name: phpLR.loginfrm.attr("id"),
+      };
+      Call_controller(data, (response) => {
+        console.log(response);
+        if (response.result === "success") {
+          phpLR.loginfrm.find("#email").val(response.msg.email);
+          phpLR.loginfrm.find("#password").val(response.msg.password);
+          phpLR.loginfrm
+            .find("#remember_me")
+            .attr("checked", response.msg.remember);
+        } else {
+          phpLR.loginfrm.find("#email").val("");
+          phpLR.loginfrm.find("#password").val("");
+          phpLR.loginfrm.find("#alertErr").html(response.msg);
+        }
       });
     });
     //remove invalid input on focus

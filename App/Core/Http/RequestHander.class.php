@@ -42,6 +42,21 @@ class RequestHandler extends GlobalVariables
         return substr($path, 0, $position);
     }
 
+    public function pageUrl()
+    {
+        $request_uri = explode('/', trim($this->getServer('REQUEST_URI'), '/'));
+        $script_name = explode('/', trim($this->getServer('SCRIPT_NAME'), '/'));
+        $parts = array_diff_assoc($request_uri, $script_name);
+        if (empty($parts)) {
+            return '/';
+        }
+        $path = implode('/', $parts);
+        if (($position = strpos($path, '?')) !== false) {
+            $path = substr($path, 0, $position);
+        }
+        return $path;
+    }
+
     public function getPathReferer() : string
     {
         $path = $this->getServer('HTTP_REFERER') ?? '/';
@@ -85,15 +100,8 @@ class RequestHandler extends GlobalVariables
         }
     }
 
-    /**
-     * Get Data From user input
-     * ==================================================.
-     * @param string $input
-     * @return mixed
-     */
-    public function get(string $input = '') : mixed
+    public function postData(string $input = '', array $postData = []) : mixed
     {
-        $postData = $this->getPost();
         if (isset($postData[$input]) && is_array($postData[$input])) {
             $r = [];
             foreach ($postData[$input] as $val) {
@@ -110,6 +118,44 @@ class RequestHandler extends GlobalVariables
             return $data;
         }
         return isset($postData[$input]) ? $this->sanitizer::clean($postData[$input]) : false;
+    }
+
+    public function getData(string $input = '', array $getData = []) : array
+    {
+        if (is_array($getData) && !empty($getData)) {
+            $gData = isset($getData['url']) ? $getData['url'] : $getData;
+            if (is_string($gData) && str_contains($gData, '/')) {
+                $parts = explode('/', $gData);
+                unset($parts[0]);
+                $parts = array_values($parts);
+                $r = [];
+                foreach ($parts as $key => $part) {
+                    if (str_contains($part, '=')) {
+                        $args = explode('=', $part);
+                        $r[$args[0]] = $this->sanitizer::clean($args[1]);
+                    }
+                }
+            }
+            return $r;
+        }
+    }
+
+    /**
+     * Get Data From user input
+     * ==================================================.
+     * @param string $input
+     * @return mixed
+     */
+    public function get(string $input = '') : mixed
+    {
+        $method = $this->getMethod();
+        $data = $this->{'get' . ucfirst($method)}();
+        if ($data) {
+            return match ($method) {
+                'post' => $this->postData($input, $data),
+                'get' => $this->getData($input, $data)
+            };
+        }
     }
 
     /**

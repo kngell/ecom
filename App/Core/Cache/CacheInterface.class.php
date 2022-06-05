@@ -109,5 +109,5 @@ interface CacheInterface
      * @throws CacheRepositoryInvalidArgumentException
      *   MUST be thrown if the $key string is not a legal value.
      */
-    public function has(string $key): bool;
+    public function exists(string $key): bool;
 }

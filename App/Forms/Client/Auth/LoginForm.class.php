@@ -5,9 +5,13 @@ class LoginForm extends ClientFormBuilder implements ClientFormBuilderInterface
 {
     private string $label = '<div>&nbspRemember Me&nbsp</div>';
 
-    public function __construct(?Object $repository = null, ?string $templateName = null)
+    public function __construct(private FormBuilderBlueprint $print, ?Object $repository = null, ?string $templateName = null)
     {
-        parent::__construct($repository, $templateName);
+        $path = FILES . 'Template' . DS . 'Users' . DS . 'Auth' . DS . 'Forms' . DS . ($templateName ?? $this::class) . 'Template.php';
+        if (file_exists($path)) {
+            $this->template = file_get_contents($path);
+        }
+        parent::__construct($repository);
     }
 
     /**
@@ -27,18 +31,26 @@ class LoginForm extends ClientFormBuilder implements ClientFormBuilderInterface
             'enctype' => 'multipart/form-data',
         ]);
         $this->template = str_replace('{{form_begin}}', $form->begin(), $this->template);
-        $this->template = str_replace('{{email}}', (string) $form->input([
-            EmailType::class => ['name' => 'email'],
-        ])->placeholder('Email :')->class('email')->noLabel(), $this->template);
-        $this->template = str_replace('{{password}}', (string) $form->input([
-            PasswordType::class => ['name' => 'password'],
-        ])->placeholder('Password :')->noLabel(), $this->template);
-        $this->template = str_replace('{{remamber_me}}', (string) $form->input([
-            CheckboxType::class => ['name' => 'remember_me'],
-        ])->labelClass('checkbox')->label($this->label)->spanClass('checkbox__box text-danger'), $this->template);
-        $this->template = str_replace('{{submit}}', (string) $form->input([
-            SubmitType::class => ['name' => 'signin'],
-        ])->label('Login'), $this->template);
+        $this->template = str_replace('{{email}}', $form->input($this->print->email(name:'email'))
+            ->placeholder('Email :')
+            ->class('email')
+            ->id('email')
+            ->noLabel()
+            ->html(), $this->template);
+        $this->template = str_replace('{{password}}', $form->input($this->print->password(name:'password'))
+            ->placeholder('Password :')
+            ->id('passwords')
+            ->noLabel()
+            ->html(), $this->template);
+        $this->template = str_replace('{{remamber_me}}', $form->input($this->print->checkbox(name:'remember_me'))
+            ->labelClass('checkbox')
+            ->label($this->label)
+            ->spanClass('checkbox__box text-danger')
+            ->id('remember_me')
+            ->html(), $this->template);
+        $this->template = str_replace('{{submit}}', $form->input($this->print->submit(name: 'sigin'))
+            ->label('Login')->id('sigin')
+            ->html(), $this->template);
         $this->template = str_replace('{{form_end}}', $form->end(), $this->template);
         return $this->template;
     }

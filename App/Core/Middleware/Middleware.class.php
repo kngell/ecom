@@ -16,16 +16,16 @@ class Middleware
      * @param array $middlewares
      * @return void
      */
-    public function __construct(array $middlewares = [])
+    public function __construct(array $middlewares = [], array $contructorArgs = [])
     {
         $output = [];
         if ($middlewares) {
             foreach ($middlewares as $key => $middleware) {
                 if (str_contains($middleware, $key)) {
                     if ($middleware) {
-                        $output[] = $this->$key = Application::diGet($middleware);
+                        $output[] = $this->$key = Application::diGet($middleware, $contructorArgs);
                     } else {
-                        $output[] = Application::diGet($middleware);
+                        $output[] = Application::diGet($middleware, $contructorArgs);
                     }
                 }
             }
@@ -39,7 +39,7 @@ class Middleware
      * @param mixed $middlewares
      * @return self
      */
-    public function middlewares(array $middlewares) : self
+    public function middlewares(array $middlewares, array $contructorArgs = []) : self
     {
         if ($middlewares instanceof self) {
             $middlewares = $middlewares->toArray();
@@ -50,7 +50,7 @@ class Middleware
         if (!is_array($middlewares)) {
             throw new MiddlewareInvalidArgumentException(get_class($middlewares) . ' is not a valid middleware object.');
         }
-        return new static(array_merge($this->middlewares, $middlewares));
+        return new static(array_merge($this->middlewares, $middlewares),$contructorArgs);
     }
 
     /**

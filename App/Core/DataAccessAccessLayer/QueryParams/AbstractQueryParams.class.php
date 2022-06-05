@@ -19,15 +19,6 @@ abstract class AbstractQueryParams implements QueryParamsInterface
         return (isset($this->query_params['conditions']) && $this->query_params['conditions'] != []) ? true : false;
     }
 
-    public function reset() : self
-    {
-        $this->query_params = [];
-        $this->current_table = '';
-        $this->conditionBreak = [];
-        $this->braceOpen = '';
-        return $this;
-    }
-
     protected function separator(mixed $separator, mixed $key) : string
     {
         if (is_string($separator) && is_numeric($key) && in_array(strtoupper($separator), self::SEPARATOR)) {
@@ -180,6 +171,48 @@ abstract class AbstractQueryParams implements QueryParamsInterface
             return trim($parts[0]);
         }
         return $tbl;
+    }
+
+    protected function getSelectors() : array
+    {
+        $selectors = [];
+        $this->key('selectors');
+        if (array_key_exists('table_join', $this->query_params)) {
+            foreach ($this->query_params['table_join'] as $tbl => $columns) {
+                if (!is_array($columns)) {
+                    throw new Exception('Columns must be in array!');
+                }
+                foreach ($columns as $column) {
+                    if (str_contains($column, '|')) {
+                        $parts = explode('|', $column);
+                        if (is_array($parts) && count($parts) < 3) {
+                            array_push($selectors, $parts[0] . '(' . $tbl . '.' . $parts[1] . ')');
+                        } else {
+                            array_push($selectors, $parts[0] . '(' . $tbl . '.' . $parts[1] . ') AS ' . $parts[2]);
+                        }
+                    } else {
+                        array_push($selectors, $tbl . '.' . $column);
+                    }
+                }
+            }
+        }
+        return $this->query_params['selectors'] = $selectors;
+    }
+
+    protected function recursiveCount() : void
+    {
+        if (isset($this->query_params['table_join'])) {
+            foreach ($this->query_params['table_join'] as $tbl => $tblParams) {
+                foreach ($tblParams as $field) {
+                    if (str_contains($field, 'COUNT')) {
+                        $part = explode('|', $field);
+                        $this->query_params['options']['recursive']['COUNT'] = $part[0] ?? '';
+                        $this->query_params['options']['recursive']['field'] = $part[1] ?? '';
+                        $this->query_params['options']['recursive']['AS'] = $part[2] ?? '';
+                    }
+                }
+            }
+        }
     }
 
     private function operator(array $parts) : string

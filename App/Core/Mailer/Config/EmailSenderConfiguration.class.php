@@ -5,7 +5,7 @@ declare(strict_types=1);
 class EmailSenderConfiguration
 {
     private string $subject = 'Welcome!';
-    private string $cssPath = ASSET . 'css' . DS . 'custom' . DS . 'client' . DS . 'users' . DS . 'email' . DS . 'welcome' . DS . 'welcomeTemplate.css';
+    private string $cssPath = ASSET . 'css' . DS . 'custom' . DS . 'client' . DS . 'users' . DS . 'email' . DS . 'main.css';
     private string $emailTemplate = 'users' . DS . 'emailTemplate' . DS . 'welcomeTemplate';
     private string $rootPath = 'Client/';
     private string $layout = 'emailTemplate';

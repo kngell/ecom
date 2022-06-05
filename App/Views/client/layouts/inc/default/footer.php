@@ -1,4 +1,7 @@
   <!-- Start footer -->
+  <!-- Comments -->
+  <?= $comments ?? ''?>
+  <!-- End Comments -->
   <footer id="footer" class="mt-5 pt-5 pb-3">
       <div class="container">
           <div class="row mx-auto mt-5">
@@ -78,7 +81,6 @@
       </div>
   </footer>
   <!-- End footer -->
-  <?= $this->content('footer'); ?>
   <!-- Librairies -->
   <script type="text/javascript" src="<?= $this->asset('js/librairies/frontlib', 'js') ?? '' ?>">
   </script>
@@ -94,6 +96,7 @@
   <!-- Mainjs -->
   <script type="text/javascript" src="<?= $this->asset('js/main/frontend/main', 'js') ?? '' ?>">
   </script>
+  <?= $this->content('footer'); ?>
   </body>
 
   </html>

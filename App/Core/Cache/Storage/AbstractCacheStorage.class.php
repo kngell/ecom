@@ -17,14 +17,14 @@ abstract class AbstractCacheStorage implements IterableStorageInterface
      *
      * @var string
      */
-    protected string $cacheDirectory = '';
+    protected string $cacheDirectory = CACHE_DIR;
 
     /**
      * A file extension to use for each cache entry.
      *
      * @var string
      */
-    protected string $cacheEntryFileExtension = '';
+    protected string $cacheEntryFileExtension = '.txt';
 
     /**
      * @var string[]
@@ -61,7 +61,7 @@ abstract class AbstractCacheStorage implements IterableStorageInterface
      */
     public function setCacheDirectory(string $cacheDirectory): void
     {
-        $this->cacheDirectory = rtrim($cacheDirectory, '/') . '/';
+        $this->cacheDirectory = rtrim($cacheDirectory, DS) . DS;
     }
 
     /**

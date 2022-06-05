@@ -20,7 +20,7 @@ class VerifyUserAccountForm extends ClientFormBuilder implements ClientFormBuild
             EmailType::class => ['name' => 'email', 'id' => 'verify_email'],
         ])->placeholder('Email :')->class('email')->noLabel(), $this->template);
         $this->template = str_replace('{{submit}}', (string) $form->input([
-            SubmitType::class => ['name' => 'verify'],
+            SubmitType::class => ['name' => 'verify-btn'],
         ])->label('Send Link'), $this->template);
         $this->template = str_replace('{{form_end}}', $form->end(), $this->template);
         return $this->template;

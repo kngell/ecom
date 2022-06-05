@@ -7,7 +7,7 @@ use DateTimeInterface;
 class UsersEntity extends Entity
 {
     /** @id */
-    private int $userID;
+    private int $userId;
     /** @Last Name */
     private string $lastName;
     private string $firstName;
@@ -22,30 +22,32 @@ class UsersEntity extends Entity
     /** @media */
     private string $profileImage;
     private string $salt;
-    private string $token;
-    private string $user_cookie;
-    private string $user_customerID;
-    private string $remember_cookie;
+    private string $userToken;
+    private string $userCookie;
+    private string $customerId;
+    private string $rememberMeCookie;
     /** @var DateTimeInterface */
-    private DateTimeInterface $token_expire;
+    private DateTimeInterface $tokenExpire;
     private string $phone;
     private int $deleted;
     private int $verified;
-    private string $fb_access_token;
+    private string $fbAccessToken;
     private string $terms;
     private string $cpassword;
 
     public function __construct()
     {
-        $this->registerDate = new DateTimeImmutable();
+        if (!isset($this->registerDate)) {
+            $this->registerDate = new DateTimeImmutable();
+        }
     }
 
     /**
      * Get the value of userID.
      */
-    public function getUserID() : int
+    public function getUserId() : int
     {
-        return $this->userID;
+        return $this->userId;
     }
 
     /**
@@ -211,9 +213,9 @@ class UsersEntity extends Entity
     /**
      * Get the value of token.
      */
-    public function getToken() : string
+    public function getUserToken() : string
     {
-        return $this->token;
+        return $this->userToken;
     }
 
     /**
@@ -221,86 +223,9 @@ class UsersEntity extends Entity
      *
      * @return  self
      */
-    public function setToken(string $token) : self
+    public function setUserToken(string $token) : self
     {
-        $this->token = $token;
-        return $this;
-    }
-
-    /**
-     * Get the value of user_cookie.
-     */
-    public function getUser_cookie() : string
-    {
-        return $this->user_cookie;
-    }
-
-    /**
-     * Set the value of user_cookie.
-     *
-     * @return  self
-     */
-    public function setUser_cookie(string $user_cookie) : self
-    {
-        $this->user_cookie = $user_cookie;
-        return $this;
-    }
-
-    /**
-     * Get the value of user_customerID.
-     */
-    public function getUser_customerID() : string
-    {
-        return $this->user_customerID;
-    }
-
-    /**
-     * Set the value of user_customerID.
-     *
-     * @return  self
-     */
-    public function setUser_customerID(string $user_customerID) : self
-    {
-        $this->user_customerID = $user_customerID;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of remember_cookie.
-     */
-    public function getRemember_cookie() : string
-    {
-        return $this->remember_cookie;
-    }
-
-    /**
-     * Set the value of remember_cookie.
-     *
-     * @return  self
-     */
-    public function setRemember_cookie(string $remember_cookie) : self
-    {
-        $this->remember_cookie = $remember_cookie;
-        return $this;
-    }
-
-    /**
-     * Get the value of token_expire.
-     */
-    public function getToken_expire() : DateTimeInterface
-    {
-        return $this->token_expire;
-    }
-
-    /**
-     * Set the value of token_expire.
-     *
-     * @return  self
-     */
-    public function setToken_expire(DateTimeInterface $token_expire) : self
-    {
-        $this->token_expire = $token_expire;
+        $this->userToken = $token;
         return $this;
     }
 
@@ -363,37 +288,18 @@ class UsersEntity extends Entity
     }
 
     /**
-     * Get the value of fb_access_token.
-     */
-    public function getFb_access_token() : string
-    {
-        return $this->fb_access_token;
-    }
-
-    /**
-     * Set the value of fb_access_token.
-     *
-     * @return  self
-     */
-    public function setFb_access_token(string $fb_access_token) : self
-    {
-        $this->fb_access_token = $fb_access_token;
-        return $this;
-    }
-
-    /**
      * Set the value of userID.
      *
      * @return  self
      */
-    public function setUserID($userID)
+    public function setUserId($userID)
     {
-        $this->userID = $userID;
+        $this->userId = $userID;
 
         return $this;
     }
 
-    public function delete(string $field) : self
+    public function delete(?string $field = null) : self
     {
         if (isset($this->$field)) {
             unset($this->$field);
@@ -437,6 +343,112 @@ class UsersEntity extends Entity
     public function setCpassword($cpassword)
     {
         $this->cpassword = $cpassword;
+        return $this;
+    }
+
+    /**
+     * Get the value of userCookie.
+     */
+    public function getUserCookie() : string
+    {
+        return $this->userCookie;
+    }
+
+    /**
+     * Set the value of userCookie.
+     *
+     * @return  self
+     */
+    public function setUserCookie(string $userCookie) : self
+    {
+        $this->userCookie = $userCookie;
+        return $this;
+    }
+
+    /**
+     * Get the value of userCustomerID.
+     */
+    public function getCustomerId() : string
+    {
+        return $this->customerId;
+    }
+
+    /**
+     * Set the value of userCustomerID.
+     *
+     * @return  self
+     */
+    public function setCustomerId(string $userCustomerID) : self
+    {
+        $this->customerId = $userCustomerID;
+        return $this;
+    }
+
+    /**
+     * Get the value of rememberCookie.
+     */
+    public function getRememberMeCookie() : string
+    {
+        return $this->rememberMeCookie;
+    }
+
+    /**
+     * Set the value of rememberCookie.
+     *
+     * @return  self
+     */
+    public function setRememberMeCookie(string $rememberCookie) : self
+    {
+        $this->rememberMeCookie = $rememberCookie;
+        return $this;
+    }
+
+    /**
+     * Get the value of tokenExpire.
+     */
+    public function getTokenExpire() : DateTimeInterface
+    {
+        return $this->tokenExpire;
+    }
+
+    /**
+     * Set the value of tokenExpire.
+     *
+     * @return  self
+     */
+    public function setTokenExpire(DateTimeInterface $tokenExpire) : self
+    {
+        $this->tokenExpire = $tokenExpire;
+        return $this;
+    }
+
+    /**
+     * Get the value of fbAccessToken.
+     */
+    public function getFbAccessToken() : string
+    {
+        return $this->fbAccessToken;
+    }
+
+    /**
+     * Set the value of fbAccessToken.
+     *
+     * @return  self
+     */
+    public function setFbAccessToken(string $fbAccessToken) : self
+    {
+        $this->fbAccessToken = $fbAccessToken;
+        return $this;
+    }
+
+    /**
+     * Set the value of registerDate.
+     *
+     * @return  self
+     */
+    public function setRegisterDate(DateTimeInterface $registerDate) : self
+    {
+        $this->registerDate = $registerDate;
         return $this;
     }
 }

@@ -98,7 +98,6 @@ class Cache extends AbstractCache
         foreach ($keys as $key) {
             $result[$key] = $this->get($key, $default);
         }
-
         return $result;
     }
 
@@ -116,7 +115,6 @@ class Cache extends AbstractCache
         foreach ($values as $key => $value) {
             $all = $this->set($key, $value, $ttl) && $all;
         }
-
         return $all;
     }
 
@@ -131,7 +129,6 @@ class Cache extends AbstractCache
         foreach ($keys as $key) {
             $this->delete($key);
         }
-
         return true;
     }
 
@@ -141,7 +138,7 @@ class Cache extends AbstractCache
      * @param string $key
      * @return bool
      */
-    public function has(string $key): bool
+    public function exists(string $key): bool
     {
         $this->ensureCacheEntryIdentifierIsvalid($key);
         return $this->storage->hasCache($key);

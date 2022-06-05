@@ -5,13 +5,13 @@ declare(strict_types=1);
 class GroupsEntity extends Entity
 {
     /** @id */
-    private int $grID;
+    private int $grId;
     /** @Status */
     private string $status;
     private string $name;
     private string $description;
     /** @var DateTimeInterface */
-    private DateTimeInterface $date_enreg;
+    private DateTimeInterface $dateEnreg;
     /** @var DateTimeInterface */
     private DateTimeInterface $updateAt;
     private int $parentID;
@@ -19,15 +19,15 @@ class GroupsEntity extends Entity
 
     public function __construct()
     {
-        $this->date_enreg = !isset($this->date_enreg) ? new DateTimeImmutable() : $this->date_enreg;
+        $this->dateEnreg = !isset($this->dateEnreg) ? new DateTimeImmutable() : $this->dateEnreg;
     }
 
     /**
      * Get the value of grID.
      */
-    public function getGrID()
+    public function getGrId()
     {
-        return $this->grID;
+        return $this->grId;
     }
 
     /**
@@ -35,9 +35,9 @@ class GroupsEntity extends Entity
      *
      * @return  self
      */
-    public function setGrID($grID)
+    public function setGrId($grID)
     {
-        $this->grID = $grID;
+        $this->grId = $grID;
 
         return $this;
     }
@@ -103,14 +103,6 @@ class GroupsEntity extends Entity
     }
 
     /**
-     * Get the value of date_enreg.
-     */
-    public function getDate_enreg()
-    {
-        return $this->date_enreg;
-    }
-
-    /**
      * Get the value of updateAt.
      */
     public function getUpdateAt()
@@ -133,7 +125,7 @@ class GroupsEntity extends Entity
     /**
      * Get the value of parentID.
      */
-    public function getParentID()
+    public function getParentId()
     {
         return $this->parentID;
     }
@@ -143,7 +135,7 @@ class GroupsEntity extends Entity
      *
      * @return  self
      */
-    public function setParentID($parentID)
+    public function setParentId($parentID)
     {
         $this->parentID = $parentID;
 
@@ -170,8 +162,28 @@ class GroupsEntity extends Entity
         return $this;
     }
 
-    public function delete(string $field) : void
+    public function delete(?string $field = null) : self
     {
         unset($this->$field);
+        return $this;
+    }
+
+    /**
+     * Get the value of dateEnreg.
+     */
+    public function getDateEnreg() : DateTimeInterface
+    {
+        return $this->dateEnreg;
+    }
+
+    /**
+     * Set the value of dateEnreg.
+     *
+     * @return  self
+     */
+    public function setDateEnreg(DateTimeInterface $dateEnreg) : self
+    {
+        $this->dateEnreg = $dateEnreg;
+        return $this;
     }
 }

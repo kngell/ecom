@@ -119,9 +119,6 @@ class ImageManager implements FilesManagerInterface
         return $result;
     }
 
-    //=======================================================================
-    //Image Destroy
-    //=======================================================================
     public function destroyImage(?GdImage &$img = null)
     {
         if (isset($img)) {

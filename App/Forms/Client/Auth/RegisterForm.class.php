@@ -7,6 +7,10 @@ class RegisterForm extends ClientFormBuilder implements ClientFormBuilderInterfa
 
     public function __construct(?Object $repository = null, ?string $templateName = null)
     {
+        $path = FILES . 'Template' . DS . 'Users' . DS . 'Auth' . DS . 'Forms' . DS . ($templateName ?? $this::class) . 'Template.php';
+        if (file_exists($path)) {
+            $this->template = file_get_contents($path);
+        }
         parent::__construct($repository, $templateName);
     }
 
@@ -43,7 +47,7 @@ class RegisterForm extends ClientFormBuilder implements ClientFormBuilderInterfa
         ])->label($this->label)->labelClass('checkbox')->spanClass('checkbox__box text-danger')->req(), $this->template);
         $this->template = str_replace('{{submit}}', (string) $form->input([
             SubmitType::class => ['name' => 'reg_singin'], ], null, ['show_label' => false,
-            ])->label('Register'), $this->template);
+            ])->label('Register')->id('reg_singin'), $this->template);
         $this->template = str_replace('{{form_end}}', $this->form()->end(), $this->template);
         return $this->template;
     }

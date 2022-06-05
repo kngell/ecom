@@ -19,11 +19,17 @@
     font-weight: $weight
     font-display: swap
     src: $src
-	
+=fontAwesome($font: "\f007",$color: $gray-common,$size:0.95rem)	
+  font-family: "Font Awesome 6 free"
+  font-weight: 900
+  content: $font
+  color: $color
+  -webkit-align-self: end
+  align-self: end
+  font-size: $size
+  overflow: hidden
+  position: relative
 
-// =============================================================================
-// Background image
-// =============================================================================
 =background($imgpath, $position: 0 0, $repeat: no-repeat) 
   background: 
     image: url($imgpath)

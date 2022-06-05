@@ -60,6 +60,12 @@ class Mailer extends AbstractMailer
         return $this;
     }
 
+    public function charset(string $hset) : self
+    {
+        $this->transporterObject->CharSet = $hset;
+        return $this;
+    }
+
     /**
      * @inheritdoc
      * @param string $message

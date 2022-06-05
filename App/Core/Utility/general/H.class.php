@@ -13,7 +13,6 @@ class H
         if ($currentPage == '/index.php' || $currentPage == PROOT || $currentPage == PROOT . 'home/index') {
             return PROOT . 'home';
         }
-
         return $currentPage;
     }
 

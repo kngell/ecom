@@ -48,20 +48,20 @@ abstract class AbstractBaseBootLoader extends Container
      * container using PHP Reflection.
      *
      * @param string $dependencies
+     * @param array $args
      * @return mixed
      */
-    public static function diGet(string $class): mixed
+    public static function diGet(string $class, array $args = []): mixed
     {
+        if (!empty($args)) {
+            return self::getInstance()->make($class, $args);
+        }
         return self::getInstance()->make($class);
-        // $container = (new ContainerFactory())->create();
-        // if ($container) {
-        //     return $container->make($dependencies);
-        // }
     }
 
     public function loadCache(): CacheInterface
     {
-        $cache = $this->make(CacheFacade::class)->create($this->app()->getCacheIdentifier());
+        $cache = $this->make(CacheFacade::class)->create($this->app()->getCacheIdentifier(), $this->app()->getCache());
         if ($this->app()->isCacheGlobal() === true) {
             GLobalManager::set($this->app()->getGlobalCacheKey(), $cache);
         }
@@ -163,13 +163,12 @@ abstract class AbstractBaseBootLoader extends Container
 
     protected function loadRoutes()
     {
-        $routes = $this->app()->getRoutes();
-        $factory = $this->make(RooterFactory::class, [
-            'rooter' => $this->app()->make(RooterInterface::class),
-        ])->create($routes, $this->app()->getControllerArray());
-        if (count($routes) > 0) {
-            return $factory->buildRoutes($routes);
-        }
+        return $this->make(RooterFactory::class, [
+            'rooter' => $this->app()->make(RooterInterface::class, [
+                'controllerProperties' => $this->loadProviders(),
+            ]),
+            'routes' => $this->app()->getRoutes(),
+        ])->create();
     }
 
     protected function loadCookies()
@@ -186,38 +185,5 @@ abstract class AbstractBaseBootLoader extends Container
         error_reporting($this->app()->getErrorHandlerLevel());
         set_error_handler($this->app()->getErrorHandling()['error']);
         set_exception_handler($this->app()->getErrorHandling()['exception']);
-    }
-
-    /**
-     * @return mixed
-     */
-    protected function loadLogger()
-    {
-        //$this->app()->getLogger()
-        return $this->make(LoggerFactory::class)
-            ->create($this->app()->getLoggerFile(), $this->app()->getLogMinLevel(), $this->app()->getLoggerOptions());
-    }
-
-    /**
-     * Load the themeBuilder component.
-     *
-     * @return ThemeBuilder
-     */
-    protected function loadThemeBuilder(): ThemeBuilder
-    {
-        $themeFactory = new ThemeBuilderFactory();
-        $themeOptions = $this->app()->getThemeBuilderOptions();
-        $themeDefault = $this->app()->getDefaultThemeBuilder();
-        $themeBuilder = $themeFactory->create($themeDefault, $themeOptions);
-        if ($themeBuilder) {
-            return $themeBuilder;
-        }
-    }
-
-    protected function properties()
-    {
-        $this->request = $this->make(RequestHandler::class);
-        $this->response = $this->make(ResponseHandler::class);
-        $this->helper = $this->make(AppHelper::class);
     }
 }

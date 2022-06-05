@@ -5,6 +5,10 @@ class ForgotPasswordForm extends ClientFormBuilder implements ClientFormBuilderI
 {
     public function __construct(?Object $repository = null, ?string $templateName = null)
     {
+        $path = FILES . 'Template' . DS . 'Users' . DS . 'Auth' . DS . 'Forms' . DS . ($templateName ?? $this::class) . 'Template.php';
+        if (file_exists($path)) {
+            $this->template = file_get_contents($path);
+        }
         parent::__construct($repository, $templateName);
     }
 

@@ -22,16 +22,16 @@ class CacheConfig
             'default_storage' => self::DEFAULT_DRIVER,
             'drivers' => [
                 'native_storage' => [
-                    'class' => '\MagmaCore\Cache\Storage\NativeCacheStorage',
+                    'class' => 'NativeCacheStorage',
                     'default' => true,
                 ],
                 'array_storage' => [
-                    'class' => '\MagmaCore\Cache\Storage\ArrayCacheStorage',
+                    'class' => 'ArrayCacheStorage',
                     'default' => false,
 
                 ],
                 'pdo_storage' => [
-                    'class' => '\MagmaCore\Cache\Storage\PdoCacheStorage',
+                    'class' => 'PdoCacheStorage',
                     'default' => false,
 
                 ],

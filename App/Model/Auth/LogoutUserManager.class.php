@@ -18,12 +18,9 @@ class LogoutUserManager extends Model
     {
         list($token, $id) = $this->deleteUserSessionAndCookie();
         if (!empty($id)) {
-            $this->userSession->table()->where(['userID' => $id, 'session_token' => $token]);
+            $this->userSession->table()->where(['user_id' => $id, 'session_token' => $token]);
             $this->userSession = $this->userSession->getAll();
-            if ($this->userSession->count() === 1) {
-                $this->userSession->getQueryParams()->reset();
-                return $this->userSession->assign((array) current($this->userSession->get_results()))->delete();
-            }
+            return $this->userSession->count() === 1 ? $this->userSession->assign(current($this->userSession->get_results())) : null;
         }
         return null;
     }
@@ -35,7 +32,7 @@ class LogoutUserManager extends Model
             $this->cookie->delete(TOKEN_NAME);
         }
         if ($this->session->exists(CURRENT_USER_SESSION_NAME)) {
-            $id = $this->session->get(CURRENT_USER_SESSION_NAME);
+            $id = $this->session->get(CURRENT_USER_SESSION_NAME)['id'];
             $this->session->delete(CURRENT_USER_SESSION_NAME);
         }
         return [$token ?? '', $id ?? ''];

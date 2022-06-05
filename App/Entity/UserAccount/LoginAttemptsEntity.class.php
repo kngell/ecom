@@ -11,13 +11,13 @@ class LoginAttemptsEntity extends Entity
     private string $timestamp;
     private string $ip;
     /** @var DateTimeInterface */
-    private DateTimeInterface $created_at;
+    private DateTimeInterface $createdAt;
     /** @var DateTimeInterface */
-    private DateTimeInterface $updated_at;
+    private DateTimeInterface $updatedAt;
 
     public function __construct()
     {
-        $this->created_at = new DateTimeImmutable();
+        $this->createdAt = !isset($this->createdAt) ? new DateTimeImmutable() : $this->createdAt;
     }
 
     /**
@@ -88,36 +88,47 @@ class LoginAttemptsEntity extends Entity
         return $this;
     }
 
-    /**
-     * Get the value of created_at.
-     */
-    public function getCreated_at()
+    public function delete(?string $field = null) : self
     {
-        return $this->created_at;
-    }
-
-    /**
-     * Get the value of updated_at.
-     */
-    public function getUpdated_at()
-    {
-        return $this->updated_at;
-    }
-
-    /**
-     * Set the value of updated_at.
-     *
-     * @return  self
-     */
-    public function setUpdated_at($updated_at)
-    {
-        $this->updated_at = $updated_at;
-
+        unset($this->$field);
         return $this;
     }
 
-    public function delete(string $field) : void
+    /**
+     * Get the value of createdAt.
+     */
+    public function getCreatedAt() : DateTimeInterface
     {
-        unset($this->$field);
+        return $this->createdAt;
+    }
+
+    /**
+     * Set the value of createdAt.
+     *
+     * @return  self
+     */
+    public function setCreatedAt(DateTimeInterface $createdAt) : self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * Get the value of updatedAt.
+     */
+    public function getUpdatedAt() : DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * Set the value of updatedAt.
+     *
+     * @return  self
+     */
+    public function setUpdatedAt(DateTimeInterface $updatedAt) : self
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
     }
 }

@@ -44,14 +44,18 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
      */
     public function select():string
     {
-        if ($this->isValidquerytype('select')) {
-            if (!$this->sql = $this->join($this->key['selectors'], $this->key['extras'])) {
-                $this->sql = $this->mainQuery();
-            }
+        if ($this->isValidQueryType('select')) {
+            list($this->sql, $query) = match (true) {
+                array_key_exists('join_rules', $this->key['extras']) => $this->recursiveQuery($this->join($this->key['selectors'], $this->key['extras'])),
+                default => $this->recursiveQuery($this->mainQuery()),
+            };
             $this->sql .= $this->where();
             $this->sql .= $this->groupBy();
             $this->sql .= $this->orderBy();
             $this->sql .= $this->queryOffset();
+            if (array_key_exists('recursive', $this->key['extras'])) {
+                $this->sql = $this->recursive($query, $this->sql);
+            }
             return $this->sql . (isset($this->key['where']['bind_array']) ? '&' . serialize($this->key['where']['bind_array']) : '');
         }
         return false;
@@ -64,7 +68,7 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
      */
     public function showColumn() : string
     {
-        if ($this->isValidquerytype('show')) {
+        if ($this->isValidQueryType('show')) {
             return $this->sql = 'SHOW COLUMNS FROM ' . "{$this->key['table']}";
         }
         return false;
@@ -78,7 +82,7 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
      */
     public function update():string
     {
-        if ($this->isValidquerytype('update')) {
+        if ($this->isValidQueryType('update')) {
             if (is_array($this->key['fields']) && count($this->key['fields']) > 0) {
                 $keyValues = '';
                 //Fields
@@ -109,7 +113,7 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
      */
     public function delete():string
     {
-        if ($this->isValidquerytype('delete')) {
+        if ($this->isValidQueryType('delete')) {
             if (is_array($this->key['conditions']) && count($this->key['conditions']) > 0) {
                 $this->sql = (isset($this->key['conditions'][0]) && $this->key['conditions'][0] != 'all') ? 'DELETE FROM ' . $this->key['table'] : 'DELETE FROM ' . $this->key['table'] . $this->where();
                 return $this->sql . (isset($this->key['where']['bind_array']) ? '&' . serialize($this->key['where']['bind_array']) : '');
@@ -127,7 +131,7 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
      */
     public function search():string
     {
-        if ($this->isValidquerytype('search')) {
+        if ($this->isValidQueryType('search')) {
             if (is_array($this->key['fields']) && count($this->key['fields']) > 0) {
                 $index = array_keys($this->key['conditions']);
                 $this->sql = "DELETE from {$this->key['table']} WHERE {$index[0]} = :{$index[0]} LIMIT 1";
@@ -154,7 +158,7 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
      */
     public function customQuery() : string
     {
-        if ($this->isValidquerytype('custom')) {
+        if ($this->isValidQueryType('custom')) {
             return $this->key['custom'];
         }
         return false;
@@ -162,7 +166,7 @@ class QueryBuilder extends AbstractQueryBuilder implements QueryBuilderInterface
 
     public function delete_bis() : string
     {
-        if ($this->isValidquerytype('custom')) {
+        if ($this->isValidQueryType('custom')) {
             if (is_array($this->key['fields']) && count($this->key['fields']) > 0) {
                 $index = array_keys($this->key['conditions']);
                 $this->sql = "DELETE from {$this->key['table']} WHERE {$index[0]} = :{$index[0]} LIMIT 1";

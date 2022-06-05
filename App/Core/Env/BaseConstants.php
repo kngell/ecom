@@ -50,7 +50,7 @@ final class BaseConstants
         defined('UPLOAD_ROOT') or define('UPLOAD_ROOT', ROOT . 'public' . DS . 'assets' . DS . 'img' . DS . 'upload' . DS);
         defined('LAZYLOAD_ROOT') or define('LAZYLOAD_ROOT', ROOT . 'public' . DS . 'assets' . DS . 'lazyload' . DS);
         defined('CUSTOM_VALIDATOR') or define('CUSTOM_VALIDATOR', ROOT . DS . 'app' . DS . 'custom_validator' . DS);
-        defined('CACHE_DIR') or define('CACHE_DIR', ROOT . DS . 'temp');
+        defined('CACHE_DIR') or define('CACHE_DIR', ROOT . 'Storage' . DS . 'Cache' . DS);
 
         // -----------------------------------------------------------------------
         // URL ROOT
@@ -158,8 +158,10 @@ final class BaseConstants
         // Form
         // -----------------------------------------------------------------------
         defined('CSRF_TOKEN_SECRET') or define('CSRF_TOKEN_SECRET', 'sdgdsfdsffgfgglkglqhgfjgqe46454878');
-        defined('CONTAINER_NAME') or define('CONTAINER_NAME', 'xddfdshgsdf');
-        defined('CONTAINER_INSTANCES') or define('CONTAINER_INSTANCES', 'qsdsqdsqxssqd');
+        // -----------------------------------------------------------------------
+        // Comments
+        // -----------------------------------------------------------------------
+        defined('COMMENT_APPROVAL_REQUIRED') or define('COMMENT_APPROVAL_REQUIRED', 0);
     }
 
     /**

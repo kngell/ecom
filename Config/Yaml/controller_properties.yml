@@ -4,9 +4,5 @@ cookie: CookieInterface
 request: RequestHandler
 response: ResponseHandler
 token: Token
-money: MoneyManager
 helper: ControllerHelper
-loginFrm: LoginForm
-registerFrm: RegisterForm
-forgotFrm: ForgotPasswordForm
 dispatcher: DispatcherFactory

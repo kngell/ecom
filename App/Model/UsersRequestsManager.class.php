@@ -10,4 +10,10 @@ class UsersRequestsManager extends Model
     {
         parent::__construct($this->_table, $this->_colID);
     }
+
+    public function getRequest(int $id) : self
+    {
+        $request_params = $this->table()->where([$this->entity->getColID() => $id, 'type' => 0])->return('class');
+        return $this->getAll($request_params);
+    }
 }

@@ -29,7 +29,7 @@ class GrantAccess
         return static::$instance;
     }
 
-    public function getMenu(string $menu)
+    public function getMenu(string $menu, ?string $submenu = null)
     {
         $menuAry = [];
         $menu = $this->fileSystem->get(APP, $menu . '.json');
@@ -55,7 +55,7 @@ class GrantAccess
                 }
             }
         }
-        return $menuAry;
+        return $submenu !== null && isset($menuAry[$submenu]) ? $menuAry[$submenu] : $menuAry;
     }
 
     private function accountIsVerified(array $acl) : array
@@ -107,7 +107,7 @@ class GrantAccess
         if (preg_match('/https?:\/\//', $route) == 1) {
             return $route;
         } else {
-            if ($this->hasAccess(get_class($this->container->make('controller')), $this->container->make('method'))) {
+            if ($this->hasAccess($this->container->make('controller'), $this->container->make('method'))) {
                 return $route;
             }
             return false;

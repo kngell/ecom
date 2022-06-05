@@ -1,0 +1,85 @@
+@use "corecss/variables" as *
+@use "corecss/mixins" as *
+
+#comments_section
+    *
+        box-sizing: border-box
+        font-family: $font-comments
+        font-size: 1rem
+        -webkit-font-smoothing: antialiased
+        -moz-osx-smoothing: grayscale
+    #comments-section-wrapper
+        background-color: $white-color
+        margin: 0 auto
+        .comments_header
+            display: inline-flex
+            align-items: center
+            vertical-align: bottom
+            width: 100%
+            margin: 30px auto
+            border-bottom: 1px solid #ebebeb
+            color: #666
+            .title
+                margin-right: .625rem
+                font-weight: bold
+        .content
+            width: 100%
+            margin: 0 auto
+        h2
+            margin: 0
+            padding: 1.5625rem 0
+        .user
+            font-weight: 600
+            color: $gray-700
+        .time, .reply
+            color: $gray-600
+            font-size: .875rem
+        .user_comment_content
+            color: $gray-standard
+        .replies
+            margin-left: 4.25rem
+            .comment
+                margin-top: .625rem
+            .reply
+                display: flex
+                justify-content: flex-start
+                vertical-align: top
+                width: 3.125rem
+                div
+                    margin-right: 0.625rem
+                    padding-right: .625rem
+                    width: 100%
+                .thumbs-up, .thumbs-down
+                    cursor: pointer
+                .thumbs-up
+                    &::before
+                        +fontAwesome("\f164")
+                .thumbs-down
+                    &::before
+                        +fontAwesome("\f165")
+        .users_comments
+            .comment:not(:first-child)
+                margin-top: 1rem
+            .comment:first-child
+                margin-top: .3125rem!important
+        .input-box
+            margin-bottom: 0!important
+        .button-box
+            margin-top: .3125rem
+            margin-bottom: 0!important
+            padding-bottom: 0!important
+        .reply-box
+            margin-top: .625rem
+        .reply-btn-group
+            display: inline-flex
+            margin-top: .125rem
+            vertical-align: top
+            float: right 
+            .button-box
+                margin-left: auto
+
+            
+                
+                
+       
+                

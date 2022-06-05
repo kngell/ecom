@@ -30,9 +30,9 @@ interface DataMapperInterface
      * combinaition method wich combines bind type and values.
      *@param array $fields
      *@param bool $isSearch
-     *@return self
+     *@return bool|self
      */
-    public function bindParameters(array $fields = [], bool $isSearch = false) : self;
+    public function bindParameters(array $fields = [], bool $isSearch = false) : bool|self;
 
     /**
      * --------------------------------------------------------------------------------------------------

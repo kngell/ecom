@@ -32,6 +32,17 @@ class Form_rules
         ];
     }
 
+    public static function comments()
+    {
+        return [
+            'content' => [
+                'display' => 'Comment',
+                'required' => true,
+                'min' => 5,
+            ],
+        ];
+    }
+
     // Units validation
     public static function shippingClass()
     {

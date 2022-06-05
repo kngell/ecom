@@ -3,7 +3,7 @@
     "denied": {
       "AdminController": ["*"]
     },
-    "VerifyUserAccountController": ["*"],
+    "UserAccountController": ["*"],
     "HomeController": ["*"],
     "ErrorsController": ["*"],
     "ClothingController": ["*"],
@@ -47,7 +47,8 @@
     "CommentsController": ["*"],
     "AssetsController": ["*"],
     "UsersController": ["profile", "payment"],
-    "CheckoutController": ["*"]
+    "CheckoutController": ["*"],
+    "ProductController": ["*"]
   },
   "admin": {
     "denied": {},

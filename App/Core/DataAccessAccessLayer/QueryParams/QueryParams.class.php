@@ -9,6 +9,15 @@ class QueryParams extends AbstractQueryParams
         $this->tableSchema = $tableSchema;
     }
 
+    public function table(?string $tbl = null, mixed $columns = null) : self
+    {
+        $this->reset();
+        $tbl = $this->parseTable($tbl);
+        $this->query_params['table_join'] = [$tbl != null ? $tbl : $this->tableSchema => $columns != null ? $columns : ['*']];
+        $this->addTableToOptions($tbl);
+        return $this;
+    }
+
     public function params(?string $repositoryMethod = null) : array
     {
         $this->getSelectors();
@@ -17,20 +26,6 @@ class QueryParams extends AbstractQueryParams
             'findBy' => [$this->query_params['selectors'] ?? [], $this->query_params['conditions'] ?? [], $this->query_params['parameters'] ?? [], $this->query_params['options'] ?? []],
             'delete','update' => [$this->query_params['conditions'] ?? []],
         };
-    }
-    //SELECT a.id, IFNULL(b.name, c.name)
-    // FROM tableA AS a
-    // LEFT JOIN tableB AS b ON a.id = b.id
-    // LEFT JOIN tableC AS c ON a.id = c.id
-    // WHERE
-    // b.name = c.name OR b.name IS NULL OR c.name IS NULL;
-
-    public function table(?string $tbl = null, mixed $columns = null) : self
-    {
-        $tbl = $this->parseTable($tbl);
-        $this->query_params['table_join'] = [$tbl != null ? $tbl : $this->tableSchema => $columns != null ? $columns : ['*']];
-        $this->addTableToOptions($tbl);
-        return $this;
     }
 
     public function join(?string $tbl = null, mixed $columns = null, string $joinType = 'INNER JOIN') : self
@@ -135,6 +130,7 @@ class QueryParams extends AbstractQueryParams
     {
         $this->key('options');
         foreach ($orderByAry as $tbl => $field) {
+            $tbl = is_numeric($tbl) ? $this->query_params['options']['table'][0] : $tbl;
             if (str_contains($field, '|')) {
                 $parts = explode('|', $field);
                 if (is_array($parts)) {
@@ -147,6 +143,13 @@ class QueryParams extends AbstractQueryParams
         return $this;
     }
 
+    public function return(string $str) : self
+    {
+        $this->key('options');
+        $this->query_params['options']['return_mode'] = $str;
+        return $this;
+    }
+
     public function parameters(array $params) : self
     {
         if (!array_key_exists('parameters', $this->query_params)) {
@@ -155,47 +158,21 @@ class QueryParams extends AbstractQueryParams
         return $this->aryParams($params, 'parameters');
     }
 
-    public function return(string $str) : self
+    public function recursive(string $parentID, string $id) : self
     {
-        if (!array_key_exists('options', $this->query_params)) {
-            $this->query_params['options'] = [];
-        }
-        $this->query_params['options']['return_mode'] = $str;
+        $this->key('options');
+        $this->query_params['options']['recursive']['parentID'] = $parentID;
+        $this->query_params['options']['recursive']['id'] = $id;
+        $this->recursiveCount();
         return $this;
     }
 
-    private function getSelectors() : array
+    private function reset() : self
     {
-        $selectors = [];
-        $this->key('selectors');
-        if (array_key_exists('table_join', $this->query_params)) {
-            foreach ($this->query_params['table_join'] as $tbl => $columns) {
-                if (!is_array($columns)) {
-                    throw new Exception('Columns must be in array!');
-                }
-                foreach ($columns as $column) {
-                    if (str_contains($column, '|')) {
-                        $parts = explode('|', $column);
-                        if (is_array($parts) && count($parts) < 3) {
-                            array_push($selectors, $parts[0] . '(' . $tbl . '.' . $parts[1] . ')');
-                        } else {
-                            array_push($selectors, $parts[0] . '(' . $tbl . '.' . $parts[1] . ') AS ' . $parts[2]);
-                        }
-                    } else {
-                        array_push($selectors, $tbl . '.' . $column);
-                    }
-                }
-            }
-        }
-        return $this->query_params['selectors'] = $selectors;
-    }
-
-    private function keyExists(string $key) : bool
-    {
-        if (!array_key_exists($key, $this->query_params)) {
-            throw new Exception($key . ' does not exists ');
-        }
-        return true;
+        $this->query_params = [];
+        $this->conditionBreak = [];
+        $this->braceOpen = '';
+        return $this;
     }
 
     private function aryParams(array $params, string $name) : self

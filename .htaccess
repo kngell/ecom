@@ -10,8 +10,8 @@
     RewriteEngine On
     RewriteBase /
     RewriteCond %{THE_REQUEST} /public/([^\s?]*) [NC]
-    RewriteRule ^(.+)/$ /$1 [L,R=301]
-    RewriteRule ^(.*)$ /public/$1 [L]
+    RewriteRule ^ %1 [L,NE,R=302]
+    RewriteRule ^(.*)$ /public/index.php?url=$1 [QSA,L]
 </IfModule>
 
 

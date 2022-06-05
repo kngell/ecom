@@ -5,34 +5,79 @@ declare(strict_types=1);
 abstract class AbstractController
 {
     protected array $middlewares = [];
-    protected ContainerInterface $container;
     protected View $view_instance;
+    /** @var array */
+    protected array $callBeforeMiddlewares = [];
+    /** @var array */
+    protected array $callAfterMiddlewares = [];
+    protected string $filePath;
 
-    public function registerMiddleware(BaseMiddleWare $middleware) : void
+    public function getComment() : CommentsInterface
+    {
+        return $this->comment;
+    }
+
+    /**
+     * Get the value of filePath.
+     */
+    public function getFilePath() : string
+    {
+        return $this->filePath;
+    }
+
+    public function view() : View
+    {
+        return $this->view_instance;
+    }
+
+    /**
+     * Set the value of filePath.
+     *
+     * @return  self
+     */
+    public function setFilePath(string $filePath) : self
+    {
+        $this->filePath = $filePath;
+        return $this;
+    }
+
+    protected function registerMiddleware(BaseMiddleWare $middleware) : void
     {
         $this->middlewares[] = $middleware;
     }
 
-    public function getMiddlewares() : array
+    protected function registerBeforeMiddleware(array $middlewares = []) : void
+    {
+        foreach ($middlewares as $name => $middleware) {
+            $this->callBeforeMiddlewares[$name] = $middleware;
+        }
+    }
+
+    protected function getMiddlewares() : array
     {
         return $this->middlewares;
     }
 
-    public function resetView() : self
+    protected function callAfterMiddlewares(): array
     {
-        $this->view_instance->reset();
-        return $this;
+        return $this->callAfterMiddlewares;
     }
 
-    public function siteTitle(?string $title = null) : View
+    protected function callBeforeMiddlewares(): array
     {
-        if ($this->view_instance === null) {
-            throw new BaseLogicException('You cannot use the render method if the View is not available !');
-        }
-        return $this->view_instance->siteTitle($title);
+        return array_merge($this->defineCoreMiddeware(), $this->callBeforeMiddlewares);
     }
 
-    public function setLayout(string $layout) : self
+    protected function defineCoreMiddeware(): array
+    {
+        return [
+            'Error404' => Error404::class,
+            'ShowCommentsMiddlewares' => ShowCommentsMiddlewares::class,
+            'SelectPathMiddleware' => SelectPathMiddleware::class,
+        ];
+    }
+
+    protected function setLayout(string $layout) : self
     {
         if ($this->view_instance === null) {
             throw new BaseLogicException('View doest not exist !');
@@ -41,7 +86,7 @@ abstract class AbstractController
         return $this;
     }
 
-    public function pageTitle(?string $page = null)
+    protected function pageTitle(?string $page = null)
     {
         if ($this->view_instance === null) {
             throw new BaseLogicException('You cannot use the render method if the View is not available !');
@@ -49,7 +94,7 @@ abstract class AbstractController
         return $this->view_instance->pageTitle($page);
     }
 
-    public function getView() : View
+    protected function getView() : View
     {
         if (!isset($this->view_instance)) {
             $this->filePath = !isset($this->filePath) ? $this->container->make('ControllerPath') : $this->filePath;
@@ -58,8 +103,22 @@ abstract class AbstractController
         return $this->view_instance;
     }
 
-    public function get_container() : ContainerInterface
+    protected function geContainer() : ContainerInterface
     {
         return $this->container;
+    }
+
+    protected function resetView() : self
+    {
+        $this->view_instance->reset();
+        return $this;
+    }
+
+    protected function siteTitle(?string $title = null) : View
+    {
+        if ($this->view_instance === null) {
+            throw new BaseLogicException('You cannot use the render method if the View is not available !');
+        }
+        return $this->view_instance->siteTitle($title);
     }
 }

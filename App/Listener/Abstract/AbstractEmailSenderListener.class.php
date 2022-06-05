@@ -12,20 +12,14 @@ abstract class AbstractEmailSenderListener
     protected View $view;
     protected CssToInlineStyles $inlineCssClass;
 
-    protected function getMessage(EmailSenderConfiguration $emailConfig) :string
+    protected function getMessage(EmailSenderConfiguration $emailConfig, Object $event) :string
     {
         $this->view->path($emailConfig->getRootPath())->webView(false)->layout($emailConfig->getLayout());
-        $html = $this->view->render($emailConfig->getEmailTemplate());
+        $html = $event->parse($this->view->render($emailConfig->getEmailTemplate(), $event->getHost()));
         $cssInliner = CssInliner::fromHtml($html)->inlineCss($emailConfig->getCssPath());
         HtmlPruner::fromDomDocument($cssInliner->getDomDocument())
             ->removeRedundantClassesAfterCssInlined($cssInliner);
-        // //$html = $this->inlineCssClass->convert($html, $emailConfig->getCssPath());
-        return utf8_decode(HtmlNormalizer::fromHtml($cssInliner->render())->render());
+        // $html = $this->inlineCssClass->convert($html, $emailConfig->getCssPath());
+        return HtmlNormalizer::fromHtml($cssInliner->render())->render();
     }
-
-    // private function parseDom(string $html) : string
-    // {
-    //     // $html = str_replace('&nbsp;', ' ', $html);
-    //     return utf8_decode($html);
-    // }
 }

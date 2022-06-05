@@ -10,29 +10,18 @@
 
 declare(strict_types=1);
 
-namespace App\EventSubscriber;
-
-use App\Event\TagActionEvent;
-use Exception;
-use MagmaCore\EventDispatcher\EventDispatcherTrait;
-use MagmaCore\EventDispatcher\EventSubscriberInterface;
-
 /**
  * Note: If we want to flash other routes then they must be declared within the ACTION_ROUTES
- * protected constant
+ * protected constant.
  */
 class TagActionSubscriber implements EventSubscriberInterface
 {
-
     use EventDispatcherTrait;
-
-    /** @var int - we want this to execute last so it doesn't interrupt other process */
-    private const FLASH_MESSAGE_PRIORITY = -1000;
 
     /**
      * Add other route index here in order for that route to flash properly. this array is index array
      * which means the first item starts at 0. See ACTION_ROUTES constant for correct order of how to
-     * load other routes for flashing
+     * load other routes for flashing.
      * @var int
      */
     protected const NEW_ACTION = 'new';
@@ -41,26 +30,28 @@ class TagActionSubscriber implements EventSubscriberInterface
     protected const STARRED_ACTION = 'starred';
     protected const BULK_ACTION = 'bulk';
 
+    /** @var int - we want this to execute last so it doesn't interrupt other process */
+    private const FLASH_MESSAGE_PRIORITY = -1000;
+
     /**
      * Subscribe multiple listeners to listen for the NewActionEvent. This will fire
      * each time a new user is added to the database. Listeners can then perform
      * additional tasks on that return object.
      * @return array
      */
-
     public static function getSubscribedEvents(): array
     {
         return [
             TagActionEvent::NAME => [
                 ['flashMessageEvent', self::FLASH_MESSAGE_PRIORITY],
-            ]
+            ],
         ];
     }
 
     /**
      * Event flash allows flashing of any specified route defined with the ACTION_ROUTES constants
      * one can declare a message and a default route. if a default route isn't
-     * set then the script will
+     * set then the script will.
      *
      * redirect back on itself using the onSelf() method. Delete route is automatically filtered to
      * redirect back to the index page. As this is the only logical route to redirect to. after we
@@ -75,7 +66,4 @@ class TagActionSubscriber implements EventSubscriberInterface
     {
         $this->flashingEvent($event);
     }
-
-
 }
-

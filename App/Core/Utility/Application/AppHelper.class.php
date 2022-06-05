@@ -38,6 +38,9 @@ final class AppHelper
             'UploaderInterface' => Uploader::class,
             'EventDispatcherInterface' => EventDispatcher::class,
             'ListenerProviderInterface' => ListenerProvider::class,
+            'TreeBuilderInterface' => TreeBuilder::class,
+            'DisplayProductsInterface' => PhonesProducts::class,
+
         ];
     }
 
@@ -57,6 +60,8 @@ final class AppHelper
         return [
             'QueryParamsInterface' => QueryParams::class,
             'View' => View::class,
+            'CommentsInterface' => Comments::class,
+            'ClientFormBuilder' => ClientFormBuilder::class,
         ];
     }
 }

@@ -17,9 +17,6 @@ interface RooterInterface
     /**
      * Resolve
      * ======================================================.
-     * @return self
      */
-    public function resolve(string $url) : self;
-
-    public function setProperties(array $params = []) : self;
+    public function resolve() : self;
 }

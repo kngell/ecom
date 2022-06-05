@@ -8,6 +8,7 @@ class Event implements StoppableEventInterface, EventsInterface
     private object $object;
     private string $name;
     private array $params;
+    private ?object $results = null;
 
     public function __construct(Object $object, string $name = '', array $params = [])
     {
@@ -105,5 +106,33 @@ class Event implements StoppableEventInterface, EventsInterface
     {
         $this->propagationStopped = $propagationStopped;
         return $this;
+    }
+
+    /**
+     * Get the value of results.
+     */
+    public function getResults() : object
+    {
+        return $this->results;
+    }
+
+    /**
+     * Set the value of results.
+     *
+     * @return  self
+     */
+    public function setResults(object $results) : self
+    {
+        $this->results = $results;
+        return $this;
+    }
+
+    protected function parseDom(string $html) : string
+    {
+        $doc = new DOMDocument('1.0', 'UTF-8');
+        $doc->preserveWhiteSpace = false;
+        $doc->encoding = 'utf-8';
+        $doc->loadHTML($html);
+        return $doc->saveHTML($doc->documentElement) . PHP_EOL . PHP_EOL;
     }
 }

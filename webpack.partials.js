@@ -132,7 +132,7 @@ exports.fontendAssetsConfig = merge(
             test: /[\\/]node_modules[\\/]((?!@ckeditor).*)[\\/]/, //except ckeditor5
             name: "commons/frontend/commonVendor",
             chunks: "initial",
-            minSize: 20000,
+            minSize: 10000,
             priority: -10,
             minChunks: 2,
             reuseExistingChunk: true,
@@ -141,7 +141,7 @@ exports.fontendAssetsConfig = merge(
             test: /[\\/]((client).*)|((core).*)[\\/]/,
             name: "commons/frontend/commonCustomModules",
             chunks: "initial",
-            minSize: 10000,
+            minSize: 5000,
             minChunks: 2,
             priority: -20,
             reuseExistingChunk: true,

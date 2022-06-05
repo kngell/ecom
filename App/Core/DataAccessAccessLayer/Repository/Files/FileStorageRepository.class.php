@@ -60,7 +60,7 @@ class FileStorageRepository extends FileStorage implements FileStorageRepository
      * @inheritDoc
      * @throws Exception
      */
-    public function findBy(string $key, string $operator, $value, string $sort = 'created_at', int $limit = 10)
+    public function findBy(string $key, string $operator, $value, string $sort = 'createdAt', int $limit = 10)
     {
         if (isset($this->conditions) && $this->conditions == true) {
             $results = $this->flatDatabase()

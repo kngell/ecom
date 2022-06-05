@@ -18,11 +18,11 @@ class CacheEnvironmentConfigurations
      * @param string|null $fileCacheBasePath
      * @param int $maximumPathLength
      */
-    public function __construct(?string $cacheIdentifier, ?string $fileCacheBasePath, ?int $maximumPathLength)
+    public function __construct(?string $cacheIdentifier, array $cacheConfig = [])
     {
         $this->cacheIdentifier = $cacheIdentifier;
-        $this->fileCacheBasePath = $fileCacheBasePath;
-        $this->maximumPathLength = $maximumPathLength;
+        $this->fileCacheBasePath = $cacheConfig['cache_path'];
+        $this->maximumPathLength = $cacheConfig['cache_expires'];
     }
 
     /**

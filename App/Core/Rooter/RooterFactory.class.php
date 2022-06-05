@@ -4,28 +4,25 @@ declare(strict_types=1);
 class RooterFactory
 {
     /** @var array */
-    protected array $routes;
+    private array $routes;
 
     /**
      * Main constructor.
      */
-    public function __construct(private RooterInterface $rooter)
-    {
-    }
-
-    public function create(array $routes, array $ctrlAry, ) : self
+    public function __construct(private RooterInterface $rooter, array $routes)
     {
         $this->routes = $routes;
-        $this->rooter->setProperties([
-            'controllerAry' => $ctrlAry,
-        ]);
-        if (empty($routes)) {
+    }
+
+    public function create() : RooterInterface
+    {
+        if (empty($this->routes)) {
             throw new BaseNoValueException("There are one or more empty arguments. In order to continue, please ensure your <code>routes.yaml</code> has your defined routes and you are passing the correct variable ie 'QUERY_STRING'");
         }
         if (!$this->rooter instanceof RooterInterface) {
             throw new BaseUnexpectedValueException(get_class($this->rooter) . ' is not a valid rooter Object!');
         }
-        return $this;
+        return $this->buildRoutes();
     }
 
     /**
@@ -35,26 +32,28 @@ class RooterFactory
      */
     public function buildRoutes() : ?RooterInterface
     {
-        if (is_array($this->routes) && !empty($this->routes)) {
-            foreach ($this->routes as $mthd => $routes) {
-                $args = [];
-                foreach ($routes as $route => $params) {
-                    if (isset($params['namespace']) && $params['namespace'] != '') {
-                        $args = ['namespace' => $params['namespace']];
-                    }
-                    if (isset($params['controller']) && $params['controller'] != '') {
-                        $args['controller'] = $params['controller'];
-                    }
-                    if (isset($params['method']) && $params['method'] != '') {
-                        $args['method'] = $params['method'];
-                    }
-                    if (isset($route)) {
-                        $this->rooter->add($mthd, $route, $args);
+        if (count($this->routes) > 0) {
+            if (is_array($this->routes) && !empty($this->routes)) {
+                foreach ($this->routes as $mthd => $routes) {
+                    $args = [];
+                    foreach ($routes as $route => $params) {
+                        if (isset($params['namespace']) && $params['namespace'] != '') {
+                            $args = ['namespace' => $params['namespace']];
+                        }
+                        if (isset($params['controller']) && $params['controller'] != '') {
+                            $args['controller'] = $params['controller'];
+                        }
+                        if (isset($params['method']) && $params['method'] != '') {
+                            $args['method'] = $params['method'];
+                        }
+                        if (isset($route)) {
+                            $this->rooter->add($mthd, $route, $args);
+                        }
                     }
                 }
             }
-            // $this->rooter->resolve($this->dispatchedUrl);
+            return $this->rooter;
         }
-        return $this->rooter;
+        return null;
     }
 }

@@ -35,7 +35,7 @@ abstract class AbstractQueryBuilder
     /** @var string */
     protected string $sql = '';
 
-    public function isValidquerytype(string $type) : bool
+    protected function isValidQueryType(string $type) : bool
     {
         if (in_array($type, self::QUERY_TYPES)) {
             return true;
@@ -50,7 +50,7 @@ abstract class AbstractQueryBuilder
             if (strpos($this->key['table'], 'SELECT') !== false) {
                 $sql = $this->key['table'];
             } else {
-                $selectors = (!empty($this->key['selectors'])) ? implode(', ', $this->key['selectors']) : '*';
+                $selectors = $this->selectors();
                 if (isset($this->key['aggregate']) && $this->key['aggregate']) {
                     $sql = "SELECT {$this->key['aggregate']}({$this->key['aggregate_field']}) FROM {$this->key['table']}";
                 } else {
@@ -68,43 +68,78 @@ abstract class AbstractQueryBuilder
      * =====================================================================.
      * @param mixed $tables
      * @param array $data
-     * @return void
+     * @return string
      */
     protected function join($selectors, array $options = []) :string
     {
         $sql = '';
-        if (array_key_exists('join_rules', $options)) {
-            if (array_key_exists('table', $options)) {
-                if (!(count($options['join_rules']) === count($options['table']) - 1)) {
-                    throw new QueryBuilderInvalidArgExceptions('Cannot join tables');
-                }
-                $columns = (!empty($selectors)) ? implode(', ', $selectors) : '*';
-                $sql .= "SELECT {$columns} FROM {$options['table'][0]}";
+        if (array_key_exists('table', $options)) {
+            if (!(count($options['join_rules']) === count($options['table']) - 1)) {
+                throw new QueryBuilderInvalidArgExceptions('Cannot join tables');
             }
-            $all_tables = $options['table'];
-            foreach ($options['join_rules'] as $index => $join_rule) {
-                $withParams = array_key_exists('params', $options['join_on'][$all_tables[$index + 1]]) ? true : false;
-                $braceOpen = $withParams ? ' (' : '';
-                $braceClose = $withParams ? ') ' : '';
-                if (is_numeric($index)) {
-                    $sql .= ' ' . $join_rule . ' ' . $all_tables[$index + 1];
-                    $i = count($options['join_on'][$all_tables[$index]]) - 1;
-                    $sql .= ' ON ' . $braceOpen . '(' . $options['join_on'][$all_tables[$index + 1]][0] . ' = ' . $options['join_on'][$all_tables[$index]][$i] . ')';
-                }
-            }
-            if (array_key_exists('params', $options['join_on'])) {
-                $allParams = array_filter($options['join_on'], function ($rule) {
-                    return $rule === 'params';
-                }, ARRAY_FILTER_USE_KEY);
-                foreach ($allParams as $params) {
-                    foreach ($params as $args) {
-                        $sql .= ' ' . $args['separator'] . ' (' . $args[0] . ' ' . $args['operator'] . ' ' . $this->getValue($args[1]) . ')';
-                    }
-                }
-                $sql .= $braceClose;
+            $columns = (!empty($selectors)) ? implode(', ', $selectors) : '*';
+            $sql .= "SELECT {$columns} FROM {$options['table'][0]}";
+        }
+        $all_tables = $options['table'];
+        foreach ($options['join_rules'] as $index => $join_rule) {
+            $withParams = array_key_exists('params', $options['join_on'][$all_tables[$index + 1]]) ? true : false;
+            $braceOpen = $withParams ? ' (' : '';
+            $braceClose = $withParams ? ') ' : '';
+            if (is_numeric($index)) {
+                $sql .= ' ' . $join_rule . ' ' . $all_tables[$index + 1];
+                $i = count($options['join_on'][$all_tables[$index]]) - 1;
+                $sql .= ' ON ' . $braceOpen . '(' . $options['join_on'][$all_tables[$index + 1]][0] . ' = ' . $options['join_on'][$all_tables[$index]][$i] . ')';
             }
         }
+        if (array_key_exists('params', $options['join_on'])) {
+            $allParams = array_filter($options['join_on'], function ($rule) {
+                return $rule === 'params';
+            }, ARRAY_FILTER_USE_KEY);
+            foreach ($allParams as $params) {
+                foreach ($params as $args) {
+                    $sql .= ' ' . $args['separator'] . ' (' . $args[0] . ' ' . $args['operator'] . ' ' . $this->getValue($args[1]) . ')';
+                }
+            }
+            $sql .= $braceClose;
+        }
         return $sql;
+    }
+
+    protected function recursive(string $query, string $globalQuery) : string
+    {
+        $sql = 'WITH RECURSIVE cte AS (';
+        $sql .= '(' . $globalQuery . ') ';
+        $sql .= 'UNION ALL ';
+        $sql .= $query;
+        return $sql;
+    }
+
+    protected function recursiveQuery(string $query) : array
+    {
+        $q = $query;
+        $options = $this->key['extras'];
+        $selectors = $this->key['selectors'];
+        $sql = 'SELECT ';
+        if (array_key_exists('recursive', $options)) {
+            $recursive = $options['recursive'];
+            if (array_key_exists('COUNT', $recursive) && count($selectors) === 1) {
+                $sql .= 'p.' . $recursive['field'] . ' FROM ' . $this->key['table'] . ' p ';
+                $sql .= 'INNER JOIN cte ON p.' . $recursive['parentID'] . '= cte.' . $recursive['id'] . ')';
+                $sql .= 'SELECT COUNT(' . $recursive['field'] . ') AS ' . $recursive['AS'] . ' FROM cte;';
+                return [$q, $sql];
+            }
+            $aryIndex = [];
+            foreach ($options['table'] as $index => $tbl) {
+                $query = str_replace($tbl . '.', $tbl . $index . '.', $query);
+                $query = str_replace(' ' . $tbl . ' ', ' ' . $tbl . ' ' . $tbl . $index . ' ', $query);
+                $aryIndex[] = $tbl . $index;
+            }
+            $sql = $query . ' ' . 'INNER JOIN cte ON ';
+            $sql .= $aryIndex[0] . '.' . $recursive['parentID'] . ' = cte' . '.' . $recursive['id'] . ') ';
+            $sql .= 'SELECT * FROM cte;';
+            return [$q, $sql];
+        }
+        return [$q, ''];
     }
 
     /**
@@ -198,6 +233,15 @@ abstract class AbstractQueryBuilder
         return isset($this->key[$key]);
     }
 
+    private function selectors() : string
+    {
+        $recursiveCount = isset($this->key['extras']['recursive']['COUNT']) ? $this->key['extras']['recursive']['field'] : false;
+        if ($recursiveCount != false) {
+            return $recursiveCount;
+        }
+        return (!empty($this->key['selectors'])) ? implode(', ', $this->key['selectors']) : '*';
+    }
+
     private function getValue(mixed $arg) : mixed
     {
         return match (gettype($arg)) {
@@ -226,11 +270,7 @@ abstract class AbstractQueryBuilder
         default:
             return $braceOpen . $aryCond['tbl'] . '.' . $field . $operator . ":$field" . $braceEnd . $separator;
         break;
-    }
-
-        // case isset($value['operator']) && in_array($value['operator'], ['NOT IN', 'IN']):
-
-        //     break;
+        }
     }
 
     /**
@@ -248,7 +288,6 @@ abstract class AbstractQueryBuilder
             $str .= ':' . $prefix . $index . ',';
             $bindArray[$prefix . $index] = $value;
         }
-
         return rtrim($str, ',');
     }
 }

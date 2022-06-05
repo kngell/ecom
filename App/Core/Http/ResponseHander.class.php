@@ -71,6 +71,25 @@ class ResponseHandler extends GlobalVariables
         return $S;
     }
 
+    public function jsonResponse(array $resp) : void
+    {
+        $this->setJsonHeader()->setResponseCode(200);
+        echo json_encode($resp);
+        exit;
+    }
+
+    public function setJsonHeader() : self
+    {
+        header('Content-Type: application/json;charset=utf-8');
+        return $this;
+    }
+
+    public function setResponseCode(int $code) : self
+    {
+        http_response_code($code);
+        return $this;
+    }
+
     /**
      * Rename keys
      * ==================================================================================.
@@ -89,19 +108,4 @@ class ResponseHandler extends GlobalVariables
             return false;
         }
     }
-    // public function cacheRefresh()
-    // {
-    //     $session = GlobalManager::get('global_session');
-    //     if ($session->exists(BRAND_NUM)) {
-    //         switch ($session->get(BRAND_NUM)) {
-    //             case 2:
-    //                 Cache::getcache()->init()->delete('phone_products_and_cart.txt');
-    //                 break;
-
-    //             default:
-    //                 Cache::getcache()->init()->delete('clothes_products_and_cart.txt');
-    //                 break;
-    //         }
-    //     }
-    // }
 }

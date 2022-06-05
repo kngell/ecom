@@ -11,8 +11,8 @@ module.exports = {
       dependOn: "css/librairies/frontlib",
     },
     //Index page css ecommerce
-    "css/custom/client/home/home": {
-      import: ["css/custom/client/home/index.sass"],
+    "css/custom/client/brand/phones/home/home": {
+      import: ["css/custom/client/brand/phones/home/index.sass"],
       dependOn: "css/librairies/frontlib",
     },
     //Email Template Css
@@ -27,14 +27,24 @@ module.exports = {
       ],
       dependOn: "css/librairies/frontlib",
     },
-    //Email Template welcome
-    "css/custom/client/users/email/welcome/welcomeTemplate": {
-      import: ["css/custom/client/users/email/welcome/welcomeTemplate.sass"],
+    //Email Template main
+    "css/custom/client/users/email/main": {
+      import: ["css/custom/client/users/email/main.sass"],
+      dependOn: "css/librairies/frontlib",
+    },
+    //Email Verify user account
+    "css/custom/client/users/account/verify": {
+      import: ["css/custom/client/users/account/verify.sass"],
       dependOn: "css/librairies/frontlib",
     },
     //Email Validate user account
     "css/custom/client/users/account/validate": {
       import: ["css/custom/client/users/account/validate.sass"],
+      dependOn: "css/librairies/frontlib",
+    },
+    // Learning
+    "css/custom/client/learn/learn": {
+      import: ["css/custom/client/learn/learn.sass"],
       dependOn: "css/librairies/frontlib",
     },
   },

@@ -15,9 +15,9 @@ class UserSessionsManager extends Model
     public function save(?Entity $entity = null): ?object
     {
         $entity != null ? $this->entity = $entity : '';
-        if (( new ReflectionProperty($this->entity, $this->entity->getColId()))->isInitialized($this->entity)) {
-            $this->delete();
-        }
+        // if (( new ReflectionProperty($this->entity, $this->entity->getColId()))->isInitialized($this->entity)) {
+        //     $this->update();
+        // }
         return parent::save();
     }
 }

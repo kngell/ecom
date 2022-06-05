@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-abstract class Entity
+class Entity extends AbstractEntity
 {
-    private ReflectionClass $reflect;
-
     /**
      * Sanitize
      * =========================================================.
@@ -35,9 +33,9 @@ abstract class Entity
             $rp = $this->reflectionInstance()->getProperty($field);
             if ($rp->isInitialized($this)) {
                 if ($rp->getType()->getName() === 'DateTimeInterface') {
-                    $properties[$field] = $rp->getValue($this)->format('Y-m-d H:i:s');
+                    $properties[$this->getOriginalField($field)] = $rp->getValue($this)->format('Y-m-d H:i:s');
                 } else {
-                    $properties[$field] = $rp->getValue($this);
+                    $properties[$this->getOriginalField($field)] = $rp->getValue($this);
                 }
             }
         }
@@ -49,22 +47,22 @@ abstract class Entity
         return $this->reflectionInstance()->getProperty($field)->getName();
     }
 
+    public function getFieldWithDoc(string $withDocComment) : string
+    {
+        return $this->getColID($withDocComment);
+    }
+
     public function getColId(string $withDocComment = 'id') :  string
     {
         $props = $this->getAllAttributes();
         foreach ($props as $field) {
             $docs = $this->getPropertyComment($field);
             if ($docs == $withDocComment) {
-                return $field;
+                return $this->getOriginalField($field);
                 exit;
             }
         }
         return '';
-    }
-
-    public function getField(string $withDocComment) : string
-    {
-        return $this->getColID($withDocComment);
     }
 
     public function getPropertyComment(string $field) : string
@@ -73,24 +71,26 @@ abstract class Entity
         return $this->filterPropertyComment($propertyComment);
     }
 
+    public function getObject() : object
+    {
+        return (object) $this->getInitializedAttributes();
+    }
+
     public function assign(array $params) : self
     {
-        $props = $this->getAllAttributes();
-        foreach ($props as $field) {
-            if (in_array($field, array_keys($params))) {
-                if (method_exists($this, 'set' . ucwords($field))) {
-                    $method = 'set' . ucwords($field);
-                    if (isset($params[$field])) {
-                        $rp = $this->reflectionInstance()->getProperty($field); // new ReflectionProperty($this, $field);
-                        $type = $rp->getType()->getName();
-                        if ($type === 'DateTimeInterface') {
-                            $this->$method(new DateTimeImmutable($params[$field]));
-                        } elseif ($type === 'string') {
-                            is_array($params[$field]) ? $this->$method((string) $params[$field][0]) : $this->$method((string) $params[$field]);
-                        } else {
-                            $this->$method($params[$field]);
-                        }
-                    }
+        foreach ($params as $field => $value) {
+            if (is_string($field)) {
+                $prop = $this->regenerateField($field);
+                $method = $this->getSetter($field);
+                if (method_exists($this, $method)) {
+                    $rp = $this->reflectionInstance()->getProperty($prop);
+                    $type = $rp->getType()->getName();
+                    $result = match ($type) {
+                        'DateTimeInterface' => $this->$method(new DateTimeImmutable($value)),
+                            'string' => is_array($value) ? $this->$method((string) $value[0]) : $this->$method((string) $value),
+                            'int' => $this->$method((int) $value),
+                            default => $this->$method($value)
+                    };
                 }
             }
         }
@@ -114,22 +114,12 @@ abstract class Entity
         return substr(strip_tags($this->htmlDecode($content)), 0, 200) . '...';
     }
 
-    private function filterPropertyComment(false|string $comment) : string
+    public function delete(?string $field = null) : self
     {
-        if (is_string($comment)) {
-            preg_match('/@(?<content>.+)/i', $comment, $content);
-            $content = isset($content['content']) ? $content['content'] : '';
-            return trim(str_replace('*/', '', $content));
-        }
-        return '';
-    }
-
-    private function reflectionInstance()
-    {
-        if (!isset($this->reflect)) {
-            return $this->reflect = new ReflectionClass($this::class);
-        }
-        return $this->reflect;
+        $reflectionProperty = $this->reflectionInstance()->getProperty($field);
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this, null);
+        return $this;
     }
 
     /**

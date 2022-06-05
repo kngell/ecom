@@ -14,7 +14,7 @@ final class ControllerHelper
     {
         if (is_array($message)) {
             $output = '<div class="align-self-center text-center alert alert-' . $type . ' alert-dismissible">
-            <button type="button" class="btn-close" data-bs-dismiss="alert"><span class="float-end"></span></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"><span class="float-end"></span></button>
             <strong class="text-center">';
             foreach ($message as $msg) {
                 $output .= $msg;

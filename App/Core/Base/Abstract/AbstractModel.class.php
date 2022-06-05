@@ -6,6 +6,7 @@ abstract class AbstractModel
 {
     protected string $_modelName;
     protected QueryParams $queryParams;
+    protected RepositoryInterface $repository;
 
     /*
      * Prevent Deleting Ids
@@ -28,7 +29,7 @@ abstract class AbstractModel
     {
         if (!$this->queryParams->hasConditions()) {
             $colID = $this->entity->getColId();
-            $this->table()->where([$colID => $this->entity->{'get' . $colID}()])->build();
+            $this->table()->where([$colID => $this->entity->{$this->entity->getGetters($colID)}()])->build();
         }
         return $this;
     }
@@ -125,5 +126,17 @@ abstract class AbstractModel
     public function getModelName() : string
     {
         return $this->_modelName;
+    }
+
+    public function getTableColumn() : array
+    {
+        $columns = $this->repository->get_tableColumn(['return_mode' => 'object']);
+        if ($columns->count() > 0) {
+            $columnsName = [];
+            foreach ($columns->get_results() as $column) {
+                $columnsName[] = '$' . $column->Field;
+            }
+        }
+        return $columnsName;
     }
 }

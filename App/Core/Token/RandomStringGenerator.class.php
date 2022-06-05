@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * Class RandomStringGenerator.
  */
-class RandomStringGenerator
+abstract class RandomStringGenerator
 {
     /** @var string */
     protected $alphabet;

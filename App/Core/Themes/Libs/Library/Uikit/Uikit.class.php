@@ -7,12 +7,12 @@ class Uikit extends AbstractThemeLibrary
     {
         return [
             'form' => [
-                'input' => 'uk-input',
-                'checkbox' => 'uk-checkbox',
-                'radio' => 'uk-radio',
-                'textarea' => 'uk-textarea',
-                'select' => 'uk-select',
-                'range' => 'uk-range',
+                'input' => 'form-control',
+                'checkbox' => 'form-check-input',
+                'radio' => 'form-check-input',
+                'textarea' => 'form-control',
+                'select' => 'form-select',
+                'range' => 'form-range',
                 'fieldset' => 'uk-fieldset',
                 'legend' => 'uk-legend',
             ],

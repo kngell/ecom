@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 $this->start('head'); ?>
 <!-------Costum-------->
-<link href="<?= $this->asset('css/custom/client/users/account/validate', 'css') ?? ''?>" rel="stylesheet"
-    type="text/css">
+<link href="<?= $this->asset('css/custom/client/users/account/verify', 'css') ?? ''?>" rel="stylesheet" type="text/css">
 <?php $this->end(); ?>
 <?php $this->start('body'); ?>
 <main id="main-site">
@@ -14,6 +13,6 @@ $this->start('head'); ?>
 <?php $this->end(); ?>
 <?php $this->start('footer') ?>
 <!----------custom--------->
-<script type="text/javascript" src="<?= $this->asset('js/custom/client/users/account/validate', 'js') ?? ''?>">
+<script type="text/javascript" src="<?= $this->asset('js/custom/client/users/account/verify', 'js') ?? ''?>">
 </script>
 <?php $this->end();

@@ -29,7 +29,12 @@ class EmailSenderlistener extends AbstractEmailSenderListener implements Listene
     {
         /** @var EmailSenderConfiguration */
         $emailConfig = $event->getEmailConfig();
-        $mail = $this->mailerFacade->basicMail($emailConfig->getSubject(), $emailConfig->getFrom(), $event->getObject()->getEmail(), $this->getMessage($emailConfig));
+        $object = $event->getObject();
+        if (!$object instanceof UsersEntity) {
+            $email = $event->getEmail();
+        }
+        $mail = $this->mailerFacade->charset('utf-8')
+            ->basicMail($emailConfig->getSubject(), $emailConfig->getFrom(), $email ?? $object->getEmail(), $this->getMessage($emailConfig, $event));
         return [$mail];
     }
 }

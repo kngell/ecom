@@ -15,9 +15,9 @@ class EmailVerificationManager extends Model
 
     public function getUser() : ?self
     {
-        $this->table(null, ['userID', 'email', 'verified'])
+        $this->table(null, ['userID', 'firstName', 'email', 'verified'])
             ->leftJoin('users_requests', ['COUNT|userID|number'])
-            ->on(['userID', 'userID'], ['type' => [0, 'users_requests']], ['timestamp|>=|' => [time() - 60 * 60, 'users_requests']])
+            ->on(['userID', 'userID'], ['type' => [0, 'users_requests']], ['timestamp|>=|' => [time() - 60 * 60 * 24, 'users_requests']])
             ->where(['email' => [$this->entity->{'getEmail'}(), 'users']])
             ->groupBy(['userID' => 'users'])
             ->return('class');
@@ -26,5 +26,9 @@ class EmailVerificationManager extends Model
             return $user->assign((array) current($user->get_results()));
         }
         return null;
+    }
+
+    public function validateAccount()
+    {
     }
 }

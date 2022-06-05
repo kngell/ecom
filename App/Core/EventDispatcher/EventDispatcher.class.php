@@ -9,20 +9,23 @@ class EventDispatcher extends AbstractEventDispatcher implements EventDispatcher
 
     public function dispatch(string|EventsInterface $event, ?object $obj = null, array $args = [], bool $debug = false) : mixed
     {
+        $eventResults = new stdClass();
         $event = $this->getEvent($event, $obj, $args); // contient des détails sur l'évenement
         $this->listener->checkEvent(name: $event->getName());
         $listeners = $this->getListenersForEvent(event: $event);
         foreach ($listeners as ['callback' => $listener]) {
             /** @var ListenerInterface */
             $obj = $this->listener->listnerCanBeInstantiated(class: $listener);
-            /**
+            /*
              * @var mixed
              */
-            $result = $obj->handle(event: $event);
+            $eventResults->result = $obj->handle(event: $event);
+            $eventResults->listener = $listener;
             if ($debug) {
-                $this->log[$event->getName()][] = $result;
+                $this->log[$event->getName()][] = $eventResults;
             }
         }
+        $event->setResults($eventResults);
         return $event;
     }
 

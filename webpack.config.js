@@ -124,10 +124,11 @@ const productionConfig = {
 module.exports = () => {
   switch (process.env.NODE_ENV) {
     case "development":
-      adminAssetsConfig.plugins.push(new CleanWebpackPlugin());
+      adminAssetsConfig.plugins.push(new CleanWebpackPlugin({ dry: false }));
       viewsConfig.plugins.push(
         new CleanWebpackPlugin({
           dangerouslyAllowCleanPatternsOutsideProject: true,
+          dry: false,
         })
       );
       return [

@@ -5,7 +5,7 @@ declare(strict_types=1);
 class VisitorsEntity extends Entity
 {
     /** @id */
-    private int $vID;
+    private int $vId;
     /** @Hits */
     private int $hits;
     /** @Ip Address @var string */
@@ -15,7 +15,7 @@ class VisitorsEntity extends Entity
     private string $latitude;
     private string $longitude;
     /** @var DateTimeInterface */
-    private DateTimeInterface $date_enreg;
+    private DateTimeInterface $dateEnreg;
     /** @var DateTimeInterface */
     private DateTimeInterface $updateAt;
     private string $statusCode;
@@ -31,17 +31,17 @@ class VisitorsEntity extends Entity
 
     public function __construct()
     {
-        $this->date_enreg = new DateTimeImmutable();
+        $this->dateEnreg = !isset($this->dateEnreg) ? new DateTimeImmutable() : $this->dateEnreg;
     }
 
-    public function getVID()
+    public function getVId()
     {
-        return $this->vID;
+        return $this->vId;
     }
 
-    public function setVID($vID)
+    public function setVId($vID)
     {
-        $this->vID = $vID;
+        $this->vId = $vID;
 
         return $this;
     }
@@ -118,15 +118,14 @@ class VisitorsEntity extends Entity
         return $this;
     }
 
-    public function getUpdateAt()
+    public function getUpdateAt() : DateTimeInterface
     {
         return $this->updateAt;
     }
 
-    public function setUpdateAt($updateAt)
+    public function setUpdateAt(DateTimeInterface $updateAt) : self
     {
         $this->updateAt = $updateAt;
-
         return $this;
     }
 
@@ -250,13 +249,28 @@ class VisitorsEntity extends Entity
         return $this;
     }
 
-    public function getDate_enreg()
-    {
-        return $this->date_enreg;
-    }
-
-    public function delete(string $field) : void
+    public function delete(?string $field = null) : self
     {
         unset($this->$field);
+        return $this;
+    }
+
+    /**
+     * Get the value of dateEnreg.
+     */
+    public function getDateEnreg() : DateTimeInterface
+    {
+        return $this->dateEnreg;
+    }
+
+    /**
+     * Set the value of dateEnreg.
+     *
+     * @return  self
+     */
+    public function setDateEnreg(DateTimeInterface $dateEnreg) : self
+    {
+        $this->dateEnreg = $dateEnreg;
+        return $this;
     }
 }

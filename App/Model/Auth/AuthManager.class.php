@@ -24,7 +24,7 @@ class AuthManager extends Model
     {
         $session = Container::getInstance()->make(SessionInterface::class);
         if ($session->exists(CURRENT_USER_SESSION_NAME)) {
-            return $session->get(CURRENT_USER_SESSION_NAME)['name'];
+            return $session->get(CURRENT_USER_SESSION_NAME)['first_name'];
         }
         return '';
     }

@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-namespace MagmaCore\Cache\Storage;
-
 class FiveHundredCacheStorage extends AbstractCacheStorage
 {
     use CacheStorageTrait;
@@ -37,10 +35,10 @@ class FiveHundredCacheStorage extends AbstractCacheStorage
         $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($key);
         $value = var_export($value, true);
         // HHVM fails at __set_state, so just use object cast for now
-        $value = str_replace('stdClass::__set_state', '(object)', $val);
+        $value = str_replace('stdClass::__set_state', '(object)', $value);
         // Write to temp file first to ensure atomicity
         $tmp = "/tmp/$key" . uniqid('', true) . '.tmp';
-        file_put_contents($tmp, '<?php $val = ' . $val . ';', LOCK_EX);
+        file_put_contents($tmp, '<?php $val = ' . $value . ';', LOCK_EX);
         rename($tmp, "/tmp/$key");
     }
 
@@ -79,18 +77,18 @@ class FiveHundredCacheStorage extends AbstractCacheStorage
      */
     public function removeCache(string $key): bool
     {
-//        $this->isCacheValidated($key);
-//        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($key);
-//        for ($i = 0; $i < 3; $i++) {
-//            $result = $this->tryRemoveWithLock($cacheEntryPathAndFilename);
-//            if ($result === true) {
-//                clearstatcache(true, $cacheEntryPathAndFilename);
-//                return true;
-//            }
-//            usleep(rand(10, 500));
-//        }
-//
-//        return false;
+        $this->isCacheValidated($key);
+        $cacheEntryPathAndFilename = $this->cacheEntryPathAndFilename($key);
+        for ($i = 0; $i < 3; $i++) {
+            $result = $this->tryRemoveWithLock($cacheEntryPathAndFilename);
+            if ($result === true) {
+                clearstatcache(true, $cacheEntryPathAndFilename);
+                return true;
+            }
+            usleep(rand(10, 500));
+        }
+
+        return false;
     }
 
     /**
@@ -99,7 +97,7 @@ class FiveHundredCacheStorage extends AbstractCacheStorage
      */
     public function flush(): void
     {
-        Files::emptyDirectoryRecursively($this->cacheDirectory);
+        FileSystem::emptyDirectoryRecursively($this->cacheDirectory);
     }
 
     /**

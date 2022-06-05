@@ -51,7 +51,7 @@ class VisitorsManager extends Model
         $query_data = $this->table()
             ->where([
                 'cookies' => $this->cookie->get(VISITOR_COOKIE_NAME),
-                'ipAddress|in' => [[$ip, '2', '3'], 'visitors'],
+                'ip_address|in' => [[$ip, '2', '3'], 'visitors'],
             ])
             ->return('class')
             ->build();
@@ -62,8 +62,7 @@ class VisitorsManager extends Model
     {
         /** @var Model */
         $info = current($m->get_results());
-        $info->assign(array_merge($info->response->transform_keys(!is_array($ipData) ? ['ipAddress' => $ipData] : $ipData, H_visitors::new_IpAPI_keys()), (array) $info));
-        //$info->getQueryParams()->reset();
+        $info->assign(array_merge($info->response->transform_keys(!is_array($ipData) ? ['ip_address' => $ipData] : $ipData, H_visitors::new_IpAPI_keys()), (array) $info));
         if (!$update = $info->update()) {
             throw new BaseRuntimeException('Erreur lors de la mise à jour des données visiteur!');
         }

@@ -89,7 +89,7 @@ class NativeCacheStorage extends AbstractCacheStorage
      */
     public function flush(): void
     {
-        Files::emptyDirectoryRecursively($this->cacheDirectory);
+        FileSystem::emptyDirectoryRecursively($this->cacheDirectory);
     }
 
     /**

@@ -1,16 +1,16 @@
 <!-- Start Header -->
 <header id="header" class="fixed-top">
     <div class="strip d-flex justify-content-between px-4 py-1 bg-light">
-        <?php if (isset($this->settings) && !empty($this->settings)) :?>
+        <?php $settings = $this->getProperty('settings'); if (isset($settings) && !empty($settings)) :?>
         <p class="font-rale font-size-12 text-black-50 m-0">
-            <?=$this->settings->site_address?>
+            <?=$settings->site_address?>
             .
         </p>&nbsp;
-        <p class="font-rale font-size-12 text-black-50 me-auto">Téléphone : <?=$this->settings->site_phone?>
+        <p class="font-rale font-size-12 text-black-50 me-auto">Téléphone : <?=$settings->site_phone?>
         </p>
         <?php endif; ?>
         <div class="font-rale font-size-14 left-side">
-            <?=$this->search_box?>
+            <?=$search_box?>
             <div class="connect">
                 <?php if (!AuthManager::isLoggedIn()) : ?>
                 <button type="button" class="px-3 border-right border-left text-dark connexion text-decoration-none"
@@ -22,7 +22,7 @@
                     <span class="icon login"></span>&nbsp;&nbsp;<?= 'Bonjour&nbsp;' . AuthManager::user(); ?>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <?php $drop = GrantAccess::getInstance()->getMenu('menu_acl')['log_reg_menu']?>
+                    <?php $drop = GrantAccess::getInstance()->getMenu('menu_acl', 'log_reg_menu')?>
                     <?php
                     foreach ($drop as $k => $v) :
                     $active = ($v == H::currentPage()) ? 'active' : ''; ?>
@@ -63,7 +63,8 @@
     <!-- Primary navigation -->
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand" href="/"><img src="../../../../../assets/img/logo1.png" alt="Logo"></a>
+            <a class="navbar-brand" href="<?= $this->route('/')?>"><img src="../../../../../assets/img/logo1.png"
+                    alt="Logo"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main-menu"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="bar"><i class="far fa-bars"></i></span>
@@ -71,7 +72,7 @@
             <div class="collapse navbar-collapse" id="main-menu">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="<?=PROOT . 'home'?>">Home</a>
+                        <a class="nav-link active" aria-current="page" href="<?=DS?>">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="<?=PROOT . 'clothing'?>">Promo</a>

@@ -69,13 +69,11 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
      * ==============================================================.
      * @inheritDoc
      */
-    public function bindParameters(array $fields = [], bool $isSearch = false) : self
+    public function bindParameters(array $fields = [], bool $isSearch = false) : bool|self
     {
-        if ($this->isArray($fields)) {
-            $type = ($isSearch === false) ? $this->bindValues($fields) : $this->biendSearchValues($fields);
-            if ($type) {
-                return $this;
-            }
+        $type = ($isSearch === false) ? $this->bindValues($fields) : $this->biendSearchValues($fields);
+        if ($type) {
+            return $this;
         }
         return false;
     }
@@ -197,7 +195,6 @@ class DataMapper extends AbstractDataMapper implements DataMapperInterface
     {
         try {
             $sql = $this->cleanSql($sql);
-
             return isset($parameters[0]) && $parameters[0] == 'all' ? $this->prepare($sql)->execute() : $this->prepare($sql)->bindParameters($parameters)->execute();
         } catch (Throwable $th) {
             throw $th;

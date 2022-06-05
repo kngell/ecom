@@ -11,8 +11,13 @@ module.exports = {
       dependOn: "js/librairies/frontlib",
     },
     //Ecommerce - Index page js
-    "js/custom/client/home/home": {
-      import: ["js/custom/client/home/index"],
+    "js/custom/client/brand/phones/home/home": {
+      import: ["js/custom/client/brand/phones/home/index"],
+      dependOn: "js/librairies/frontlib",
+    },
+    //Ecommerce - Verify user account
+    "js/custom/client/users/account/verify": {
+      import: ["js/custom/client/users/account/verify"],
       dependOn: "js/librairies/frontlib",
     },
     //Ecommerce - Validate user account

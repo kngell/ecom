@@ -1,4 +1,3 @@
-import { get_visitors_data, send_visitors_data } from "corejs/visitors";
 import log_reg from "corejs/logregloader";
 import "focus-within-polyfill";
 import select2 from "corejs/select2_manager";
@@ -18,7 +17,7 @@ class HomePlugin {
     this.navigation = this.element.find(".navigation");
     this.wrapper = this.element.find(".tab-content");
   };
-  _setupEvents = (event) => {
+  _setupEvents = (e) => {
     var phpPlugin = this;
     /**
      * Login and Register
@@ -36,22 +35,6 @@ class HomePlugin {
       }
     );
 
-    /**
-     * Get Visitors data
-     */
-    let visitor = get_visitors_data(event).then((visitors_data) => {
-      var data = {
-        url: "visitors",
-        table: "visitors",
-        ip: visitors_data.ip,
-      };
-      send_visitors_data(data, (response) => {
-        console.log(response);
-      });
-    });
-    //=======================================================================
-    //Ajax Select2
-    //=======================================================================
     //Activate select2 box for contries
     const select = new select2();
     const csrftoken = document.querySelector('meta[name="csrftoken"]');
@@ -62,13 +45,28 @@ class HomePlugin {
       csrftoken: csrftoken ? csrftoken.getAttribute("content") : "",
       frm_name: "all_product_page",
     });
-
-    // window.onbeforeunload = function () {
-    //   websocket.onclose = function () {}; // disable onclose handler first
-    //   websocket.close();
-    // };
   };
 }
 document.addEventListener("DOMContentLoaded", function (e) {
   new HomePlugin($("#body"))._init(e);
+  (function () {
+    if (typeof EventTarget !== "undefined") {
+      let supportsPassive = false;
+      try {
+        // Test via a getter in the options object to see if the passive property is accessed
+        const opts = Object.defineProperty({}, "passive", {
+          get: () => {
+            supportsPassive = true;
+          },
+        });
+        window.addEventListener("testPassive", null, opts);
+        window.removeEventListener("testPassive", null, opts);
+      } catch (e) {}
+      const func = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function (type, fn) {
+        this.func = func;
+        this.func(type, fn, supportsPassive ? { passive: false } : false);
+      };
+    }
+  })();
 });

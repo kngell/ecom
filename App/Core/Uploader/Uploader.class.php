@@ -12,13 +12,13 @@ class Uploader implements UploaderInterface
     {
         if ($this->fm->validate()) {
             $en = $this->model->getEntity();
-            if ((new ReflectionProperty($en, $en->getField('media')))->isInitialized($en)) {
+            if ((new ReflectionProperty($en, $en->getFieldWithDoc('media')))->isInitialized($en)) {
                 $incommingPath = $this->fm->getDestinationPath() . DS . $this->fm->getFileName();
                 if (file_exists($incommingPath)) {
-                    if ($incommingPath == $en->{$en->getField('media')}) {
+                    if ($incommingPath == $en->{$en->getFieldWithDoc('media')}) {
                         return $this->model;
                     } else {
-                        $this->model->getEntity()->{'set' . ucfirst($this->model->getEntity()->getField('media'))}(serialize([$incommingPath]));
+                        $this->model->getEntity()->{'set' . ucfirst($this->model->getEntity()->getFieldWithDoc('media'))}(serialize([$incommingPath]));
                         return $this->model;
                     }
                 }

@@ -20,7 +20,7 @@ class RegisterUserManager extends Model
             /** @var UsersEntity */
             $entity = $this->getEntity()->assign([
                 'salt' => $this->getUniqueId('salt'),
-                'user_cookie' => $this->cookie->get(VISITOR_COOKIE_NAME),
+                'userCookie' => $this->cookie->get(VISITOR_COOKIE_NAME),
             ]);
             $entity->setPassword(password_hash($entity->getPassword(), PASSWORD_DEFAULT));
             $entity->delete('terms')->delete('cpassword');

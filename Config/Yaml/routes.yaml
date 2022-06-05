@@ -2,79 +2,81 @@ get: # Http Get ===========================================
   /:
     controller: home
     method: index
-    namespace: Client
-
+    namespace: Client/brand/phones
   home:
     controller: home
     method: index
-    namespace: Client
-
+    namespace: Client/brand/phones
+  comments:
+    controller: comments
+    method: showComment
+    namespace: Client/brand/phones
+  votes:
+    controller: comments
+    method: votes
+    namespace: Client/brand/phones
   learn:
     controller: learning
     method: index
     namespace: Client
-
   login:
     controller: security
     method: login
-    namespace: Client
-
+    namespace: Client/brand/phones
   verify_email:
-    controller: verify_user_account
+    controller: user_account
     method: index
-    namespace: Client
-
+    namespace: Client/brand/phones
   assets:
     controller: assets
     method: get_asset
-    namespace: Client
-
+    namespace: Client/brand/phones
+  validate_account:
+    controller: user_account
+    method: validate
+    namespace: Client/brand/phones
   email:
     controller: emailing
     method: email
-    namespace: Client
-
+    namespace: Client/brand/phones
+  product:
+    controller: product
+    method: single
+    namespace: Client/brand/phones
   admin/{controller}/{method}:
     namespace: Admin
-
   admin/{controller}/{method}/{id:[\da-f]+}:
     namespace: Admin
-
   client/{controller}/{method}:
-    namespace: Admin
-
+    namespace: Client
   client/{controller}/{method}/{id:[\da-f]+}:
-    namespace: Admin
+    namespace: Client
 
 post: # Http Post method =========================================================
   visitors:
     controller: visitors
     method: track
-
   ajaxLogin:
     controller: login_user_with_ajax
     method: index
-
   ajaxlogout:
     controller: logout_user_with_ajax
     method: index
-
   ajaxRegister:
     controller: register_user_with_ajax
     method: index
-
   forgotPassword:
     controller: forgot_password_ajax
     method: index
-
   verify:
-    controller: verify_user_account
+    controller: user_account
     method: verify
-
   remember_me:
-    controller: auth
-    method: remember_check
-
+    controller: login_user_with_ajax
+    method: rememberMeCheck
+  comments:
+    controller: comments
+    method: newComment
   activation/activate/{token:[\da-f]+}:
     controller: activate_user_with_ajax
     method: activate

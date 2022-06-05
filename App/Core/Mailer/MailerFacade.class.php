@@ -9,7 +9,7 @@ class MailerFacade
     /** @var object */
     protected object $mailer;
 
-    public function __construct(?array $settings = null)
+    public function __construct(?array $settings)
     {
         $this->mailer = Container::getInstance()->make(MailerFactory::class, [
             'settings' => $settings,
@@ -34,5 +34,13 @@ class MailerFacade
             ->address($to)
             ->body($message)
             ->send();
+    }
+
+    public function charset(?string $hset = null) : self
+    {
+        if (null !== $hset) {
+            $this->mailer->charset($hset);
+        }
+        return $this;
     }
 }

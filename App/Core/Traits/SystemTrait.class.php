@@ -17,7 +17,7 @@ trait SystemTrait
             throw new BaseLogicException('Please enable session within session.yaml configuration');
         }
         if ($useSessionGlobals == true) {
-            GlobalsManager::set('global_session', $session);
+            GlobalManager::set('global_session', $session);
         } else {
             return $session;
         }

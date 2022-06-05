@@ -51,7 +51,7 @@
   "require-dev": {
     "symfony/var-dumper": "^6.0",
     "phpunit/phpunit": "^9.5",
-    "friendsofphp/php-cs-fixer": "^3.4",
+    "friendsofphp/php-cs-fixer": "^3.8",
     "symfony/dotenv": "^6.0"
   },
   "autoload": {

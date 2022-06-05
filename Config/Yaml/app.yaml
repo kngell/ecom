@@ -76,7 +76,7 @@ cache:
   use_cache: true
   storage: file
   key: auto
-  cache_path: /Storage/cache/
+  cache_path: /Storage/Cache/
   cache_expires: 3600
   default_driver: native_storage
   drivers:
